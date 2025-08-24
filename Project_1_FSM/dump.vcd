@@ -1,0 +1,24 @@
+$date
+	Sun Aug 24 14:10:16 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ns
+$end
+$scope module tb_count $end
+$var reg 1 ! clk $end
+$var reg 1 " rst $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+0"
+0!
+$end
+#5
+1!

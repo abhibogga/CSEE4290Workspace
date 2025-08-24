@@ -1,6 +1,6 @@
 `timescale 1ns/1ns
 
-module tb_count() begin 
+module tb_count();  
 
     //Define inputs as reg
     reg clk; 
@@ -10,22 +10,29 @@ module tb_count() begin
     //Define outputs as wire
     wire [2:0] count; 
 
+    //Define moudle
+    Count counter(
+        .clk(clk), 
+        .rst(rst), 
+        .
+    );
+
     //Define clk
 
     always begin 
         clk = 0; 
-        #5
+        #5;
         clk = 1; 
-        #5
+        #5;
     end
 
-    initial begin 
-        $dumpvars(0, tb_count)
 
-        #200 
+
+    initial begin 
+        $dumpvars(0, tb_count);
 
         rst = 0; 
-        #500
+        repeat (200) @(posedge clk)
 
         $finish; 
     end

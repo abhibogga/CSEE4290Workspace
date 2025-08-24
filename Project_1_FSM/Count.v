@@ -51,11 +51,13 @@ module (clk, rst, count);
                         end else begin
                             seven_counter = 0; 
                             three_counter = three_counter + 1;
+                        end 
                     else begin 
                         state_next = s_idle; 
                         isDone = 1; 
                     end
-                         
+                    end 
+                end   
             end
 
             default begin 
