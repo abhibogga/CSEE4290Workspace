@@ -1,5 +1,5 @@
 `timescale 1ns/1ns
-
+`include "Count.v"
 module tb_count();  
 
     //Define inputs as reg
@@ -14,7 +14,7 @@ module tb_count();
     Count counter(
         .clk(clk), 
         .rst(rst), 
-        .
+        .count(count)
     );
 
     //Define clk
@@ -32,7 +32,7 @@ module tb_count();
         $dumpvars(0, tb_count);
 
         rst = 0; 
-        repeat (200) @(posedge clk)
+        repeat (200) @(posedge clk);
 
         $finish; 
     end
