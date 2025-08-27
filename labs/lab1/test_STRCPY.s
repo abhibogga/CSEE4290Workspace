@@ -1,21 +1,22 @@
 .global _start
 .text
 _start:
-    MOVZ x0, #0x50      
-    MOVZ x1, #0x13C
-    MOVZ x5, #0x66 //The # means that its a literal value, not a label
+    //place move instructions here
+    MOVZ	X0, #0x0050
+    MOVZ	X1, #0x013C
+    MOVZ	X5, #0x65
+    MOVZ	X6, #0x66
 
-    //Store Unsigned Byte [Register, address offset]
+    // store values in memory
     STURB W5, [X0]
-	STURB W6, [X0, #1]
-    STURB WZR, [X0, #2] 
+    STURB W6, [X0, #1]
+    STURB WZR, [X0, #2]
 
-    LDURB  W2, [X0]  // Load byte into X2 from memory pointed to by X0 (*src)
-    ADD X0, X0, #1 // Increment src pointer
-    STURB  W2, [X1]  // Store byte in X2 into memory pointed to by X2 (*dst)
-    ADD  X1, X1, #1     // Increment dst pointer
+//strcpy operation
+_strcpyloop: 
+    LDRB  W2, [X0, #1]  // Load byte into X2 from memory pointed to by X0 (*src)
+    STRB W2, [X1, #1]  // Store byte in X2 into memory pointed to by X2 (*dst)
     CMP   X2, #0         // Was the byte 0? 
     BNE   _strcpyloop    // If not, repeat the _strcpyloop
-    
 
-    YIELD
+YIELD
