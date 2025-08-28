@@ -1,0 +1,32 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Thu Aug 28 01:17:53 2025
+[*]
+[dumpfile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/Lab1/Educore-SingleCycle/dump.lx2"
+[dumpfile_mtime] "Wed Aug 27 20:41:58 2025"
+[dumpfile_size] 2920
+[savefile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/Lab1/Educore-SingleCycle/gtkwave_file.gtkw"
+[timestart] 0
+[size] 1854 1001
+[pos] -38 -38
+*-7.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 278
+[signals_width] 238
+[sst_expanded] 1
+[sst_vpaned_height] 297
+@28
+test_Educore.core_clk[0]
+test_Educore.mem_clk[0]
+test_Educore.nreset[0]
+test_Educore.instruction_memory_en[0]
+@22
+test_Educore.instruction_memory_a[63:0]
+test_Educore.instruction_memory_v[31:0]
+@28
+test_Educore.data_memory_write[0]
+@22
+test_Educore.data_memory_out_v[63:0]
+test_Educore.data_memory_a[63:0]
+test_Educore.error_indicator[3:0]
+[pattern_trace] 1
+[pattern_trace] 0
