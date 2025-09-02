@@ -1,0 +1,34 @@
+$date
+	Tue Aug 19 13:21:03 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module gettingStarted $end
+$var reg 1 ! clk $end
+$var reg 4 " fifo [3:0] $end
+$var reg 1 # in $end
+$var reg 8 $ m0 [7:0] $end
+$var reg 8 % m1 [7:0] $end
+$var reg 8 & m2 [7:0] $end
+$var reg 8 ' m3 [7:0] $end
+$var reg 1 ( out $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#5
+$dumpvars
+0(
+b10101011 '
+b11101111 &
+b11001101 %
+b10101011 $
+1#
+b1 "
+1!
+$end
