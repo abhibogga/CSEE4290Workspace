@@ -27,47 +27,47 @@ module Count(clk, rst, count);
         case (state)
             s_idle: begin
                 if (rst == 1) begin 
-                    state_next = s_idle; 
+                    state_next <= s_idle; 
                 end else if (rst == 0 && isDone == 0) begin
-                    state_next = s_count; 
-                    seven_counter = 0; 
-                    three_counter = 0; //Possibly look at this
+                    state_next <= s_count; 
+                    seven_counter <= 0; 
+                    three_counter <= 0; //Possibly look at this
             
                 end else begin
-                    state_next = s_idle;
+                    state_next <= s_idle;
                 end
 
             end
 
         s_count: begin 
             if (rst == 1) begin 
-                state_next = s_idle; 
+                state_next <= s_idle; 
             end else if (rst == 0) begin
                 
                 count = seven_counter; 
 
                 if (three_counter < 3) begin 
                     if (seven_counter < 7) begin 
-                        seven_counter = seven_counter + 1;
-                        state_next = s_count;
+                        seven_counter <= seven_counter + 1;
+                        state_next <= s_count;
                     end else begin
-                        seven_counter = 0; 
-                        three_counter = three_counter + 1;
-                        state_next = s_count;
+                        seven_counter <= 0; 
+                        three_counter <= three_counter + 1;
+                        state_next <= s_count;
                     end
                 end else begin 
-                    count = 7; 
-                    state_next = s_idle; 
-                    isDone = 1; 
+                    count <= 7; 
+                    state_next <= s_idle; 
+                    isDone <= 1; 
                 end
             end
         end
 
 
-            default begin 
-                state_next = s_idle; 
-                isDone = 0; 
-            end
+        default begin 
+            state_next <= s_idle; 
+            isDone <= 0; 
+        end
         endcase 
 
     end 
