@@ -32,7 +32,7 @@ module Count(clk, rst, count);
                     state_next = s_count; 
                     seven_counter = 0; 
                     three_counter = 0; //Possibly look at this
-            
+		    count = 0;            
                 end else begin
                     state_next = s_idle;
                 end
