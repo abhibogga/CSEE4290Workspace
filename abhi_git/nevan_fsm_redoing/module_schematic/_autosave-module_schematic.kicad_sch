@@ -1,0 +1,116 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "1006145d-62c3-4cb7-b895-73e7d8a79066")
+	(paper "A4")
+	(lib_symbols)
+	(rectangle
+		(start 125.73 77.47)
+		(end 142.24 92.71)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid 2d56c7e8-36ac-49fe-bcdf-c9119c694302)
+	)
+	(text "RESET"
+		(exclude_from_sim no)
+		(at 118.618 80.264 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "20543c22-7e7e-439a-9e1b-f51466bf4aa3")
+	)
+	(text "CLOCK"
+		(exclude_from_sim no)
+		(at 118.872 87.884 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "70c9fd89-fbdb-426e-b256-3016aba59c0b")
+	)
+	(text "COUNT"
+		(exclude_from_sim no)
+		(at 146.812 83.058 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "bd660c00-1bbe-4fb8-8057-7cf9e64a2d98")
+	)
+	(text "MODULE"
+		(exclude_from_sim no)
+		(at 129.54 76.708 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "c30bfa08-86c4-4266-a5ff-06d0e6db4719")
+	)
+	(text_box "COUNTER"
+		(exclude_from_sim no)
+		(at 128.27 82.55 0)
+		(size 11.43 3.81)
+		(margins 0.9525 0.9525 0.9525 0.9525)
+		(stroke
+			(width 0)
+			(type solid)
+		)
+		(fill
+			(type none)
+		)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "f8ad4c05-375d-4858-84ec-3fffb2dc230b")
+	)
+	(polyline
+		(pts
+			(xy 114.3 81.28) (xy 125.73 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1314c5fe-3570-4b38-bea8-e97ce54ba365")
+	)
+	(polyline
+		(pts
+			(xy 114.3 88.9) (xy 125.73 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "556bf016-9852-44e8-b584-19990006b076")
+	)
+	(polyline
+		(pts
+			(xy 142.24 83.82) (xy 151.13 83.82)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "60337210-c9ba-461a-9355-1e3fcbabcacf")
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

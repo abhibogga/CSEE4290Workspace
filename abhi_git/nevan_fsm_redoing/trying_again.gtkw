@@ -1,0 +1,24 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Wed Sep  3 20:05:02 2025
+[*]
+[dumpfile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/abhi_git/nevan_fsm_redoing/dump.vcd"
+[dumpfile_mtime] "Wed Sep  3 19:58:13 2025"
+[dumpfile_size] 1978
+[savefile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/abhi_git/nevan_fsm_redoing/trying_again.gtkw"
+[timestart] 0
+[size] 1854 1001
+[pos] -101 -101
+*-4.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] tb_count.
+[sst_width] 278
+[signals_width] 110
+[sst_expanded] 1
+[sst_vpaned_height] 297
+@28
+tb_count.clk
+tb_count.rst
+@29
+tb_count.count[2:0]
+[pattern_trace] 1
+[pattern_trace] 0

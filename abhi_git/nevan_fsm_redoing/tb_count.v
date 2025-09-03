@@ -12,9 +12,9 @@ module tb_count();
 
     //Define moudle
     Count counter(
-        .clk(clk), 
-        .rst(rst), 
-        .count(count)
+        clk, 
+        rst, 
+        count
     );
 
     //Define clk
@@ -36,7 +36,7 @@ module tb_count();
 				   //see if it waits the right amount of time
 
 	rst = 0;
-	repeat (12) @(posedge clk); //see if it counts to 7 then 3
+	repeat (10) @(posedge clk); //see if it counts to 7 then 3
 
 	rst = 1;
 	repeat (2) @(posedge clk); //interrupt counting with 

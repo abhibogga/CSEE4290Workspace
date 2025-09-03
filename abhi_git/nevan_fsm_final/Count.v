@@ -28,6 +28,7 @@ module Count(clk, rst, count);
             s_idle: begin
                 if (rst == 1) begin 
                     state_next = s_idle; 
+		    count = 0;
                 end else if (rst == 0 && isDone == 0) begin
                     state_next = s_count; 
                     seven_counter = 0; 
@@ -41,9 +42,9 @@ module Count(clk, rst, count);
 
         s_count: begin 
             if (rst == 1) begin 
-                state_next = s_idle; 
+                state_next = s_idle;
+		count = 0; 
             end else if (rst == 0) begin
-                
                 count = seven_counter; 
 
                 if (three_counter < 3) begin 
