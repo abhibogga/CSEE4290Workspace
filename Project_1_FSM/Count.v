@@ -64,10 +64,10 @@ module Count(clk, rst, count);
         end
 
 
-            default begin 
-                state_next = s_idle; 
-                isDone = 0; 
-            end
+        default begin 
+            state_next = s_idle; 
+            isDone = 0; 
+        end
         endcase 
 
     end 
