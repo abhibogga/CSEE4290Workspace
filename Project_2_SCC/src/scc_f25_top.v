@@ -43,6 +43,12 @@ Instruction_and_data iFetch (
     .data_memory_in_v(data_memory_in_v)
 );
 
+InstructionDecoder iDecoder (
+    .clk(clk) //Clk
+
+    
+);
+
 
 
 
