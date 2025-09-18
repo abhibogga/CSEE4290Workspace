@@ -1,0 +1,168 @@
+$date
+	Thu Sep 18 16:42:24 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module sep_18_checkpoint $end
+$var wire 1 ! halt_f $end
+$var wire 32 " instruction_memory_v [31:0] $end
+$var wire 2 # err_bits [1:0] $end
+$var wire 32 $ data_memory_in_v [31:0] $end
+$var reg 1 % clk $end
+$var reg 1 & clk_en $end
+$var reg 1 ' rst $end
+$scope module topMod $end
+$var wire 1 % clk $end
+$var wire 1 & clk_en $end
+$var wire 32 ( dataFetch [31:0] $end
+$var wire 1 ! halt_f $end
+$var wire 32 ) programCounter [31:0] $end
+$var wire 1 * readBit $end
+$var wire 1 ' rst $end
+$var wire 1 + writeBit $end
+$var wire 32 , instruction_memory_v [31:0] $end
+$var wire 32 - instruction [31:0] $end
+$var wire 2 . err_bits [1:0] $end
+$var wire 32 / data_memory_in_v [31:0] $end
+$var wire 32 0 dataIn [31:0] $end
+$scope module iFetch $end
+$var wire 32 1 data_memory_a [31:0] $end
+$var wire 32 2 data_memory_out_v [31:0] $end
+$var wire 1 * data_memory_read $end
+$var wire 1 + data_memory_write $end
+$var wire 1 ! halt_f $end
+$var wire 32 3 instruction_memory_a [31:0] $end
+$var wire 1 4 instruction_memory_en $end
+$var wire 1 % mem_Clk $end
+$var reg 8 5 a [7:0] $end
+$var reg 8 6 b [7:0] $end
+$var reg 8 7 c [7:0] $end
+$var reg 8 8 d [7:0] $end
+$var reg 32 9 data_memory_in_v [31:0] $end
+$var reg 32 : instruction_memory_v [31:0] $end
+$var integer 32 ; fd [31:0] $end
+$var integer 32 < i [31:0] $end
+$upscope $end
+$scope module scc $end
+$var wire 1 % clk $end
+$var wire 1 & clk_en $end
+$var wire 32 = dataIn [31:0] $end
+$var wire 32 > instruction [31:0] $end
+$var wire 1 ? rst $end
+$var reg 32 @ data_memory_v [31:0] $end
+$var reg 2 A err_bits [1:0] $end
+$var reg 32 B instruction_memory_v [31:0] $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+bx B
+bx A
+bx @
+z?
+bx >
+bx =
+bx <
+bx ;
+bx :
+bx 9
+bx 8
+bx 7
+bx 6
+bx 5
+14
+bz 3
+bz 2
+bz 1
+bx 0
+bx /
+bx .
+bx -
+bx ,
+z+
+z*
+bz )
+bz (
+0'
+1&
+1%
+bx $
+bx #
+bx "
+z!
+$end
+#5
+0%
+#10
+1%
+#15
+0%
+#20
+1%
+#25
+0%
+#30
+1'
+1%
+#35
+0%
+#40
+1%
+#45
+0%
+#50
+1%
+#55
+0%
+#60
+0'
+1%
+#65
+0%
+#70
+1%
+#75
+0%
+#80
+1%
+#85
+0%
+#90
+1%
+#95
+0%
+#100
+1%
+#105
+0%
+#110
+1%
+#115
+0%
+#120
+1%
+#125
+0%
+#130
+1%
+#135
+0%
+#140
+1%
+#145
+0%
+#150
+1%
+#155
+0%
+#160
+1%

@@ -6,14 +6,13 @@ module scc
 	input         clk_en, // Clock enable
 	input         rst, // Active low reset
 	input  [31:0] instruction, // Instruction memory read value
-	input  [63:0] dataIn,     // Data memory read value
+	input  [31:0] dataIn,     // Data memory read value
 
-	output  [3:0] err_bits,
-	output [31:0] instruction_memory_a, // Instruction memory address
-	output        instruction_memory_en,// Instruction memory read enable
-	output [63:0] data_memory_a,        // Data memory address
-	output [63:0] data_memory_out_v,    // Data memory write value
-	output  [1:0] data_memory_s,        // Data memory read/write size
+	output  reg [1:0] err_bits,
+	output reg [31:0] instruction_memory_v, // Instruction memory address
+	
+	output reg [31:0] data_memory_v      // Data memory address
+	
 );
 
 /******************************************************************************/
