@@ -1,5 +1,3 @@
-
-
 module scc
 (
 	input         clk,    // Core clock

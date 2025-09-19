@@ -35,6 +35,8 @@ wire [31:0] dataFetch;
 wire [31:0] instruction; 
 wire [31:0] dataIn; 
 
+wire [31:0] instruction_fetched_IF;
+reg [63:0] regfile;
 //Initialize modules: 
 Instruction_and_data iFetch (
     .mem_Clk(clk), //Clk
