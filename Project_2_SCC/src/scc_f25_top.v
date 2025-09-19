@@ -36,7 +36,7 @@ wire [31:0] instruction;
 wire [31:0] dataIn; 
 
 //Initialize modules: 
-Instruction_and_data iFetch (
+Instruction_and_data memMod (
     .mem_Clk(clk), //Clk
     .halt_f(halt_f), //Checks to see if halt has been found, if so stop searching for mem
     .instruction_memory_en(1'b1), //Instruction enable, this says do we need to fetch a instrction on the neg edge
