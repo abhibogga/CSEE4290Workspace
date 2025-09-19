@@ -1,4 +1,4 @@
-`timescale 1ps/1ps
+`timescale 1ns/1ns
 `include "scc_f25_top.v"
 module sep_18_checkpoint();
 

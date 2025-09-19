@@ -1,0 +1,47 @@
+[*]
+[*] GTKWave Analyzer v3.3.48 (w)1999-2013 BSI
+[*] Fri Sep 19 14:05:34 2025
+[*]
+[dumpfile] "C:\Users\elija\Repos\CSEE4290Workspace\Project_2_SCC\src\dump.vcd"
+[dumpfile_mtime] "Fri Sep 19 14:03:48 2025"
+[dumpfile_size] 2391
+[savefile] "C:\Users\elija\Repos\CSEE4290Workspace\Project_2_SCC\src\Waveform"
+[timestart] 0
+[size] 1920 1009
+[pos] -191 -191
+*-4.337243 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] sep_18_checkpoint.
+[treeopen] sep_18_checkpoint.topMod.
+[sst_width] 263
+[signals_width] 238
+[sst_expanded] 1
+[sst_vpaned_height] 577
+@28
+sep_18_checkpoint.clk
+@200
+-
+@28
+sep_18_checkpoint.rst
+@200
+-
+@28
+sep_18_checkpoint.clk_en
+@200
+-
+-
+@28
+sep_18_checkpoint.topMod.iFetch.halt_f
+@200
+-
+@28
+sep_18_checkpoint.topMod.scc.err_bits[1:0]
+@200
+-
+@22
+sep_18_checkpoint.topMod.scc.instruction_memory_v[31:0]
+@200
+-
+@23
+sep_18_checkpoint.topMod.scc.data_memory_v[31:0]
+[pattern_trace] 1
+[pattern_trace] 0
