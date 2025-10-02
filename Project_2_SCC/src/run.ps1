@@ -1,4 +1,4 @@
-iverilog -o test .\testbenches\sep_18_checkpoint.v
+iverilog -o test .\testbenches\oct_3_checkpoint.v
 
 vvp .\test
 

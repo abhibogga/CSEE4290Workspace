@@ -50,12 +50,15 @@ Instruction_and_data memMod (
 
 scc scc(
     .clk(clk), 
-    .clk_en(clk_en), 
+    .clk_en(clk_en),
+    .rst(rst), 
     .instruction(instruction), 
     .dataIn(dataIn), 
     .err_bits(err_bits), 
     .instruction_memory_v(instruction_memory_v),
-    .data_memory_v(data_memory_in_v)
+    .data_memory_v(data_memory_in_v), 
+    .programCounter(programCounter) 
+
 ); 
 
 
