@@ -1,0 +1,2 @@
+	mov R0,#0x1
+	halt

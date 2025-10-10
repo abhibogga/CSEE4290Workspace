@@ -1,5 +1,8 @@
 module execute(dataRegisterImm, dest_reg, imm, dest_reg_value);
 
+
+
+
 	input reg dataRegisterImm;
 	input reg [15:0] imm;
 	output reg [3:0] dest_reg;
