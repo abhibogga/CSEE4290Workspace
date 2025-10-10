@@ -1,6 +1,9 @@
 
 `include "iFetch.v"
 `include "iDecode.v"
+`include "execute.v"
+`include "mem.v"
+`include "register.v"
 
 module scc
 (
@@ -20,21 +23,25 @@ module scc
     //Outputs to talk to instruction_and_data.v
     output wire writeFlag, 
     output wire [31:0] dataOut, 
-    output wire [31:0] addressIn 
+    output wire [31:0] addressIn, 
+    output wire halt
+
 
 	
 );
 
 
-//Lets intialize IF module
-wire [31:0] instrcutionForID; 
-iFetch IF (
-	.clk(clk), 
-	.rst(rst), 
-	.fetchedInstruction(instruction), 
-	.programCounter(programCounter), 
-	.filteredInstruction(instrcutionForID)
-);
+    //Lets intialize IF module
+    wire [31:0] instrcutionForID; 
+    iFetch IF (
+        .clk(clk), 
+        .rst(rst), 
+        .fetchedInstruction(instruction), 
+        .programCounter(programCounter), 
+        .filteredInstruction(instrcutionForID), 
+        .exeOverride(exeOverride),
+        .exeData(exeData)
+    );
 
 
 	//Decode Inputs/Outputs
@@ -52,6 +59,8 @@ iFetch IF (
     wire [3:0]  out_sourceSecReg;
     wire [15:0] out_imm;
     wire [3:0] branchInstruction; 
+    wire [1:0] firstLevelDecode; 
+    wire [3:0] secondLevelDecode; 
 
     //Init module
     iDecode ID (
@@ -71,8 +80,106 @@ iFetch IF (
         .out_sourceFirstReg(out_sourceFirstReg),
         .out_sourceSecReg(out_sourceSecReg),
         .out_imm(out_imm), 
-        .branchInstruction(branchInstruction)
+        .branchInstruction(branchInstruction), 
+        .firstLevelDecode_out(firstLevelDecode), 
+        .secondLevelDecode_out(secondLevelDecode), 
+        .halt(halt)
     );
+
+
+//Exe wires
+wire [3:0] exe_readRegDest;
+wire [3:0] exe_readRegFirst;
+wire [3:0] exe_readRegSec;
+wire [31:0] exe_writeData;
+wire        exe_writeToReg;
+wire        exeOverride;
+wire [15:0] exeData;
+
+// Memory interface outputs
+wire [31:0] exe_memoryDataOut;
+wire [31:0] exe_memoryAddressOut;
+wire        exe_memoryWrite;
+
+//Register File Reads
+wire [31:0] readDataDest; 
+wire [31:0] readDataFirst;
+wire [31:0] readDataSec;
+
+execute exe (
+    .clk(clk),
+    .rst(rst),
+
+    // Control inputs from Decode
+    .firstLevelDecode(firstLevelDecode),
+    .specialEncoding(specialEncoding),
+    .secondLevelDecode(secondLevelDecode),
+    .aluFunctions(aluFunction),
+    .branchInstruction(branchInstruction),
+    .imm(out_imm),
+    .destReg(out_destRegister),
+    .sourceFirstReg(out_sourceFirstReg),
+    .sourceSecReg(out_sourceSecReg),
+    .setFlags(setFlags),
+
+    // Register file read values
+    .readDataDest(readDataDest),
+    .readDataFirst(readDataFirst),
+    .readDataSec(readDataSec),
+
+    // Register file control outputs
+    .readRegDest(exe_readRegDest),
+    .readRegFirst(exe_readRegFirst),
+    .readRegSec(exe_readRegSec),
+    .writeData(exe_writeData),
+    .writeToReg(exe_writeToReg),
+
+    // Branch control (to IF)
+    .exeOverride(exeOverride),
+    .exeData(exeData),
+
+    // Memory interface (to instruction_and_data)
+    .memoryDataOut(exe_memoryDataOut),
+    .memoryAddressOut(exe_memoryAddressOut),
+    .memoryWrite(exe_memoryWrite)
+);
+
+
+register REGFILE (
+    .clk(clk),
+    .rst(rst),
+
+    // Register addresses
+    .rd(exe_readRegDest),     // destination register index (from EXE or Decode)
+    .rs1(exe_readRegFirst),   // source register 1 (from EXE or Decode)
+    .rs2(exe_readRegSec),     // source register 2 (from EXE or Decode)
+
+    // Write-back control
+    .write(exe_writeToReg),   // enable write (from EXE)
+    .writeData(exe_writeData),// data to write back into rd
+
+    // Read outputs
+    .out_rd(readDataDest),
+    .out_rs1(readDataFirst),
+    .out_rs2(readDataSec)
+);
+
+
+mem MEM (
+    .clk(clk),
+    .rst(rst),
+
+    // Inputs from Execute
+    .writeIn(exe_memoryWrite),
+    .addressIn(exe_memoryAddressOut),
+    .dataIn(exe_memoryDataOut),
+
+    // Outputs to memory module (instruction_and_data.v)
+    .dataOut(dataOut),
+    .addressOut(addressIn),
+    .writeFlag(writeFlag)
+);
+
 
 
 
