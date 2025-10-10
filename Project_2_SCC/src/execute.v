@@ -6,7 +6,7 @@ module execute(
     input [3:0] secondLevelDecode, 
     input [2:0] aluFunctions, 
     input [3:0] branchInstruction
-)
+);
 
 
     //Define extra registers here
