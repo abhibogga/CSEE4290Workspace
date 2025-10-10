@@ -1,4 +1,4 @@
-module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegisterImm, specialEncoding, setFlags, aluFunction, regWrite, regRead, out_destRegister, out_sourceFirstReg, out_sourceSecReg, out_imm); 
+module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegisterImm, specialEncoding, setFlags, aluFunction, regWrite, regRead, out_destRegister, out_sourceFirstReg, out_sourceSecReg, out_imm, firstLevelDecode_out, secondLevelDecode_out, branchInstruction); 
 
     //Define inputs here
     input [31:0] instruction; 
@@ -22,6 +22,8 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
     output reg [3:0] out_sourceFirstReg; 
     output reg [3:0] out_sourceSecReg;
     output reg [15:0] out_imm; 
+    output reg [1:0] firstLevelDecode_out; 
+    output reg [3:0] secondLevelDecode_out; 
     
 
 
@@ -40,7 +42,7 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
     //Assign Registers
     assign firstLevelDecode = instruction[31:30]; 
     assign specialBit = instruction[29]; 
-    assign secondLevelDecode = instruction[28];
+    assign secondLevelDecode = instruction[28:25];
     assign aluOperationCommands = instruction[27:25];
     assign branchCondition = instruction[24:21]; 
     assign destReg = instruction[24:21]; 
@@ -68,6 +70,7 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
                     out_sourceSecReg = sourceSecReg; 
 
                     branchInstruction = branchCondition; 
+                    
                 end
 
                 //Load/Store
@@ -133,6 +136,7 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
             endcase
 
             case (secondLevelDecode)
+                
                 1'b1: begin 
                     setFlags = 1; 
                 end
@@ -141,7 +145,10 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
                     setFlags = 0; 
                 end
             endcase
-
+            
+            out_imm = imm;
+            firstLevelDecode_out = firstLevelDecode; 
+            secondLevelDecode_out = secondLevelDecode;
             aluFunction = aluOperationCommands; 
 
     end

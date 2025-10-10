@@ -6,7 +6,7 @@ module mem(
     input [31:0] dataIn, 
     output wire [31:0] dataOut,
     output wire [31:0] addressOut,
-    output writeFlag; 
+    output writeFlag
 ); 
 
 
