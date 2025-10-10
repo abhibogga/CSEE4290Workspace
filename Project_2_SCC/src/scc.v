@@ -23,7 +23,9 @@ module scc
     //Outputs to talk to instruction_and_data.v
     output wire writeFlag, 
     output wire [31:0] dataOut, 
-    output wire [31:0] addressIn 
+    output wire [31:0] addressIn, 
+    output wire halt
+
 
 	
 );
@@ -80,7 +82,8 @@ module scc
         .out_imm(out_imm), 
         .branchInstruction(branchInstruction), 
         .firstLevelDecode_out(firstLevelDecode), 
-        .secondLevelDecode_out(secondLevelDecode)
+        .secondLevelDecode_out(secondLevelDecode), 
+        .halt(halt)
     );
 
 

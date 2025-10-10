@@ -1,4 +1,4 @@
-module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegisterImm, specialEncoding, setFlags, aluFunction, regWrite, regRead, out_destRegister, out_sourceFirstReg, out_sourceSecReg, out_imm, firstLevelDecode_out, secondLevelDecode_out, branchInstruction); 
+module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegisterImm, specialEncoding, setFlags, aluFunction, regWrite, regRead, out_destRegister, out_sourceFirstReg, out_sourceSecReg, out_imm, firstLevelDecode_out, secondLevelDecode_out, branchInstruction, halt); 
 
     //Define inputs here
     input [31:0] instruction; 
@@ -23,7 +23,8 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
     output reg [3:0] out_sourceSecReg;
     output reg [15:0] out_imm; 
     output reg [1:0] firstLevelDecode_out; 
-    output reg [3:0] secondLevelDecode_out; 
+    output reg [3:0] secondLevelDecode_out;
+    output reg halt;  
     
 
 
@@ -55,6 +56,12 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
 
 
     always @(*) begin 
+
+            if (instruction[31:25] == 7'b1101000) begin 
+                halt = 1; 
+            end else begin 
+                halt = 0; 
+            end
 
             case (firstLevelDecode)
                 //Branch
@@ -145,7 +152,7 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
                     setFlags = 0; 
                 end
             endcase
-            
+
             out_imm = imm;
             firstLevelDecode_out = firstLevelDecode; 
             secondLevelDecode_out = secondLevelDecode;

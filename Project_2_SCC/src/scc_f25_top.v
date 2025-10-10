@@ -37,10 +37,12 @@ wire [31:0] dataIn;
 
 wire [31:0] dataOutMem; 
 
+wire halt; 
+
 //Initialize modules: 
 Instruction_and_data memMod (
     .mem_Clk(clk), //Clk
-    .halt_f(halt_f), //Checks to see if halt has been found, if so stop searching for mem
+    .halt_f(halt), //Checks to see if halt has been found, if so stop searching for mem
     .instruction_memory_en(1'b1), //Instruction enable, this says do we need to fetch a instrction on the neg edge
     .instruction_memory_a(programCounter), //Memory address will start at loction 0
     .data_memory_a(addressFetch), //Data memory address, will start at 0 for now as well, but I acctually don't know how this works 
@@ -64,7 +66,8 @@ scc scc(
 
     .writeFlag(writeBit), 
     .dataOut(dataOutMem), 
-    .addressIn(addressFetch)
+    .addressIn(addressFetch), 
+    .halt(halt)
 
 ); 
 

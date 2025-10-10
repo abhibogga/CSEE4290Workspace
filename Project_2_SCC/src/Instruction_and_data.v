@@ -66,6 +66,7 @@ end
 
 // Outputs contents of memory on HALT
 always@(posedge halt_f) begin
+  $display("in here"); 
   fd = $fopen("scc_out.txt", "w");
   $fwrite(fd, "Address,Value\n");
   for(i = 32'b000000000; i < 32'h0000ffff; i=i+4) begin
