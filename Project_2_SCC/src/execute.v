@@ -18,7 +18,17 @@ module execute(
 
             (2'b11): begin 
                 //This means that it is a conditional branch and we need to do sum about it
+                
+                case (branchInstruction)
 
+                //Branch NE
+                (4'b0000)
+
+                //Branch EQ
+
+                endcase
+
+                
             end
 
         endcase
