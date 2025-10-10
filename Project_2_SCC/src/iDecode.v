@@ -14,6 +14,7 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
     output reg specialEncoding;
     output reg setFlags;  
     output reg [2:0] aluFunction; //This will determine which ALU funciton we are using
+    output reg [3:0] branchInstruction; 
 
     output reg regWrite; 
     output reg regRead; 
@@ -65,6 +66,8 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
                     out_destRegister = destReg; 
                     out_sourceFirstReg = sourceFirstReg; 
                     out_sourceSecReg = sourceSecReg; 
+
+                    branchInstruction = branchCondition; 
                 end
 
                 //Load/Store

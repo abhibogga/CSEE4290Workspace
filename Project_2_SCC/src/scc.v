@@ -14,7 +14,13 @@ module scc
 	
 	output reg [31:0] data_memory_v,      // Data memory address
 
-	output wire [31:0] programCounter
+	output wire [31:0] programCounter, 
+
+    //Outputs to talk to instruction_and_data.v
+    output wire writeFlag, 
+    output wire [31:0] dataOut, 
+    output wire [31:0] addressIn 
+
 	
 );
 
@@ -44,6 +50,7 @@ iFetch IF (
     wire [3:0]  out_sourceFirstReg;
     wire [3:0]  out_sourceSecReg;
     wire [15:0] out_imm;
+    wire [3:0] branchInstruction; 
 
     //Init module
     iDecode ID (
@@ -62,8 +69,12 @@ iFetch IF (
         .out_destRegister(out_destRegister),
         .out_sourceFirstReg(out_sourceFirstReg),
         .out_sourceSecReg(out_sourceSecReg),
-        .out_imm(out_imm)
+        .out_imm(out_imm), 
+        .branchInstruction(branchInstruction)
     );
+
+
+
 
 
 
