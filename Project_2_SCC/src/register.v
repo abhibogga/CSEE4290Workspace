@@ -1,4 +1,4 @@
-module register(clk, rst, rd, rs1, rs2, read, write, writeData, out_rd, out_rs1, out_rs2);
+module register(clk, rst, rd, rs1, rs2, write, writeData, out_rd, out_rs1, out_rs2);
     //define inputs here
     input clk; 
     input rst; 

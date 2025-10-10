@@ -30,10 +30,12 @@ wire readBit;
 wire writeBit; 
 
 wire [31:0] programCounter; 
-wire [31:0] dataFetch; 
+wire [31:0] addressFetch; // I don't know if we need this, but we need to test before finalizing
 
 wire [31:0] instruction; 
 wire [31:0] dataIn; 
+
+wire [31:0] dataOutMem; 
 
 //Initialize modules: 
 Instruction_and_data memMod (
@@ -41,11 +43,12 @@ Instruction_and_data memMod (
     .halt_f(halt_f), //Checks to see if halt has been found, if so stop searching for mem
     .instruction_memory_en(1'b1), //Instruction enable, this says do we need to fetch a instrction on the neg edge
     .instruction_memory_a(programCounter), //Memory address will start at loction 0
-    .data_memory_a(dataFetch), //Data memory address, will start at 0 for now as well, but I acctually don't know how this works 
+    .data_memory_a(addressFetch), //Data memory address, will start at 0 for now as well, but I acctually don't know how this works 
     .data_memory_read(readBit), 
     .data_memory_write(writeBit), 
     .instruction_memory_v(instruction), 
-    .data_memory_in_v(dataIn)
+    .data_memory_in_v(dataIn),
+    .data_memory_out_v(dataOutMem)
 );
 
 scc scc(
@@ -57,7 +60,11 @@ scc scc(
     .err_bits(err_bits), 
     .instruction_memory_v(instruction_memory_v),
     .data_memory_v(data_memory_in_v), 
-    .programCounter(programCounter) 
+    .programCounter(programCounter),
+
+    .writeFlag(writeBit), 
+    .dataOut(dataOutMem), 
+    .addressIn(addressFetch)
 
 ); 
 
