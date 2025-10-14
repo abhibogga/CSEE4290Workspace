@@ -25,15 +25,20 @@ module scc
 );
 
 
-//Lets intialize IF module
-wire [31:0] instrcutionForID; 
-iFetch IF (
-	.clk(clk), 
-	.rst(rst), 
-	.fetchedInstruction(instruction), 
-	.programCounter(programCounter), 
-	.filteredInstruction(instrcutionForID)
-);
+    //Lets intialize IF module
+    wire [31:0] instrcutionForID; 
+    wire [6:0] mul_opcode_scc
+    iFetch IF (
+        .clk(clk), 
+        .rst(rst), 
+        .fetchedInstruction(instruction), 
+        .programCounter(programCounter), 
+        .filteredInstruction(instrcutionForID), 
+        .exeOverride(exeOverride),
+        .exeData(exeData)
+        .mul_opcode_out(mul_opcode_scc)
+    );
+
 
 
 	//Decode Inputs/Outputs

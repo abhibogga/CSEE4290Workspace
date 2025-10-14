@@ -1,4 +1,5 @@
-module iFetch(clk, rst, fetchedInstruction, programCounter, filteredInstruction);
+module iFetch(clk, rst, fetchedInstruction, programCounter, filteredInstruction, exeOverride, exeData, mul_opcode_out, mul_imm_rd, mul_imm_rs, mul_imm_imm);
+
 
     //Inputs here: 
     input clk; 
@@ -9,6 +10,11 @@ module iFetch(clk, rst, fetchedInstruction, programCounter, filteredInstruction)
     //Outputs here: 
     output reg [31:0] programCounter;
     output reg [31:0] filteredInstruction;
+    output reg [6:0] mul_opcode_out;
+    output reg [3:0] mul_imm_rd;
+    output reg [3:0] mul_imm_rs;
+    output reg [15:0] mul_imm_imm; //just forward the registers and immediate to ucode_rom
+
 
 
     //Registers/States here: 
@@ -25,6 +31,12 @@ module iFetch(clk, rst, fetchedInstruction, programCounter, filteredInstruction)
     assign imm16 = fetchedInstruction[15:0];
     wire [31:0] branchOffsetAddress = {{16{imm16[15]}}, imm16} << 2;
     
+    wire [6:0] mul_opcode_inside;
+    assign mul_opcode = fetchedInstruction[31:25]; 
+    assign mul_imm_rd = fetchedInstruction[24:21];
+    assign mul_imm_rs = fetchedInstruction[20:17];
+    assign mul_imm_imm = fetchedInstruction[15:0];
+
 
     //Sequential Logic Here: 
     always @(posedge clk) begin 
@@ -40,21 +52,31 @@ module iFetch(clk, rst, fetchedInstruction, programCounter, filteredInstruction)
                 
                 //Prefetch logic, LOOKING FOR B, NOP, AND BR
 
-                //B OPCODE: 1100000
-                //NOP OPCODE: 1100100
+                    //B OPCODE: 1100000
+                    //NOP OPCODE: 1100100
 
-                if (fetchedInstruction[31:30] == 2'b11 && fetchedInstruction[28:25] == 4'b0000) begin 
-                    //This is uncoditional branch with imm offset, so lets just change PC to whatever value is in here: 
-                    programCounter <= PC + 4 + branchOffsetAddress;   
-                end else if (fetchedInstruction[31:30] == 2'b11 && fetchedInstruction[28:25] == 4'b0010) begin 
-                    //This will be no operation (NOP), we just load, current PC value into PC + 4
-                    programCounter <= PC;
-                    PC <= PC + 4;
-                end else begin 
-                    //Continue program counter as regular
-                    programCounter <= PC;
-                    PC <= PC + 4; 
+                    if (fetchedInstruction[31:30] == 2'b11 && fetchedInstruction[28:25] == 4'b0000) begin 
+                        //This is uncoditional branch with imm offset, so lets just change PC to whatever value is in here: 
+                        programCounter <= PC + 4 + branchOffsetAddress;   
+                    end else if (fetchedInstruction[31:30] == 2'b11 && fetchedInstruction[28:25] == 4'b0010) begin 
+                        //This will be no operation (NOP), we just load, current PC value into PC + 4
+                        programCounter <= PC;
+                        PC <= PC + 4;
+                    end else begin 
+                        //Continue program counter as regular
+                        programCounter <= PC;
+                        PC <= PC + 4; 
+
+
+		    if (mul_opcode_inside == 0010000 || mul_opcode_inside == 0011000 || mul_opcode_inside == 0110000 || mul_opcode_inside == 0111000) begin
+			mul_opcode_out <= mul_opcode_inside
+		    end else begin
+			mul_opcode_out <= 7'b0 //only send mul opcode out if a multiply gets trapped
+		    end
+
                 end
+              
+       
             end
         end
 
