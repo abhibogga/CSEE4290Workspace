@@ -26,11 +26,11 @@ module iFetch(clk, rst, fetchedInstruction, programCounter, filteredInstruction,
     wire [15:0] imm16; 
 
     assign imm16 = fetchedInstruction[15:0];
-    wire [31:0] branchOffsetAddress = {{16{imm16[15]}}, imm16} << 2;
+    wire signed [31:0] branchOffsetAddress = {{16{imm16[15]}}, imm16};
 
     wire [15:0] imm16_exe; 
     assign imm16_exe = exeData;
-    wire [31:0] branchOffsetAddress_exe = {{16{imm16_exe[15]}}, imm16_exe} << 2;
+    wire signed [31:0] branchOffsetAddress_exe = {{16{imm16_exe[15]}}, imm16_exe};
     
 
     //Sequential Logic Here: 
@@ -46,7 +46,10 @@ module iFetch(clk, rst, fetchedInstruction, programCounter, filteredInstruction,
             if (state == sFilter) begin 
 
                 if (exeOverride) begin 
-                    programCounter <= PC + 4 + branchOffsetAddress_exe;
+                    
+                    programCounter = programCounter + branchOffsetAddress_exe;
+                    PC = programCounter + 4;
+                    
                 end else begin 
                     //Prefetch logic, LOOKING FOR B, NOP, AND BR
 
@@ -54,8 +57,11 @@ module iFetch(clk, rst, fetchedInstruction, programCounter, filteredInstruction,
                     //NOP OPCODE: 1100100
 
                     if (fetchedInstruction[31:30] == 2'b11 && fetchedInstruction[28:25] == 4'b0000) begin 
-                        //This is uncoditional branch with imm offset, so lets just change PC to whatever value is in here: 
+                        //This is uncoditional branch with imm offset, so lets just change PC to whatever value is in here:
+                        
                         programCounter <= PC + 4 + branchOffsetAddress;   
+                        $display("in uncond branch");
+                        $display(branchOffsetAddress); 
                     end else if (fetchedInstruction[31:30] == 2'b11 && fetchedInstruction[28:25] == 4'b0010) begin 
                         //This will be no operation (NOP), we just load, current PC value into PC + 4
                         programCounter <= PC;

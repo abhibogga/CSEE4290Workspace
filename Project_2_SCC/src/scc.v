@@ -106,7 +106,7 @@ wire [31:0] readDataDest;
 wire [31:0] readDataFirst;
 wire [31:0] readDataSec;
 
-execute exe (
+execute EXE (
     .clk(clk),
     .rst(rst),
 

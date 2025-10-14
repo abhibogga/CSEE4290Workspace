@@ -1,5 +1,6 @@
 `timescale 1ps/1ps
 `include "scc_f25_top.v"
+
 module oct_10_checkpoint();
 
 //Call all our inputs as registers

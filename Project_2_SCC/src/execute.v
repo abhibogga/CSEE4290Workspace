@@ -6,7 +6,7 @@ module execute(
     input [3:0] secondLevelDecode, 
     input [2:0] aluFunctions, 
     input [3:0] branchInstruction,
-    input [15:0] imm,
+    input signed [15:0] imm,
     input [3:0] destReg, 
     input [3:0] sourceFirstReg, 
     input [3:0] sourceSecReg,
@@ -30,10 +30,16 @@ module execute(
 
     assign exeData = imm; 
     reg [3:0] flags; // NZCV
+    reg [3:0] flags_next; 
+
 
     //other registers
-    reg [31:0] immExt;
-    reg [32:0] tempDiff;
+    reg  signed [31:0] immExt;
+    reg signed [32:0] tempDiff;
+
+
+    //Registers for Register additions
+    reg [32:0] aluRegister;
 
     // Reset
     always @(posedge clk or posedge rst) begin 
@@ -42,7 +48,9 @@ module execute(
             exeOverride <= 1'b0; 
             writeToReg  <= 1'b0; 
         end
+        exeOverride = 0; 
     end
+
 
     // Combinational logic
     always @(*) begin 
@@ -65,6 +73,7 @@ module execute(
                 case (branchInstruction)
                     4'b0000: begin //We need to see if the branch is taken 
                         if (flags[2] == 1'b1) begin 
+                            $display("Zero Flag Branch Taken");
                             exeOverride = 1; 
                         end else begin 
                             exeOverride = 0; 
@@ -72,7 +81,9 @@ module execute(
                     end   
 
                     4'b0001: begin 
+                       
                         if (flags[2] == 1'b0) begin 
+                            $display("Non Zero Flag Branch Taken");
                             exeOverride = 1; 
                         end else begin 
                             exeOverride = 0; 
@@ -90,7 +101,7 @@ module execute(
 
                     
                     memoryAddressOut = readDataFirst + {{16{imm[15]}}, imm};
-                    memoryDataOut = destReg;
+                    memoryDataOut = readRegDest;
                     memoryWrite   = 1'b1;
 
                     writeToReg   = 1'b0; // store doesn’t write back
@@ -118,7 +129,8 @@ module execute(
 
                     3'b001: begin 
                         case (secondLevelDecode)
-                            4'b1001: begin 
+                            4'b1001: begin //ADDS
+                                
                                 readRegDest  = destReg;
                                 readRegFirst = sourceFirstReg; 
                                 writeToReg   = 1'b1; 
@@ -131,13 +143,14 @@ module execute(
                                 // Update flags
                                 flags[3] = writeData[31];           // N
                                 flags[2] = (writeData == 32'd0);    // Z
-                                flags[1] = ~tempDiff[32];           // C = NOT borrow
+                                flags[1] = tempDiff[32];           // C = NOT borrow
                                 flags[0] = (readDataFirst[31] ^ immExt[31]) & 
                                            (readDataFirst[31] ^ writeData[31]); // V
 
                             end  
 
-                            4'b1010: begin 
+                            4'b1010: begin //SUBS
+                               
                                 //Algorithm provided by chat-gpt
                                 readRegDest  = destReg;
                                 readRegFirst = sourceFirstReg; 
@@ -157,9 +170,61 @@ module execute(
                             end
                         endcase
                     end
-
                     
                 endcase
+            end
+
+
+            2'b01: begin 
+                case (secondLevelDecode) // Since all of them are 011 we just need the second level decode
+                    4'b1001: begin //ADDS
+                        
+                        readRegDest = destReg; 
+                        readRegFirst = sourceFirstReg; 
+                        readRegSec = sourceSecReg; 
+
+                        aluRegister = readDataFirst + readDataSec; 
+
+                        writeToReg = 1; 
+
+                        writeData = aluRegister; 
+
+
+                        //Update the flags
+                        flags[3] = writeData[31];           // N
+                        flags[2] = (writeData == 32'd0);    // Z
+                        flags[1] = aluRegister[32];           // C = NOT borrow
+                        flags[0] = (readDataFirst[31] == readDataSec[31]) && 
+                                    (writeData[31] != readDataFirst[31]); // V
+
+
+                    end  
+
+                    4'b1010: begin //SUBS
+                        $display("subs taken"); 
+                        readRegDest = destReg; 
+                        readRegFirst = sourceFirstReg; 
+                        readRegSec = sourceSecReg; 
+
+                        aluRegister = readDataFirst - readDataSec; 
+
+                        writeToReg = 1; 
+
+                        writeData = aluRegister; 
+
+
+                        //Update the flags
+                        flags[3] = writeData[31];           // N
+                        flags[2] = (writeData == 32'd0);    // Z
+                        flags[1] = ~aluRegister[32];           // C = NOT borrow
+                        flags[0] = (readDataFirst[31] == readDataSec[31]) && 
+                                    (writeData[31] != readDataFirst[31]); // V
+
+                    end
+                    
+
+                endcase
+
             end
         endcase
     end

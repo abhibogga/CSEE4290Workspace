@@ -72,9 +72,9 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
                     dataRegisterImm = 0;
 
                     //Now we need to return the registers
-                    out_destRegister = destReg; 
-                    out_sourceFirstReg = sourceFirstReg; 
-                    out_sourceSecReg = sourceSecReg; 
+                    out_destRegister = destReg >> 1; 
+                    out_sourceFirstReg = sourceFirstReg >> 1; 
+                    out_sourceSecReg = sourceSecReg >> 1; 
 
                     branchInstruction = branchCondition; 
                     
@@ -89,9 +89,9 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
 
                     
                     //Now we need to return the registers
-                    out_destRegister = destReg; 
-                    out_sourceFirstReg = sourceFirstReg; 
-                    out_sourceSecReg = sourceSecReg; 
+                    out_destRegister = destReg >> 1; 
+                    out_sourceFirstReg = sourceFirstReg >> 1; 
+                    out_sourceSecReg = sourceSecReg >> 1; 
 
                 end
 
@@ -103,9 +103,9 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
                     dataRegisterImm = 0;
 
                     //Now we need to return the registers
-                    out_destRegister = destReg; 
-                    out_sourceFirstReg = sourceFirstReg; 
-                    out_sourceSecReg = sourceSecReg; 
+                    out_destRegister = destReg >> 1; 
+                    out_sourceFirstReg = sourceFirstReg >> 1; 
+                    out_sourceSecReg = sourceSecReg >> 1; 
                 end
 
 
@@ -117,9 +117,9 @@ module iDecode(instruction, clk, rst, branch, loadStore, dataRegister, dataRegis
                     dataRegisterImm = 1; 
 
                     //Now we need to return the registers
-                    out_destRegister = destReg; 
-                    out_sourceFirstReg = sourceFirstReg; 
-                    out_imm = sourceSecReg; 
+                    out_destRegister = destReg >> 1; 
+                    out_sourceFirstReg = sourceFirstReg >> 1; 
+                    out_imm = sourceSecReg >> 1; 
                 end
 
                 default: begin 
