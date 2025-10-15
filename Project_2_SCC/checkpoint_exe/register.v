@@ -24,7 +24,7 @@ module register(clk, rst, rd, rs1, rs2, write, writeData, out_rd, out_rs1, out_r
             for (i = 0; i < 16; i = i + 1) registerFile[i] <= 32'd0;
         end else if (write) begin
             registerFile[rd] <= writeData;
-            $display("WRITE -> R[%0d] = %0d (0x%08h)", rd, $signed(writeData), writeData);
+            $display("Time=%0t | WRITE -> R[%0d] = 0x%08h", $time, rd, writeData);
         end
     end
 

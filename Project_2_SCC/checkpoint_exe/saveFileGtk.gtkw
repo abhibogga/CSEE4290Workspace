@@ -1,0 +1,49 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Fri Oct 10 13:54:29 2025
+[*]
+[dumpfile] "C:\CSEE4290Workspace\Project_2_SCC\checkpoint_exe\dump.vcd"
+[savefile] "C:\CSEE4290Workspace\Project_2_SCC\checkpoint_exe\saveFileGtk.gtkw"
+[timestart] 0
+[size] 1000 600
+[pos] -1 -1
+*-4.620081 202 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] oct_10_checkpoint.
+[treeopen] oct_10_checkpoint.topMod.
+[treeopen] oct_10_checkpoint.topMod.scc.
+[sst_width] 197
+[signals_width] 230
+[sst_expanded] 1
+[sst_vpaned_height] 153
+@28
+oct_10_checkpoint.topMod.scc.IF.clk
+@200
+-
+@28
+oct_10_checkpoint.topMod.scc.IF.rst
+@200
+-
+@22
+oct_10_checkpoint.topMod.scc.IF.programCounter[31:0]
+@200
+-
+@22
+oct_10_checkpoint.topMod.scc.IF.filteredInstruction[31:0]
+@200
+-
+@22
+oct_10_checkpoint.topMod.scc.MEM.dataOut[31:0]
+@200
+-
+@22
+oct_10_checkpoint.topMod.scc.REGFILE.out_rd[31:0]
+@200
+-
+@22
+oct_10_checkpoint.topMod.scc.REGFILE.out_rs1[31:0]
+@200
+-
+@22
+oct_10_checkpoint.topMod.scc.REGFILE.out_rs2[31:0]
+[pattern_trace] 1
+[pattern_trace] 0
