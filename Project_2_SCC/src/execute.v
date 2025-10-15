@@ -73,7 +73,7 @@ module execute(
                 case (branchInstruction)
                     4'b0000: begin //We need to see if the branch is taken 
                         if (flags[2] == 1'b1) begin 
-                            $display("Zero Flag Branch Taken");
+                            //$display("Zero Flag Branch Taken");
                             exeOverride = 1; 
                         end else begin 
                             exeOverride = 0; 
@@ -83,7 +83,7 @@ module execute(
                     4'b0001: begin 
                        
                         if (flags[2] == 1'b0) begin 
-                            $display("Non Zero Flag Branch Taken");
+                            //$display("Non Zero Flag Branch Taken");
                             exeOverride = 1; 
                         end else begin 
                             exeOverride = 0; 
@@ -119,7 +119,7 @@ module execute(
                                 
                                 readRegDest = destReg; 
                                 writeData = {{16{imm[15]}}, imm};
-                                $display(imm);
+                                //$display(imm);
                                 
                                 
                                 writeToReg  = 1'b1;  
@@ -201,13 +201,14 @@ module execute(
                     end  
 
                     4'b1010: begin //SUBS
-                        $display("subs taken"); 
+                        //$display("subs taken"); 
                         readRegDest = destReg; 
                         readRegFirst = sourceFirstReg; 
                         readRegSec = sourceSecReg; 
 
                         aluRegister = readDataFirst - readDataSec; 
 
+                        $display("Source Reg First in SUBS:   %b", readRegFirst); 
                         writeToReg = 1; 
 
                         writeData = aluRegister; 

@@ -1,15 +1,19 @@
 # File: app.py
 # Author(s): CSEE 4290 Fall 2021
+#
+####################
+## Changes Fall25 ##
+####################
+#
+# Addition: Support for 16 registers by extending register field to 4 bits
+# Addition: Support to use XZR register as a shortcut for the value zero OR shortcut for R14
+# Addition: CMP now "stores" to R14 (XZR) and SUBS can be used to store to a destination register
 
-#Command to Run: 
-#python3 parser/assembler.py tests/INSERT_ASSEMBLYFILE.asm parser/instructions.json
-
-
+#: 
 import re
 import json
 import sys
 import copy
-
 
 condition_lookup = {
     "eq": 0,
@@ -171,9 +175,29 @@ def parse_arguments(line, cond):
         if '#0x' in arg:
             temp = {'Imm': None}
             temp['Imm']= int(arg[3:],16)
+            if (temp['Imm'] < 0):
+                temp['Imm'] = 0xFFFF + temp['Imm'] + 1
             args[i] = temp
             continue
 
+        '''
+        # This XZR implementation substitues XZR with a 0 immediate value
+        if type(arg) == str: #checking if zxr is used for zero register
+            if arg.lower() == 'xzr':
+                temp = {'Imm': None}
+                temp['Imm'] = 0
+                args[i] = temp
+                continue
+        '''
+
+        # This XZR implementation substitues XZR with register 14
+        if type(arg) == str: #checking if zxr is used for zero register
+            if arg.lower() == 'xzr':
+                temp = {'Reg': None}
+                temp['Reg'] = 14
+                args[i] = temp
+                continue
+                
         if type(arg) == str: #check type now that some elements have changed
             if 'r' == arg[0] or 'R' == arg[0]:
                 temp = {'Reg': None}
@@ -258,7 +282,7 @@ def parse_line(i, line, line_dict):
             print("typing error") #handle this the correct way
             return line_dict
 
-directives = ['org', 'mov32', 'rmb', 'fcb']
+directives = ['org', 'mov32', 'rmb', 'fcb', 'cmp']
 
 def check_mnemonics(line_data):
     '''
@@ -388,6 +412,11 @@ def pseudo_mnemonics(index, lines):
         lines[index]["args"][1]["Imm"] &= 0xFFFF
         lines[index+1]["mnemonic"] = "MOVT"
         lines[index+1]["args"][1]["Imm"] >>= 16
+    elif lines[index]["mnemonic"] == "CMP" or lines[index]["mnemonic"] == "cmp":
+        lines[index]["mnemonic"] = "subs"
+        lines[index]["args"].append(lines[index]["args"][1])
+        lines[index]["args"][1] = lines[index]["args"][0]
+        lines[index]["args"][0] = {"Reg": 14}
     return False
 
 
@@ -451,10 +480,10 @@ def assemble_opcode(dict):
                     continue
                 # Gets the arguments
                 for (index, arg) in enumerate(line["args"]):
-                    if arg.get("Reg"):
-                        # Shifts the current op_code right 3 and adds the register
-                        opcode = (opcode << 3)
-                        opcode_len = opcode_len + 3
+                    if (arg.get("Reg") or (arg.get("Reg") == 0)):
+                        # Shifts the current op_code right 4 and adds the register
+                        opcode = (opcode << 4)                  # changed from 3 to 4
+                        opcode_len = opcode_len + 4        # changed from 3 to 4
                         try:
                             opcode = opcode | int(arg["Reg"])
                         except TypeError:
@@ -484,6 +513,10 @@ def assemble_opcode(dict):
                         if type(arg["Imm"]) == str:
                             try:
                                 temp = labels[arg["Imm"]] - line["addr"]
+                                # Uses absolute address for mov instruction (for loading addresses into registers)
+                                if line["mnemonic"].lower() == "mov":
+                                    temp = labels[arg["Imm"]]
+                                # Converts to 2's complement if negative
                                 if temp < 0:
                                     temp = int(hex(((abs(temp) ^ 0xffff) + 1) & 0xffff),16)
                                 opcode = opcode | temp
