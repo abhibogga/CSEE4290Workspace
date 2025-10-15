@@ -1,4 +1,4 @@
-module iFetch(clk, rst, fetchedInstruction, programCounter, filteredInstruction, exeOverride, exeData, mul_opcode_out, mul_imm_rd, mul_imm_rs, mul_imm_imm);
+module iFetch(clk, rst, fetchedInstruction, programCounter,  filteredInstruction, exeOverride, exeData, mul_opcode_out, mul_imm_rd, mul_imm_rs, mul_imm_imm);
 
 
     //Inputs here: 
