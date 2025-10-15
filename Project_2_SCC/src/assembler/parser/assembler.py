@@ -63,7 +63,7 @@ def del_blanklines(lines, line_data):
     cleaned_lines = []
     cleaned_data = []
 
-    re_blank = re.compile('^\s*$')
+    re_blank = re.compile(r'^\s*$')
     for i, line in enumerate(lines):
         
         blank_obj = re_blank.match(line)
@@ -78,8 +78,8 @@ def get_line_type(line, type_label, type_instruction, error):
     input line as a string, return true or false for label, instruction or error
     '''
 
-    re_label = re.compile('^([a-zA-Z0-9_]+):\s*$')
-    re_instruction = re.compile('^\s+\w+')
+    re_label = re.compile(r'^([a-zA-Z0-9_]+):\s*$')
+    re_instruction = re.compile(r'^\s+\w+')
 
     label_obj = re_label.match(line)
     instruction_obj = re_instruction.match(line)
@@ -96,7 +96,7 @@ def get_line_type(line, type_label, type_instruction, error):
     return type_label, type_instruction, error
 
 def parse_label(line):
-    re_label = '^([a-zA-Z0-9_]+):\s*$'
+    re_label = r'^([a-zA-Z0-9_]+):\s*$'
     label_obj = re.search(re_label, line)
     
     label = label_obj.group(1) #group 0 contains the entire string, group 1 contains the match
@@ -105,8 +105,8 @@ def parse_label(line):
     
 def parse_instruction(line):
 
-    re_mnem = re.compile('\s+([A-Za-z.0-9]+).*$')
-    re_cond = re.compile('[bB]\.([a-zA-Z]+)')
+    re_mnem = re.compile(r'\s+([A-Za-z.0-9]+).*$')
+    re_cond = re.compile(r'[bB]\.([a-zA-Z]+)')
     
     mnemonic_obj = re_mnem.search(line)
 
