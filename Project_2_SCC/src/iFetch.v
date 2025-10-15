@@ -62,11 +62,30 @@ module iFetch(clk, rst, fetchedInstruction, programCounter, filteredInstruction,
                         //This will be no operation (NOP), we just load, current PC value into PC + 4
                         programCounter <= PC;
                         PC <= PC + 4;
-                    end else begin 
+                    end else if (state = ucode) begin
+			case (ghost_instruction) begin //do I need an always for this case in the if statement?
+
+				mov_instruction
+					programCounter <= gPC;
+					gPC <= gPC + 4; //assuming byte alignment for ghost addresses
+				add_instruction					
+					programCounter <= gPC;
+					gPC <= gPC + 4; //assuming byte alignment for ghost addresses
+					//when all is said and done ghost register 0 will hold the result
+				sub_instruction
+					programCounter <= gPC;
+					gPC <= gPC + 4; //assuming byte alignment for ghost addresses
+				cmp_instruction
+					programCounter <= gPC;
+					gPC <= gPC + 4; //assuming byte alignment for ghost addresses
+				bne_instruction
+					programCounter <= gPC + 4 + ghost_branch_offset_address;
+			endcase
+		    end else begin 
                         //Continue program counter as regular
                         programCounter <= PC;
                         PC <= PC + 4; 
-
+		    end
 
 		    if (mul_opcode_inside == 0010000 || mul_opcode_inside == 0011000 || mul_opcode_inside == 0110000 || mul_opcode_inside == 0111000) begin
 			mul_opcode_out <= mul_opcode_inside
@@ -110,7 +129,21 @@ module iFetch(clk, rst, fetchedInstruction, programCounter, filteredInstruction,
 
             end
 
-            
+	    ucode: begin
+		PC = PC; //freeze regular PC
+		gPC = 0; //start ghost PC
+		filteredInstruction = ghost_inst; //sending the ghost instructions to Decode
+
+		if (ucode_done = 1) begin
+			stateNext = sFilter;
+		end
+		else begin
+			stateNext = ucode
+		end
+
+
+
+	    end            
 
              default: 
                 stateNext = sIdle; 
