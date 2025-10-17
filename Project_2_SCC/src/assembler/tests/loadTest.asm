@@ -10,7 +10,7 @@ start:
 
     ORG #0x0000;
 
-    LOAD R0, R0, #0x400;
+    MOV R0, #0x400;
 
     LOAD R1, R0, #0; 
     LOAD R2, R0, #4;
