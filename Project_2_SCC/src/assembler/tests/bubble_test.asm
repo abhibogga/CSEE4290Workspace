@@ -18,7 +18,7 @@ setup:
 
 mainloop:
     CMP     R5, #0x0;  r14, r5, 0  -> r14 = r5 - 0
-    B.eq    exit;            exit if length is zero
+    B       exit;            exit if length is zero
     LOAD    R1, R4;          initial pointer to array 
 
 iter:

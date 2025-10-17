@@ -45,23 +45,18 @@ module execute(
     reg [32:0] aluRegister;
 
     // Reset
+    // Reset / flag register
     always @(posedge clk or posedge rst) begin 
         if (rst) begin 
-            flags       <= 4'b0000; 
-            exeOverride <= 1'b0; 
-            writeToReg  <= 1'b0; 
-        end 
-            /*if (setFlags) begin
-                //$display("t=%0t | flags_next = %b (bin) | old flags = %b",$time, flags_next, flags);
-                 flags <= flags_next;
-                
-            end */
-        
-            exeOverride = 0; 
-            memoryWrite = 0; 
-
+            flags <= 4'b0000;
+        end else begin
+            // Always capture next flags; gating happens in comb logic
+            flags <= flags_next;
+        end
     end
 
+
+    
 
     // Combinational logic
     always @(*) begin 
@@ -87,8 +82,9 @@ module execute(
                 case (branchInstruction)
                     //$display("t=%0t | flags_next = %b (bin) | old flags = %b",$time, flags_next, flags);
                     4'b0000: begin //BEQ
+                        //$display("beq considered");
                         if (flags[2] == 1'b1) begin 
-                            //$display("Zero Flag Branch Taken");
+                            //$display("beq taken");
                             exeOverride = 1; 
                         end else begin 
                             exeOverride = 0; 
@@ -107,9 +103,10 @@ module execute(
 
 
                     4'b0100: begin //BMI
+                        //$display("BMI? flags=%b | N=%b Z=%b C=%b V=%b", flags, flags[3], flags[2], flags[1], flags[0]);
                        
                         if (flags[3] == 1'b1) begin 
-                            
+                            //$display("BMI? flags=%b | N=%b Z=%b C=%b V=%b", flags, flags[3], flags[2], flags[1], flags[0]);
                             exeOverride = 1; 
                         end else begin 
                             exeOverride = 0; 
@@ -134,6 +131,7 @@ module execute(
 
                     
                 end else begin //Load
+                    
 
                     //First we get the calculate the address
                     readRegFirst = sourceFirstReg; // base
@@ -150,6 +148,8 @@ module execute(
                     
                     writeToReg  = 1'b1; 
                     //Load it into the desination register
+
+                    
 
 
 
@@ -201,11 +201,14 @@ module execute(
                                 writeData = tempDiff[31:0];
 
                                 // Update flags
-                                flags[3] = writeData[31];                     // N
-                                flags[2] = (writeData == 32'd0);              // Z
-                                flags[1] = tempDiff[32];                   // C
-                                flags[0] = (~(readDataFirst[31] ^ immExt[31])) &
+                                flags_next[3] = writeData[31];                     // N
+                                flags_next[2] = (writeData == 32'd0);              // Z
+                                flags_next[1] = tempDiff[32];                   // C
+                                flags_next[0] = (~(readDataFirst[31] ^ immExt[31])) &
                                                 ( readDataFirst[31] ^ writeData[31]);
+
+                                //$display("flags_next = %b (bin))",
+                                            //flags_next);
 
                             end  
 
@@ -220,17 +223,17 @@ module execute(
                                 tempDiff = {1'b0, readDataFirst} - {1'b0, immExt};
                                 writeData = tempDiff[31:0];
 
+                                //$display("tempdiff", tempDiff); 
+
                                 // Update flags
-                                flags[3] = writeData[31];           // N
-                                flags[2] = (writeData == 32'd0);    // Z
-                                flags[1] = ~tempDiff[32];           // C = NOT borrow
-                                flags[0] = (readDataFirst[31] ^ immExt[31]) &
+                                flags_next[3] = writeData[31];           // N
+                                flags_next[2] = (writeData == 32'd0);    // Z
+                                flags_next[1] = ~tempDiff[32];           // C = NOT borrow
+                                flags_next[0] = (readDataFirst[31] ^ immExt[31]) &
                                                 (readDataFirst[31] ^ writeData[31]);
 
-                                if (destReg == 4'd14) begin
-                                    $display("zero found | flags_next = %b (bin))",
-                                            flags_next);
-                                end
+                                //$display("flags_next = %b (bin))",
+                                            //flags_next);
                             end
 
 
@@ -289,11 +292,14 @@ module execute(
                         writeData = aluRegister; 
 
 
-                        flags[3] = writeData[31];                     // N
-                        flags[2] = (writeData == 32'd0);              // Z
-                        flags[1] = aluRegister[32];                   // C
-                        flags[0] = (~(readDataFirst[31] ^ readDataSec[31])) &
+                        flags_next[3] = writeData[31];                     // N
+                        flags_next[2] = (writeData == 32'd0);              // Z
+                        flags_next[1] = aluRegister[32];                   // C
+                        flags_next[0] = (~(readDataFirst[31] ^ readDataSec[31])) &
                                         ( readDataFirst[31] ^ writeData[31]); // V
+
+                        //$display("flags_next = %b (bin))",
+                                            //flags_next);
 
                     end  
 
@@ -305,6 +311,8 @@ module execute(
 
                         aluRegister = readDataFirst - readDataSec; 
 
+                        
+
                         //$display("Source Reg First in SUBS:   %b", readRegFirst); 
                         writeToReg = 1; 
 
@@ -312,12 +320,14 @@ module execute(
 
 
                         //Update the flags
-                        flags[3] = writeData[31];           // N
-                        flags[2] = (writeData == 32'd0);    // Z
-                        flags[1] = ~aluRegister[32];           // C = NOT borrow
-                        flags[0] = (readDataFirst[31] == readDataSec[31]) && 
-                                    (writeData[31] != readDataFirst[31]); // V
+                        flags_next[3] = writeData[31];           // N
+                        flags_next[2] = (writeData == 32'd0);    // Z
+                        flags_next[1] = ~aluRegister[32];           // C = NOT borrow
+                        flags_next[0] = (readDataFirst[31] ^ readDataSec[31]) &
+                                        (readDataFirst[31] ^ writeData[31]);   // V
 
+                       // $display("flags_next = %b (bin))",
+                                            //flags_next);
                     end
                     
 
