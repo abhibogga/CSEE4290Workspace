@@ -38,6 +38,7 @@ module scc
     wire ucode_flag;
     // FIX: Added wire for ucode_rom output to iFetch ghost_instruction input
     wire [31:0] ucode_instruction_scc;
+    wire ucode_done;
 
     iFetch_gemini IF (
         .clk(clk), 
@@ -53,7 +54,8 @@ module scc
         .mul_imm_rs(mul_imm_rs_scc), // FIX: Added missing connection for rs
         .mul_imm_imm(mul_imm_imm_scc),
         .ghost_PC(ghost_PC_scc),
-        .ucode_flag(ucode_flag)
+        .ucode_flag(ucode_flag),
+	.ucode_done(ucode_done)
     );
 
     ucode_rom ucode_rom (
@@ -64,7 +66,8 @@ module scc
         .reg1(mul_imm_rs_scc),
         .dest_reg(mul_imm_rd_scc), // FIX: Added missing connection for dest
         .ghost_pc(ghost_PC_scc), // FIX: Added missing connection for ghost_pc
-        .output_instruction(ucode_instruction_scc) // FIX: Added missing connection for output
+        .output_instruction(ucode_instruction_scc), // FIX: Added missing connection for output
+	.ucode_done(ucode_done)
     );
         
     register REGFILE (
