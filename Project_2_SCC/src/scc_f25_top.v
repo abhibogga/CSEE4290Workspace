@@ -67,6 +67,8 @@ scc scc(
     .writeFlag(writeBit), 
     .dataOut(dataOutMem), 
     .addressIn(addressFetch), 
+    .memoryRead(readBit), 
+    .memoryDataIn(dataIn),
     .halt(halt)
 
 ); 

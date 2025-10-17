@@ -23,9 +23,12 @@ module execute(
     output reg exeOverride, 
     output wire [15:0] exeData,
 
+    //I/O for memory
     output reg [31:0] memoryDataOut, 
     output reg [31:0] memoryAddressOut, 
-    output reg memoryWrite
+    output reg memoryWrite, 
+    output reg memoryRead, 
+    input [31:0] memoryDataIn
 );
 
     assign exeData = imm; 
@@ -47,8 +50,16 @@ module execute(
             flags       <= 4'b0000; 
             exeOverride <= 1'b0; 
             writeToReg  <= 1'b0; 
-        end
-        exeOverride = 0; 
+        end 
+            /*if (setFlags) begin
+                //$display("t=%0t | flags_next = %b (bin) | old flags = %b",$time, flags_next, flags);
+                 flags <= flags_next;
+                
+            end */
+        
+            exeOverride = 0; 
+            memoryWrite = 0; 
+
     end
 
 
@@ -63,15 +74,19 @@ module execute(
         writeData       = 32'd0;
         memoryWrite     = 1'b0;
         memoryDataOut   = 32'd0;
+        memoryRead      = 1'b0; 
         memoryAddressOut = 32'd0;
         immExt = 0; 
         tempDiff = 0; 
+
+        flags_next = flags; //MAYBE TAKE OUT IDK
 
         case (firstLevelDecode)
             2'b11: begin 
                 // Branch logic
                 case (branchInstruction)
-                    4'b0000: begin //We need to see if the branch is taken 
+                    //$display("t=%0t | flags_next = %b (bin) | old flags = %b",$time, flags_next, flags);
+                    4'b0000: begin //BEQ
                         if (flags[2] == 1'b1) begin 
                             //$display("Zero Flag Branch Taken");
                             exeOverride = 1; 
@@ -80,10 +95,21 @@ module execute(
                         end 
                     end   
 
-                    4'b0001: begin 
+                    4'b0001: begin  //BNE
                        
                         if (flags[2] == 1'b0) begin 
                             //$display("Non Zero Flag Branch Taken");
+                            exeOverride = 1; 
+                        end else begin 
+                            exeOverride = 0; 
+                        end 
+                    end
+
+
+                    4'b0100: begin //BMI
+                       
+                        if (flags[3] == 1'b1) begin 
+                            
                             exeOverride = 1; 
                         end else begin 
                             exeOverride = 0; 
@@ -101,12 +127,32 @@ module execute(
 
                     
                     memoryAddressOut = readDataFirst + {{16{imm[15]}}, imm};
-                    memoryDataOut = readRegDest;
+                    memoryDataOut = readDataDest;
                     memoryWrite   = 1'b1;
 
                     writeToReg   = 1'b0; // store doesn’t write back
 
                     
+                end else begin //Load
+
+                    //First we get the calculate the address
+                    readRegFirst = sourceFirstReg; // base
+                    memoryAddressOut = readDataFirst + {{16{imm[15]}}, imm};
+                    //$display(imm);
+                    //$display("memory address out = %0d (dec) = 0x%0h (hex)", memoryAddressOut, memoryAddressOut);
+
+                    //Then we use that address to look into memory, so load that address into an output
+                    memoryRead = 1; 
+                    //Read that value
+                    readRegDest = destReg; 
+                    writeData = memoryDataIn;
+                    
+                    
+                    writeToReg  = 1'b1; 
+                    //Load it into the desination register
+
+
+
                 end
             end
 
@@ -124,12 +170,26 @@ module execute(
                                 
                                 writeToReg  = 1'b1;  
                             end
+
+                            3'b010: begin //CLR - imm
+                               
+                                //Algorithm provided by chat-gpt
+                                readRegDest  = destReg;
+                                
+                                writeToReg   = 1'b1; 
+
+                                
+                                writeData = 32'b0;
+
+                                
+
+                            end
                         endcase
                     end
 
                     3'b001: begin 
                         case (secondLevelDecode)
-                            4'b1001: begin //ADDS
+                            4'b1001: begin //ADDS - imm
                                 
                                 readRegDest  = destReg;
                                 readRegFirst = sourceFirstReg; 
@@ -141,15 +201,15 @@ module execute(
                                 writeData = tempDiff[31:0];
 
                                 // Update flags
-                                flags[3] = writeData[31];           // N
-                                flags[2] = (writeData == 32'd0);    // Z
-                                flags[1] = tempDiff[32];           // C = NOT borrow
-                                flags[0] = (readDataFirst[31] ^ immExt[31]) & 
-                                           (readDataFirst[31] ^ writeData[31]); // V
+                                flags[3] = writeData[31];                     // N
+                                flags[2] = (writeData == 32'd0);              // Z
+                                flags[1] = tempDiff[32];                   // C
+                                flags[0] = (~(readDataFirst[31] ^ immExt[31])) &
+                                                ( readDataFirst[31] ^ writeData[31]);
 
                             end  
 
-                            4'b1010: begin //SUBS
+                            4'b1010: begin //SUBS - imm
                                
                                 //Algorithm provided by chat-gpt
                                 readRegDest  = destReg;
@@ -164,10 +224,49 @@ module execute(
                                 flags[3] = writeData[31];           // N
                                 flags[2] = (writeData == 32'd0);    // Z
                                 flags[1] = ~tempDiff[32];           // C = NOT borrow
-                                flags[0] = (readDataFirst[31] ^ immExt[31]) & 
-                                           (readDataFirst[31] ^ writeData[31]); // V
+                                flags[0] = (readDataFirst[31] ^ immExt[31]) &
+                                                (readDataFirst[31] ^ writeData[31]);
+
+                                if (destReg == 4'd14) begin
+                                    $display("zero found | flags_next = %b (bin))",
+                                            flags_next);
+                                end
+                            end
+
+
+                            4'b0001: begin //ADD - imm
+                                
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                writeToReg   = 1'b1; 
+
+                                
+                                immExt   = {{16{imm[15]}}, imm};
+                                tempDiff = {1'b0, readDataFirst} + {1'b0, immExt};
+                                writeData = tempDiff[31:0];
+
+                               
+
+                            end  
+
+                            4'b0010: begin //SUB - imm
+                               
+                                //Algorithm provided by chat-gpt
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                writeToReg   = 1'b1; 
+
+                                immExt   = {{16{imm[15]}}, imm};
+                                tempDiff = {1'b0, readDataFirst} - {1'b0, immExt};
+                                writeData = tempDiff[31:0];
+
+                                
 
                             end
+
+
+                            
+
                         endcase
                     end
                     
@@ -190,13 +289,11 @@ module execute(
                         writeData = aluRegister; 
 
 
-                        //Update the flags
-                        flags[3] = writeData[31];           // N
-                        flags[2] = (writeData == 32'd0);    // Z
-                        flags[1] = aluRegister[32];           // C = NOT borrow
-                        flags[0] = (readDataFirst[31] == readDataSec[31]) && 
-                                    (writeData[31] != readDataFirst[31]); // V
-
+                        flags[3] = writeData[31];                     // N
+                        flags[2] = (writeData == 32'd0);              // Z
+                        flags[1] = aluRegister[32];                   // C
+                        flags[0] = (~(readDataFirst[31] ^ readDataSec[31])) &
+                                        ( readDataFirst[31] ^ writeData[31]); // V
 
                     end  
 
@@ -208,7 +305,7 @@ module execute(
 
                         aluRegister = readDataFirst - readDataSec; 
 
-                        $display("Source Reg First in SUBS:   %b", readRegFirst); 
+                        //$display("Source Reg First in SUBS:   %b", readRegFirst); 
                         writeToReg = 1; 
 
                         writeData = aluRegister; 
@@ -220,6 +317,43 @@ module execute(
                         flags[1] = ~aluRegister[32];           // C = NOT borrow
                         flags[0] = (readDataFirst[31] == readDataSec[31]) && 
                                     (writeData[31] != readDataFirst[31]); // V
+
+                    end
+                    
+
+
+                     4'b0001: begin //ADD
+                        
+                        readRegDest = destReg; 
+                        readRegFirst = sourceFirstReg; 
+                        readRegSec = sourceSecReg; 
+
+                        aluRegister = readDataFirst + readDataSec; 
+
+                        writeToReg = 1; 
+
+                        writeData = aluRegister; 
+
+
+                        
+
+                    end  
+
+                    4'b0010: begin //SUB
+                        //$display("subs taken"); 
+                        readRegDest = destReg; 
+                        readRegFirst = sourceFirstReg; 
+                        readRegSec = sourceSecReg; 
+
+                        aluRegister = readDataFirst - readDataSec; 
+
+                        //$display("Source Reg First in SUBS:   %b", readRegFirst); 
+                        writeToReg = 1; 
+
+                        writeData = aluRegister; 
+
+
+                        
 
                     end
                     

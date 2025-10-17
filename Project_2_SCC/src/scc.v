@@ -24,6 +24,9 @@ module scc
     output wire writeFlag, 
     output wire [31:0] dataOut, 
     output wire [31:0] addressIn, 
+    output wire memoryRead,
+    input [31:0] memoryDataIn,
+    
     output wire halt
 
 
@@ -139,9 +142,11 @@ execute EXE (
     .exeData(exeData),
 
     // Memory interface (to instruction_and_data)
-    .memoryDataOut(exe_memoryDataOut),
-    .memoryAddressOut(exe_memoryAddressOut),
-    .memoryWrite(exe_memoryWrite)
+    .memoryDataOut(dataOut),
+    .memoryAddressOut(addressIn),
+    .memoryWrite(writeFlag), 
+    .memoryRead(memoryRead), 
+    .memoryDataIn(memoryDataIn)
 );
 
 
@@ -162,22 +167,6 @@ register REGFILE (
     .out_rd(readDataDest),
     .out_rs1(readDataFirst),
     .out_rs2(readDataSec)
-);
-
-
-mem MEM (
-    .clk(clk),
-    .rst(rst),
-
-    // Inputs from Execute
-    .writeIn(exe_memoryWrite),
-    .addressIn(exe_memoryAddressOut),
-    .dataIn(exe_memoryDataOut),
-
-    // Outputs to memory module (instruction_and_data.v)
-    .dataOut(dataOut),
-    .addressOut(addressIn),
-    .writeFlag(writeFlag)
 );
 
 

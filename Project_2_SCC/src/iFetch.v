@@ -60,8 +60,8 @@ module iFetch(clk, rst, fetchedInstruction, programCounter, filteredInstruction,
                         //This is uncoditional branch with imm offset, so lets just change PC to whatever value is in here:
                         
                         programCounter <= PC + 4 + branchOffsetAddress;   
-                        $display("in uncond branch");
-                        $display(branchOffsetAddress); 
+                        //$display("in uncond branch");
+                        //$display(branchOffsetAddress); 
                     end else if (fetchedInstruction[31:30] == 2'b11 && fetchedInstruction[28:25] == 4'b0010) begin 
                         //This will be no operation (NOP), we just load, current PC value into PC + 4
                         programCounter <= PC;

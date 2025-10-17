@@ -21,10 +21,17 @@ module register(clk, rst, rd, rs1, rs2, write, writeData, out_rd, out_rs1, out_r
     //Logic
     always @(posedge clk) begin 
         if (rst) begin
-            for (i = 0; i < 16; i = i + 1) registerFile[i] <= 32'd0;
-        end else if (write) begin
-            registerFile[rd] <= writeData;
-            $display("WRITE -> R[%0d] = %0d (0x%08h)", rd, $signed(writeData), writeData);
+            for (i = 0; i < 16; i = i + 1)
+                registerFile[i] <= 32'd0;
+        end 
+        else begin
+            // write only if enabled and not register 14
+            if (write && (rd != 4'd14)) begin
+                registerFile[rd] <= writeData;
+                $display("WRITE -> R[%0d] = %0d (0x%08h)", rd, $signed(writeData), writeData);
+            end
+            // keep R14 permanently zero
+            registerFile[14] <= 32'd0;
         end
     end
 
@@ -32,6 +39,8 @@ module register(clk, rst, rd, rs1, rs2, write, writeData, out_rd, out_rs1, out_r
     assign out_rd = registerFile[rd]; 
     assign out_rs1 = registerFile[rs1];
     assign out_rs2 = registerFile[rs2];
+
+    
 
 
 
