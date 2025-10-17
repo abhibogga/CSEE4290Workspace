@@ -63,8 +63,13 @@ module iFetch_gemini(
             ghost_PC <= 0;
             ucode_flag <= 0;
         end else begin 
-            // Update state register
-            state <= stateNext; 
+       
+
+	    if (stateNext == sUcode && state != sUcode) begin
+		ghost_PC <= 0;
+	    end  //initialize ghost_PC to be start of algorithm
+
+	    state <= stateNext;
             
             // Sequential Logic based on current state
             case (state)
@@ -94,37 +99,24 @@ module iFetch_gemini(
                 end
 
                 sUcode: begin
-                    // FIX: This logic was moved from the sFilter state to the correct sUcode state
-                    case (ghost_instruction) // This is pseudo-code, you need to define these instructions
-                        // mov_instruction: 
-                        //     ghost_PC <= ghost_PC + 1; 
-                        // add_instruction:
-                        //     ghost_PC <= ghost_PC + 1; 
-                        // sub_instruction:
-                        //     ghost_PC <= ghost_PC + 1;
-                        // cmp_instruction:
-                        //     ghost_PC <= ghost_PC + 1;
-                        // bne_instruction:
-                        //     ghost_PC <= ghost_PC - 3;
-                        default:
-                            ghost_PC <= ghost_PC + 1;
-                    endcase
-                end
+                   ghost_PC <= ghost_PC +1;
+                   
+                end 
             endcase
         end 
     end
 
     // Combinational Logic Here: 
     always @(*) begin 
-        // Default assignments to avoid latches
-        stateNext = state; 
-        filteredInstruction = fetchedInstruction;
-        ucode_flag = 0;
 
         case (state) 
             sIdle: begin 
-                stateNext = sFilter; 
-            end
+                if (rst == 1) begin
+		    stateNext = sIdle; 
+		end else begin
+		    stateNext = sFilter;
+		end          
+	     end
 
             sFilter: begin 
                 // In sFilter, normal instructions are from fetchedInstruction
@@ -143,7 +135,7 @@ module iFetch_gemini(
             sUcode: begin
                 // In sUcode, instructions come from the ghost ROM
                 filteredInstruction = ghost_instruction; 
-                ghost_PC = 0; // start ghost PC, initiate it at the location of the first mul opcode
+                
                 ucode_flag = 1;
 
                 // FIX: Corrected comparison from '=' to '=='
