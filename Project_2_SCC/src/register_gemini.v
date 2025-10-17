@@ -23,6 +23,7 @@ module register(clk, rst, rd, rs1, rs2, write, writeData, out_rd, out_rs1, out_r
     parameter sIdle = 0, sRegular = 1, sUcode = 2;
 
     integer i;
+    reg trigger;
 
     // Sequential Logic for writing to registers
     always @(posedge clk) begin 
@@ -62,6 +63,7 @@ module register(clk, rst, rd, rs1, rs2, write, writeData, out_rd, out_rs1, out_r
             if (state == sUcode && statePrev == sRegular) begin
                 for (integer j = 0; j < 16; j = j + 1) begin
                     ghost_register_file[j] <= registerFile[j];
+		    trigger <= 1'b1; //does the copying happen?
                 end
             end
         end

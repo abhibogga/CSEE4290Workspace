@@ -64,6 +64,7 @@ module scc
         .rst(rst), // FIX: Added missing comma
         .immediate(mul_imm_imm_scc), // FIX: Corrected typo from mul_imm_scc
         .reg1(mul_imm_rs_scc),
+	.reg2(4'b0000);
         .dest_reg(mul_imm_rd_scc), // FIX: Added missing connection for dest
         .ghost_pc(ghost_PC_scc), // FIX: Added missing connection for ghost_pc
         .output_instruction(ucode_instruction_scc), // FIX: Added missing connection for output

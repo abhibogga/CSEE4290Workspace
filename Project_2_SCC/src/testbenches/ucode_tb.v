@@ -35,6 +35,10 @@ end
 //Define testbench action
 initial begin
     $dumpvars(0, ucode_tb);
+    $dumpvars(0, ucode_tb.topMod.scc.REGFILE.registerFile);
+    $dumpvars(0, ucode_tb.topMod.scc.REGFILE.ghost_register_file);
+    $dumpvars(0, ucode_tb.topMod.scc.REGFILE.registerFile.immediate_held);
+
     rst = 1;
     clk_en = 1;
 

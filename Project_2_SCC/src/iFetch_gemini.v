@@ -103,7 +103,7 @@ module iFetch_gemini(
 		   if (ghost_instruction[31:28] == 4'b1101) begin
 			state <= sFilter;
 			trigger <= 2'b01;
-		   end else if (ghost_instruction[31:21] == 11'b11000010000) begin
+		   end else if (ghost_PC == 4) begin
 			ghost_PC <= ghost_PC - 3;
 			trigger <= 2'b10;
 		   end else begin
