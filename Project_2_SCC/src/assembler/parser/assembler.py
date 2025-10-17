@@ -9,6 +9,8 @@
 # Addition: Support to use XZR register as a shortcut for the value zero OR shortcut for R14
 # Addition: CMP now "stores" to R14 (XZR) and SUBS can be used to store to a destination register
 
+
+# python3 parser/assembler.py tests/BabyTest.asm parser/instructions.json
 #: 
 import re
 import json
