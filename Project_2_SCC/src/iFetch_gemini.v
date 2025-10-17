@@ -29,9 +29,9 @@ module iFetch_gemini(
     output reg [31:0] programCounter;
     output reg [31:0] filteredInstruction;
     output reg [6:0] mul_opcode_out;
-    output reg [3:0] mul_imm_rd;
-    output reg [3:0] mul_imm_rs;
-    output reg [15:0] mul_imm_imm; //just forward the registers and immediate to ucode_rom
+    output [3:0] mul_imm_rd;
+    output [3:0] mul_imm_rs;
+    output [15:0] mul_imm_imm; //just forward the registers and immediate to ucode_rom
     output reg [3:0] ghost_PC; ///only 30 lines in ucode rom
     output reg ucode_flag;
 

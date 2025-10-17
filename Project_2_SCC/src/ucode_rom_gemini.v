@@ -9,7 +9,7 @@ module ucode_rom(mul_opcode, clk, rst, immediate, reg1, reg2, dest_reg, ghost_pc
     input [3:0] reg1;
     input [3:0] reg2;
     input [3:0] dest_reg;
-    input [4:0] ghost_pc;
+    input [3:0] ghost_pc;
 
     // FIX: The output should be a 'reg' since it's assigned inside an 'always' block.
     output reg [31:0] output_instruction;

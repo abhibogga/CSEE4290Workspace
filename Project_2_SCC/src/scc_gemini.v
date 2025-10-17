@@ -34,7 +34,7 @@ module scc
     wire [3:0] mul_imm_rs_scc;
     // FIX: Corrected width from [3:0] to [15:0] to match module port
     wire [15:0] mul_imm_imm_scc; 
-    wire [4:0] ghost_PC_scc; // FIX: Width should be [4:0] to match ucode_rom input
+    wire [3:0] ghost_PC_scc; // FIX: Width should be [4:0] to match ucode_rom input
     wire ucode_flag;
     // FIX: Added wire for ucode_rom output to iFetch ghost_instruction input
     wire [31:0] ucode_instruction_scc;
