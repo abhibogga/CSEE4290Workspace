@@ -13,6 +13,7 @@ c_flag:
     MOV R0, #65535     
     ADD R1, R0, #1       
 v_flag:
+    ORG #0x40C
     MOV R0, #32767
     ADD R1, R0, #1
     HALT
