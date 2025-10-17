@@ -1,4 +1,5 @@
-iverilog -o test .\testbenches\oct_10_checkpoint.v
+iverilog -o ucode_test_trying ./testbenches/ucode_tb.v scc_f25_top.v
+
 
 vvp .\test
 
