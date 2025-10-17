@@ -10,18 +10,11 @@ z_flag:
 
 c_flag:
     ORG #0x408;
-    MOV   R0, #0x408
-
-    LOAD  R1, R0, #0
-    LOAD  R2, R0, #4
-    ADD  R3, R1, R2
+    MOV R0, #65535     
+    ADD R1, R0, #1       
 v_flag:
-    ORG #0x40C;
-    MOV   R0, #0x40C
-    LOAD  R1, R0, #0
-    LOAD  R2, R0, #4
-
-    SUB R3, R1, R2  
+    MOV R0, #32767
+    ADD R1, R0, #1
     HALT
 
     
