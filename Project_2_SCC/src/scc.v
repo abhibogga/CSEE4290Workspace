@@ -1,8 +1,9 @@
-`include "iFetch.v"
+`include "iFetch_gemini.v"
 `include "iDecode.v"
 `include "execute.v"
 `include "mem.v"
-`include "register.v"
+`include "register_gemini.v"
+`include "ucode_rom_gemini.v"
 
 module scc
 (
@@ -32,9 +33,14 @@ module scc
 
     //Lets intialize IF module
     wire [31:0] instrcutionForID; 
-    wire [6:0] mul_opcode_scc
+    wire [6:0] mul_opcode_scc;
+    wire [3:0] mul_imm_rd_scc;
+    wire [3:0] mul_imm_rs_scc;
+    wire [3:0] mul_imm_imm_scc;
+    wire [3:0] ghost_PC_scc;
+    wire ucode_flag;
 
-    iFetch IF (
+    iFetch_gemini IF (
         .clk(clk), 
         .rst(rst), 
         .fetchedInstruction(instruction), 
@@ -42,9 +48,46 @@ module scc
         .filteredInstruction(instrcutionForID), 
         .exeOverride(exeOverride),
         .exeData(exeData)
-        .mul_opcode_out(mul_opcode_scc)
+        .mul_opcode_out(mul_opcode_scc),
+        .mul_imm_rd(mul_imm_rd_scc),
+	.mul_imm_imm(mul_imm_imm_scc),
+	.ghost_PC(ghost_PC_scc),
+	.ucode_flag(ucode_flag)
     );
 
+    ucode_rom ucode_rom (
+	.clk(clk),
+	.mul_opcode(mul_opcode_scc),
+	.rst(rst)
+	.immediate(mul_imm_scc),
+	.reg1(mul_imm_rs_scc),
+	
+    );
+
+	    
+    register REGFILE (
+         .clk(clk),
+         .rst(rst),
+
+          // Register addresses
+         .rd(exe_readRegDest),     // destination register index (from EXE or Decode)
+         .rs1(exe_readRegFirst),   // source register 1 (from EXE or Decode)
+         .rs2(exe_readRegSec),     // source register 2 (from EXE or Decode)
+
+         // Write-back control
+         .write(exe_writeToReg),   // enable write (from EXE)
+         .writeData(exe_writeData),// data to write back into rd
+
+         // Read outputs
+         .out_rd(readDataDest),
+         .out_rs1(readDataFirst),
+         .out_rs2(readDataSec) //all from decode/exe NOT ucode rom
+
+	 .ucode_flag(ucode_flag)
+	 
+    );
+
+    
 	//Decode Inputs/Outputs
     wire        branch;
     wire        loadStore;
@@ -62,6 +105,8 @@ module scc
     wire [3:0] branchInstruction; 
     wire [1:0] firstLevelDecode; 
     wire [3:0] secondLevelDecode; 
+
+    
 
     //Init module
     iDecode ID (
@@ -145,25 +190,6 @@ execute EXE (
     .memoryWrite(exe_memoryWrite)
 );
 
-
-register REGFILE (
-    .clk(clk),
-    .rst(rst),
-
-    // Register addresses
-    .rd(exe_readRegDest),     // destination register index (from EXE or Decode)
-    .rs1(exe_readRegFirst),   // source register 1 (from EXE or Decode)
-    .rs2(exe_readRegSec),     // source register 2 (from EXE or Decode)
-
-    // Write-back control
-    .write(exe_writeToReg),   // enable write (from EXE)
-    .writeData(exe_writeData),// data to write back into rd
-
-    // Read outputs
-    .out_rd(readDataDest),
-    .out_rs1(readDataFirst),
-    .out_rs2(readDataSec)
-);
 
 
 mem MEM (

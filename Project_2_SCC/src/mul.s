@@ -1,0 +1,3 @@
+	MOV R0,#4
+	MUL R0,R0,#3
+	HALT

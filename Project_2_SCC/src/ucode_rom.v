@@ -10,24 +10,19 @@ module ucode_rom(mul_opcode, clk, rst, immediate, reg1, reg2, dest_reg, result_g
   input reg [4:0] ghost_pc; //5 bits handles up to decimal 32, which I think covers the number of lines total in ucode rom
 
 
-  output reg [31:0] result_g;
-  output reg [15:0] imm_g;
-  output reg [3:0] reg1_g;
-  output reg [3:0] reg2_g;
- 
   output reg [31:0] output_instruction;
 
   wire [31:0] mov_instruction, add_instruction, sub_instruction, cmp_instruction, bne_instruction;
+  //^temporary wires to hold the 32 bit instruction
+
+  
+  reg [31:0] rom [0:30] //31 32-bit lines = 4 Multiply codes  + 6 insts per algo (4 algos ) + some buffer
+
 
   always(@posedge clk)begin
 
 	  case(mul_opcode)
-	     7'b0010000 //mul imm
-	                
-	        assign imm_g = immediate;
-	        assign reg1_g = reg1;
-	        assign reg2_g = reg2; //sending to ghost register file
-        
+	     7'b0010000 //mul imm             
 
 		//if I send the information to reg file on this clock, do I need to wait before these below instructions can work? registers update on a flop....
 	        mov_instruction = {7'b0000000, 4'b0001, 4'b0000, immediate}; //these are 32 bit instructions
@@ -59,9 +54,6 @@ module ucode_rom(mul_opcode, clk, rst, immediate, reg1, reg2, dest_reg, result_g
 		//trigger flags to be set?
 	endcase
   end
-
-
-  reg [31:0] rom [0:30] //31 32-bit lines = 4 Multiply codes  + 6 insts per algo (4 algos ) + some buffer
 
 
   always(*) begin

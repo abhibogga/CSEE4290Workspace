@@ -1,5 +1,5 @@
 `include "Instruction_and_data.v"
-`include "scc.v"
+`include "scc_gemini.v"
 module scc_f25_top (
     clk, 
     clk_en,
