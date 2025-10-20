@@ -1,11 +1,10 @@
 $date
-	Mon Oct 20 14:43:43 2025
 $end
 $version
 	Icarus Verilog
 $end
 $timescale
-	1ps
+	1s
 $end
 $scope module oct_17_checkpoint $end
 $var wire 1 ! halt_f $end
@@ -210,9 +209,9 @@ bx B"
 b0 A"
 b0 @"
 b0 ?"
-b0 >"
-b0 ="
-b0 <"
+b100 >"
+b100 ="
+b1 <"
 b0 ;"
 bx :"
 b100 9"
@@ -243,12 +242,12 @@ bx }
 x|
 b0 {
 b0 z
-b0 y
-b0 x
-b0 w
-b0 v
-b0 u
-b0 t
+bx y
+bx x
+bx w
+bx v
+bx u
+bx t
 b0 s
 b0 r
 bx q
@@ -263,9 +262,9 @@ bx i
 bx h
 bx g
 bx f
-bx e
-bx d
-bx c
+b0 e
+xd
+xc
 bx b
 bx a
 b0 `
