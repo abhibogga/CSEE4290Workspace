@@ -7,7 +7,8 @@ module iFetch(
     input exeOverride, 
     input [15:0] exeData, //15 bit imm
     output reg [31:0] programCounter,
-    output reg [31:0] filteredInstruction
+    output reg [31:0] filteredInstruction,
+    output reg switchReg
 );
 
     //Registers/States here: 
@@ -58,6 +59,7 @@ module iFetch(
                 end else begin 
                     stateNext = sFilter; 
                     PC_next = 0; 
+                    switchReg = 0; //Keep it regular
                 end
             end
 
@@ -79,6 +81,14 @@ module iFetch(
                 else if (fetchedInstruction[31:25] == 7'b1100100) begin 
                     PC_next = PC + 4; 
                 end 
+                
+                //We need to catch the MUL 
+                else if (fetchedInstruction[31:25] == 7'b0010000) begin 
+                    //Dont update the PC 
+                    $display("found");
+                end
+
+
 
                 // === Default ===
                 else begin 
