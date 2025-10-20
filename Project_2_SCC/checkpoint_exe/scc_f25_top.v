@@ -1,5 +1,5 @@
 `include "Instruction_and_data.v"
-`include "scc_gemini.v"
+`include "scc.v"
 module scc_f25_top (
     clk, 
     clk_en,
@@ -67,8 +67,6 @@ scc scc(
     .writeFlag(writeBit), 
     .dataOut(dataOutMem), 
     .addressIn(addressFetch), 
-    .memoryRead(readBit), 
-    .memoryDataIn(dataIn),
     .halt(halt)
 
 ); 
