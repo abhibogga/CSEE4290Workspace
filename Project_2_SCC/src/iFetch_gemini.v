@@ -101,7 +101,7 @@ module iFetch_gemini(
 
                 sUcode: begin
 		   if (ghost_instruction[31:28] == 4'b1101) begin
-			state <= sFilter;
+			state <= sFilter; //HALT from ucode
 			trigger <= 2'b01;
 		   end else if (ghost_PC == 4) begin
 			ghost_PC <= ghost_PC - 3;
