@@ -37,18 +37,18 @@ module ucode_tb;
 
 	//Define testbench action
 	initial begin
-	    $dumpvars(0, ucode_tb);
+	    $dumpvars(1, ucode_tb);
 
 	    rst = 1;
 	    clk_en = 1;
 
 	    repeat (3) @(posedge clk);
-	    //Keep rst high for 3 clks
+
 	    rst = 0;
 	    repeat (100) @(posedge clk);
 
 	    $finish;
-	// FIX: Added the missing 'end' to close the initial block
+
 	end
 
 endmodule
