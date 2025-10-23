@@ -89,15 +89,6 @@ module scc
         .halt(halt)
     );
 
-    //Initialize Microcode module here
-    u_code_control uCode (
-
-    );
-
-    u_Code_Rom (
-
-    );
-
 
 //Exe wires
 wire [3:0] exe_readRegDest;

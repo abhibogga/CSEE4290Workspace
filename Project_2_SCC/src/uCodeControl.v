@@ -10,5 +10,6 @@ module u_code_control (
     output reg  uc_active,
     output reg [7:0] uc_addr
 );
+    
 
 endmodule

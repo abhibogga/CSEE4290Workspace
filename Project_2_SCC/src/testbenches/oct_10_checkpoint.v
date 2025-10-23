@@ -38,7 +38,11 @@ end
 //Define testbench action
 initial begin 
 
+    $dumpfile("dump.vcd");
     $dumpvars(0, oct_10_checkpoint); 
+    $dumpvars(0, oct_10_checkpoint.topMod.scc.ID);
+    $dumpvars(0, oct_10_checkpoint.topMod.scc.ID.Ucontrol);
+    $dumpvars(0, oct_10_checkpoint.topMod.scc.ID.URom);
     rst = 1; 
     clk_en = 1; 
 
