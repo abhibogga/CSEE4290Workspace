@@ -28,11 +28,19 @@ module iDecode(
     reg  [31:0] ifid_instr;
     wire        hold_if;
 
+    reg hold_if_cal; //This was added because original hold_if was asserting itself at the same time the IF/ID Instruction was latching. 
+    always @(posedge clk) begin
+        if (rst) 
+            hold_if_cal <= 1'b1;
+        else
+            hold_if_cal <= hold_if;
+    end
+
     // Latch to IF/ID (freeze on hold_if)
     always @(posedge clk) begin
         if (rst) begin
-            ifid_instr <= 32'b0;
-        end else if (!hold_if) begin
+            ifid_instr <= 32'h0;
+        end else if (!hold_if_cal) begin
             ifid_instr <= instruction;
         end
     end
