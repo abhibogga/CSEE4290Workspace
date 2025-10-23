@@ -6,6 +6,8 @@ module iFetch(
     input [31:0] fetchedInstruction,
     input exeOverride, 
     input [15:0] exeData, //15 bit imm
+    input ucode_trigger,
+
     output reg [31:0] programCounter,
     output reg [31:0] filteredInstruction
 );
@@ -35,6 +37,12 @@ module iFetch(
             programCounter <= 0; 
             state <= sIdle; 
         end 
+
+        else if (ucode_trigger) begin
+	    PC <= PC; //freeze program counter
+	end
+
+
         else begin 
             if (state == sFilter) begin 
                 // Update PC and programCounter together

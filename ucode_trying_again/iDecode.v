@@ -21,10 +21,12 @@ module iDecode(
     output reg [15:0] out_imm, 
     output reg [1:0]  firstLevelDecode_out, 
     output reg [3:0]  secondLevelDecode_out,
-    output reg        halt
+    output reg        halt,
+    output	      mul_trigger
+
 );
 
-    // === Field extraction (adjust bit slices if your ISA differs) ===
+    // === Field extraction ===
     wire [1:0] firstLevelDecode     = instruction[31:30]; 
     wire       specialBit           = instruction[29]; 
     wire [3:0] secondLevelDecode    = instruction[28:25];
@@ -34,6 +36,8 @@ module iDecode(
     wire [3:0] sourceFirstReg       = instruction[20:17]; 
     wire [3:0] sourceSecReg         = instruction[16:13]; 
     wire [15:0] imm                 = instruction[15:0];
+    wire [6:0] opcode		    = instruction[31:25];
+
 
     always @(*) begin
         //$display("Instr raw = %h", instruction);
@@ -102,7 +106,20 @@ module iDecode(
                 // out_imm already set to imm above
                 regRead            = 1'b1;
                 regWrite           = 1'b1; // ALU result will be written
-            end
+           
+		case (opcode)
+		   7'b0010000: begin
+			mul_trigger <= 1'b1;
+			out_sourceFirstReg = sourceFirstReg;
+			out_destRegister = destReg;
+			out_imm = imm; //send these over to ucode control			
+
+		   end
+
+		endcase
+
+		
+	     end
 
             default: begin
                 // all defaults already safe

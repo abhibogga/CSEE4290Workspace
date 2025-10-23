@@ -4,6 +4,9 @@
 `include "execute.v"
 `include "mem.v"
 `include "register.v"
+`include "ucode.v"
+`include "mux.v"
+
 
 module scc
 (
@@ -35,17 +38,20 @@ module scc
 
 
     //Lets intialize IF module
-    wire [31:0] instrcutionForID; 
+    wire [31:0] instructionForID;
+ 
     iFetch IF (
         .clk(clk), 
         .rst(rst), 
         .fetchedInstruction(instruction), 
         .programCounter(programCounter), 
-        .filteredInstruction(instrcutionForID), 
+        .filteredInstruction(filtered_instruction), 
         .exeOverride(exeOverride),
-        .exeData(exeData)
+        .exeData(exeData),
+	.ucode_trigger(mul_trigger)
     );
 
+    wire [31:0] filtered_instruction;
 
 	//Decode Inputs/Outputs
     wire        branch;
@@ -67,7 +73,7 @@ module scc
 
     //Init module
     iDecode ID (
-        .instruction(instrcutionForID),
+        .instruction(instructionForID),
         .clk(clk),
         .rst(rst),
         .branch(branch),
@@ -87,6 +93,27 @@ module scc
         .firstLevelDecode_out(firstLevelDecode), 
         .secondLevelDecode_out(secondLevelDecode), 
         .halt(halt)
+    );
+
+    wire mul_trigger;
+    wire [31:0] ucode_inst;
+
+    ucode ucode (
+	.clk(clk),
+	.rst(rst),
+	.start_mul(mul_trigger), //leaving mul type for later
+	.dest_reg(out_destRegister),
+	.source_reg(out_sourceFirstReg),
+	.immediate(out_imm)
+	.output_instruction(ucode_inst)
+    );
+
+
+    mux mux (
+	.filtered_instruction(filtered_instruction),
+	.ucode_instruction(ucode_inst),
+	.control(mul_trigger),
+	.finalized_instruction(instructionForID)
     );
 
 

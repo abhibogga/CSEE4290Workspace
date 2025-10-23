@@ -13,6 +13,7 @@
  * - immediate = 0 (results in R_dest = 0)
  * - immediate = 1 (results in MOV R_dest, R_source)
  * - immediate > 1 (results in MOV + (Imm) ADDs)
+ * gemini helped in getting the fire started but group still did the heavy lifting
  */
 module ucode_controller (
     input wire clk,
@@ -28,8 +29,7 @@ module ucode_controller (
 
     // Outputs to pipeline MUX
     output reg [31:0] output_instruction, // The generated MOV/ADD/SUB
-    output reg mux_ctrl                // 1'b1: Use this instruction
-                                       // 1'b0: Use instruction from IF
+
 );
 
     // --- FSM State Definitions ---
@@ -72,13 +72,12 @@ module ucode_controller (
         state_next = state_reg;
         count_next = count_reg;
         output_instruction = {5'b11001,27'b0}; // Default to NOP
-        mux_ctrl = 1'b0;            // Default to IF stage
-
+        
         case (state_reg)
             
             sIdle: begin
                 // Wait for the decoder to signal 'start_mul'
-                mux_ctrl = 1'b0; // Give control to IF
+                
                 if (start_mul) begin
                     // A MUL instruction has arrived. Decide what to do.
                     if (immediate == 0) begin
@@ -102,7 +101,7 @@ module ucode_controller (
                 // Handle immediate = 0. Issue SUB R_dest, R_dest, R_dest
                 // This results in R_dest = 0.
                 output_instruction = {SUB_OPCODE, dest_reg, dest_reg, dest_reg, 13'b0};
-                mux_ctrl = 1'b1;
+                
                 state_next = sHalt; // We are done
             end
 
@@ -114,7 +113,7 @@ module ucode_controller (
 		count_reg = immediate; //initialize the decrement counter as zero
 
 		//zero out the source register of the multiply
-                mux_ctrl = 1'b1;
+                
                 
                 // Check if we are done (i.e., immediate was 1)
                 if (count_reg == 0) begin
@@ -128,8 +127,7 @@ module ucode_controller (
                 // Issue ADD R_dest, R_dest, R_source
                 output_instruction = {ADD_OPCODE, dest_reg, dest_reg, source_reg, 13'b0};
 		//it just needs to know the register number...it doesn't actually need to read it
-                mux_ctrl = 1'b1;
-                
+                                
                 // Decrement counter
                 count_next = count_reg - 1;
                 
@@ -144,14 +142,14 @@ module ucode_controller (
 
             sHalt: begin
                 // Done. Hand control back to the main IF stage.
-                mux_ctrl = 1'b0;
+                
                 state_next = sIdle; // Wait for the next MUL
             end
 
             default: begin
                 // Safety case
                 state_next = sIdle;
-                mux_ctrl = 1'b0;
+                
             end
         endcase
     end
