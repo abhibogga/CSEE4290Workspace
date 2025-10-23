@@ -1,5 +1,7 @@
 //FORMATTED CODE BY CHAT-GPT, CODE IS DONE BY GROUP 7 HOWEVER
 //COMMENTS ALSO ADDED BY CHAT-GPT
+`include "uCodeControl.v"
+`include "uCodeROM.v"
 module iDecode(
     input  [31:0] instruction, 
     input         clk, 
@@ -24,18 +26,58 @@ module iDecode(
     output reg        halt
 );
 
-    // === Field extraction (adjust bit slices if your ISA differs) ===
-    wire [1:0] firstLevelDecode     = instruction[31:30]; 
-    wire       specialBit           = instruction[29]; 
-    wire [3:0] secondLevelDecode    = instruction[28:25];
-    wire [2:0] aluOperationCommands = instruction[27:25];
-    wire [3:0] branchCondition      = instruction[24:21]; 
-    wire [3:0] destReg              = instruction[24:21]; 
-    wire [3:0] sourceFirstReg       = instruction[20:17]; 
-    wire [3:0] sourceSecReg         = instruction[16:13]; 
-    wire [15:0] imm                 = instruction[15:0];
+    reg [31:0] ifid_instr; //Register for instruction coming from IF
+    wire       hold_if; //From ucode control
+
+    always @(posedge clk) begin
+        if (!hold_if) begin
+            ifid_instr <= instruction;  //Instruction from Ifetch is not a uc specific one
+        end
+        //else:
+            //Continue using uc instruction
+    end
+
+    
+    //MicroCode Handler 
+    wire        uc_active; //Control signal for IF to halt
+    wire [31:0] uc_instr;
+    wire [31:0] ifid_istr;
+
+    wire [31:0] instruction_eff = (uc_active) ? uc_instr : ifid_instr; //MUX to switch between uc_instr and ifid_instr depndent on control signal
+
+    //Instantiate u-Code Control
+    u_code_control Ucontrol (
+        .clk(clk),
+        .rst(rst),
+        .ifid_instr(ifid_instr),
+
+        .hold_if(hold_if),
+        .uc_active(uc_active)
+
+        //What else to add?
+    );
+
+    //Instantiate u-Code ROM
+    u_Code_Rom URom (
+        .clk(clk),
+        .rst(rst),
+        .uc_instr(uc_instr)
+        //What else to add?
+    );
 
     always @(*) begin
+
+    // === Field extraction (adjust bit slices if your ISA differs) ===
+    wire [1:0] firstLevelDecode     = instruction_eff[31:30]; 
+    wire       specialBit           = instruction_eff[29]; 
+    wire [3:0] secondLevelDecode    = instruction_eff[28:25];
+    wire [2:0] aluOperationCommands = instruction_eff[27:25];
+    wire [3:0] branchCondition      = instruction_eff[24:21]; 
+    wire [3:0] destReg              = instruction_eff[24:21]; 
+    wire [3:0] sourceFirstReg       = instruction_eff[20:17]; 
+    wire [3:0] sourceSecReg         = instruction_eff[16:13]; 
+    wire [15:0] imm                 = instruction_eff[15:0];
+
         //$display("Instr raw = %h", instruction);
         // ---------- Defaults to avoid latches / stale values ----------
         branch              = 1'b0;

@@ -1,8 +1,7 @@
-
 `include "iFetch.v"
 `include "iDecode.v"
 `include "execute.v"
-`include "mem.v"
+`include "mem.v" //Never used?
 `include "register.v"
 
 module scc
@@ -35,13 +34,13 @@ module scc
 
 
     //Lets intialize IF module
-    wire [31:0] instrcutionForID; 
+    wire [31:0] instructionForID; 
     iFetch IF (
         .clk(clk), 
         .rst(rst), 
         .fetchedInstruction(instruction), 
         .programCounter(programCounter), 
-        .filteredInstruction(instrcutionForID), 
+        .filteredInstruction(instructionForID), 
         .exeOverride(exeOverride),
         .exeData(exeData)
     );
@@ -63,11 +62,12 @@ module scc
     wire [15:0] out_imm;
     wire [3:0] branchInstruction; 
     wire [1:0] firstLevelDecode; 
-    wire [3:0] secondLevelDecode; 
+    wire [3:0] secondLevelDecode;
+     
 
     //Init module
     iDecode ID (
-        .instruction(instrcutionForID),
+        .instruction(instructionForID), //Instruction from IF, proceed as normal
         .clk(clk),
         .rst(rst),
         .branch(branch),
@@ -87,6 +87,15 @@ module scc
         .firstLevelDecode_out(firstLevelDecode), 
         .secondLevelDecode_out(secondLevelDecode), 
         .halt(halt)
+    );
+
+    //Initialize Microcode module here
+    u_code_control uCode (
+
+    );
+
+    u_Code_Rom (
+
     );
 
 
