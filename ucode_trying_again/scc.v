@@ -2,7 +2,7 @@
 `include "iFetch.v"
 `include "iDecode.v"
 `include "execute.v"
-`include "mem.v"
+//`include "mem.v"
 `include "register.v"
 `include "ucode.v"
 `include "mux.v"

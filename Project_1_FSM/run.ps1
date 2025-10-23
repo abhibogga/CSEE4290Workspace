@@ -1,6 +1,6 @@
-iverilog -o test .\tb_count.v
+iverilog -o test ./tb_count.v
 
-vvp .\test
+vvp ./test
 
 
 gtkwave dump.vcd

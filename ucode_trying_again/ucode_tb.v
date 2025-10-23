@@ -38,7 +38,7 @@ module ucode_tb;
 	//Define testbench action
 	initial begin
 	    $dumpvars(1, ucode_tb);
-
+	    $monitor;
 	    rst = 1;
 	    clk_en = 1;
 
@@ -46,7 +46,7 @@ module ucode_tb;
 
 	    rst = 0;
 	    repeat (100) @(posedge clk);
-
+	    $display;
 	    $finish;
 
 	end
