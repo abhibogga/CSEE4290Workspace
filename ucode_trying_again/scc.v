@@ -1,4 +1,3 @@
-
 `include "iFetch.v"
 `include "iDecode.v"
 `include "execute.v"
@@ -104,7 +103,7 @@ module scc
 	.start_mul(mul_trigger), //leaving mul type for later
 	.dest_reg(out_destRegister),
 	.source_reg(out_sourceFirstReg),
-	.immediate(out_imm)
+	.immediate(out_imm),
 	.output_instruction(ucode_inst)
     );
 

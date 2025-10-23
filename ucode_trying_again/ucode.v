@@ -15,7 +15,7 @@
  * - immediate > 1 (results in MOV + (Imm) ADDs)
  * gemini helped in getting the fire started but group still did the heavy lifting
  */
-module ucode_controller (
+module ucode (
     input wire clk,
     input wire rst, // Active-high reset
     
@@ -83,14 +83,10 @@ module ucode_controller (
                     if (immediate == 0) begin
                         // R1 = R0 * 0. We must clear R1.
                         state_next = sClear;
-                    else if (immediate == 1) begin 
-                        // R1 = R0 * 1. Just need to MOV R1, R0.
-                        state_next = sMov;
-                        count_next = 0; // No ADDs needed
                     end else begin
                         // R1 = R0 * N (N > 1). Need MOV + (N-1) ADDs.
                         state_next = sMov;
-                        count_next = immediate - 1; // Load counter
+                        count_next = immediate; // Load counter
                     end
                 end else begin
                     state_next = sIdle;
