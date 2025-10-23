@@ -38,18 +38,14 @@ end
 //Define testbench action
 initial begin 
 
-    $dumpfile("dump.vcd");
-    $dumpvars(0, oct_10_checkpoint); 
-    $dumpvars(0, oct_10_checkpoint.topMod.scc.ID);
-    $dumpvars(0, oct_10_checkpoint.topMod.scc.ID.Ucontrol);
-    $dumpvars(0, oct_10_checkpoint.topMod.scc.ID.URom);
+    $dumpvars(0, oct_10_checkpoint);
     rst = 1; 
     clk_en = 1; 
 
     repeat (3) @(posedge clk);
     //Keep rst high for 3 clks
     rst = 0; 
-    repeat (1000) @(posedge clk);
+    repeat (30) @(posedge clk);
 
     
     

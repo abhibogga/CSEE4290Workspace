@@ -6,7 +6,9 @@ module u_Code_Rom (
 );
     always @(*) begin
         case (u_addr)
-            
+            8'b00000000: begin //ADDRESS for MUL Regular instructions
+                //LOGIC HERE
+            end
         endcase
     end
 endmodule
