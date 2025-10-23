@@ -15,7 +15,7 @@
  * - immediate > 1 (results in MOV + (Imm) ADDs)
  * gemini helped in getting the fire started but group still did the heavy lifting
  */
-module ucode_controller (
+module ucode (
     input wire clk,
     input wire rst, // Active-high reset
     
@@ -28,7 +28,7 @@ module ucode_controller (
     input wire [15:0] immediate,  // Multiplier value (e.g., 3)
 
     // Outputs to pipeline MUX
-    output reg [31:0] output_instruction, // The generated MOV/ADD/SUB
+    output reg [31:0] output_instruction // The generated MOV/ADD/SUB
 
 );
 
@@ -47,9 +47,9 @@ module ucode_controller (
     reg [15:0] count_reg, count_next;
     
     // --- Instruction Opcode ---
-    localparam [5:0] MOV_OPCODE = 7'b0000000; // Mov register immediate, used for loading the immediate value in source register into destination register in the beginning
-    localparam [5:0] ADD_OPCODE = 7'b0110001; // e.g., ADD Rd, Rs1, Rs2, used to 
-    localparam [5:0] SUB_OPCODE = 7'b0110010; // used to clear destination reg when imm is 0: SUB Rd, Rd, Rd
+    localparam [6:0] MOV_OPCODE = 7'b0000000; // Mov register immediate, used for loading the immediate value in source register into destination register in the beginning
+    localparam [6:0] ADD_OPCODE = 7'b0110001; // e.g., ADD Rd, Rs1, Rs2, used to 
+    localparam [6:0] SUB_OPCODE = 7'b0110010; // used to clear destination reg when imm is 0: SUB Rd, Rd, Rd
 
     // --- Synchronous Block (State & Counter Registers) ---
     // This always block flops the 'next' values into the 'current' registers
@@ -81,17 +81,11 @@ module ucode_controller (
                 if (start_mul) begin
                     // A MUL instruction has arrived. Decide what to do.
                     if (immediate == 0) begin
-                        // R1 = R0 * 0. We must clear R1.
                         state_next = sClear;
-                    } else if (immediate == 1) {
-                        // R1 = R0 * 1. Just need to MOV R1, R0.
+                    end else begin
                         state_next = sMov;
-                        count_next = 0; // No ADDs needed
-                    } else begin
-                        // R1 = R0 * N (N > 1). Need MOV + (N-1) ADDs.
-                        state_next = sMov;
-                        count_next = immediate - 1; // Load counter
-                    }
+                        count_next = immediate; // Load counter
+                    end
                 end else begin
                     state_next = sIdle;
                 end
@@ -106,14 +100,8 @@ module ucode_controller (
             end
 
             sMov: begin
-                // Issue the first instruction: MOV R_dest, R_source
-                // (Assuming MOV Rd, Rs1 format)
                 output_instruction = {MOV_OPCODE, dest_reg, 5'b0, 16'b0};
-		
-		count_reg = immediate; //initialize the decrement counter as zero
-
-		//zero out the source register of the multiply
-                
+		//zero out Rd to start looping adder
                 
                 // Check if we are done (i.e., immediate was 1)
                 if (count_reg == 0) begin

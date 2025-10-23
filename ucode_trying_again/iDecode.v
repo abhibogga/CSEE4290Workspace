@@ -22,7 +22,7 @@ module iDecode(
     output reg [1:0]  firstLevelDecode_out, 
     output reg [3:0]  secondLevelDecode_out,
     output reg        halt,
-    output	      mul_trigger
+    output reg	      mul_trigger
 
 );
 
@@ -59,12 +59,12 @@ module iDecode(
         firstLevelDecode_out= firstLevelDecode;
         secondLevelDecode_out = secondLevelDecode;
         aluFunction         = aluOperationCommands;
-
+	
+	mul_trigger         = 1'b0; //default
         // Halt detect (keep your pattern)
         halt = (instruction[31:25] == 7'b1101000);
 
         // Special / Flags
-        specialEncoding = specialBit;
         setFlags        = secondLevelDecode[4]; // bit 28 is set flags
 
         // Common immediate (for data-imm path)
@@ -109,7 +109,7 @@ module iDecode(
            
 		case (opcode)
 		   7'b0010000: begin
-			mul_trigger <= 1'b1;
+			mul_trigger = 1'b1;
 			out_sourceFirstReg = sourceFirstReg;
 			out_destRegister = destReg;
 			out_imm = imm; //send these over to ucode control			
@@ -122,8 +122,7 @@ module iDecode(
 	     end
 
             default: begin
-                // all defaults already safe
-               
+                // all defaults already safe       
             end
         endcase
     end
