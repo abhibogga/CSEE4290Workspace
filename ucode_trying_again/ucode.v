@@ -28,7 +28,7 @@ module ucode_controller (
     input wire [15:0] immediate,  // Multiplier value (e.g., 3)
 
     // Outputs to pipeline MUX
-    output reg [31:0] output_instruction, // The generated MOV/ADD/SUB
+    output reg [31:0] output_instruction // The generated MOV/ADD/SUB
 
 );
 
@@ -83,15 +83,15 @@ module ucode_controller (
                     if (immediate == 0) begin
                         // R1 = R0 * 0. We must clear R1.
                         state_next = sClear;
-                    } else if (immediate == 1) {
+                    else if (immediate == 1) begin 
                         // R1 = R0 * 1. Just need to MOV R1, R0.
                         state_next = sMov;
                         count_next = 0; // No ADDs needed
-                    } else begin
+                    end else begin
                         // R1 = R0 * N (N > 1). Need MOV + (N-1) ADDs.
                         state_next = sMov;
                         count_next = immediate - 1; // Load counter
-                    }
+                    end
                 end else begin
                     state_next = sIdle;
                 end
