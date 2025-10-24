@@ -79,7 +79,7 @@ module ucode (
             
             sIdle: begin
                 // Wait for the decoder to signal 'start_mul'
-                
+                mux_ctrl = 0;
                 if (start_mul) begin
                     // A MUL instruction has arrived. Decide what to do.
                     if (immediate == 0) begin
@@ -90,6 +90,7 @@ module ucode (
                     end
                 end else begin
                     state_next = sIdle;
+		    output_instruction = 32'b0;
                 end
             end
             
@@ -98,12 +99,13 @@ module ucode (
                 // This results in R_dest = 0.
                 output_instruction = {SUB_OPCODE, dest_reg, dest_reg, dest_reg, 13'b0};
                 state_next = sHalt; // We are done
+		mux_ctrl = 1;
             end
 
             sMov: begin
                 output_instruction = {MOV_OPCODE, dest_reg, 5'b0, 16'b0};
 		//zero out Rd to start looping adder
-                
+                mux_ctrl = 1;
                 // Check if we are done (i.e., immediate was 1)
                 if (count_reg == 0) begin
                     state_next = sHalt;
@@ -116,7 +118,7 @@ module ucode (
                 // Issue ADD R_dest, R_dest, R_source
                 output_instruction = {ADD_OPCODE, dest_reg, dest_reg, source_reg, 13'b0};
 		//it just needs to know the register number...it doesn't actually need to read it
-                                
+                mux_ctrl = 1;                
                 // Decrement counter
                 count_next = count_reg - 1;
                 
@@ -131,14 +133,14 @@ module ucode (
 
             sHalt: begin
                 // Done. Hand control back to the main IF stage.
-                
+                mux_ctrl = 0;
                 state_next = sIdle; // Wait for the next MUL
             end
 
             default: begin
                 // Safety case
                 state_next = sIdle;
-                
+                mux_ctrl = 0;
             end
         endcase
     end
