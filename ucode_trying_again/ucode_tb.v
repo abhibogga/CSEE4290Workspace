@@ -37,7 +37,7 @@ module ucode_tb;
 
 	//Define testbench action
 	initial begin
-	    $dumpvars(1, ucode_tb);
+	    $dumpvars(0, ucode_tb);
 	    $monitor;
 	    rst = 1;
 	    clk_en = 1;
