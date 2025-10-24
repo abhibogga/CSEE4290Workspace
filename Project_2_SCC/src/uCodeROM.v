@@ -5,9 +5,10 @@ module u_Code_Rom (
     output reg [31:0] uc_instr
 );
     always @(*) begin
+        //$readmemh("uCodeROM.mem", memory);
         case (u_addr)
             8'b00000000: begin //ADDRESS for MUL Regular instructions
-                //LOGIC HERE
+                
             end
         endcase
     end

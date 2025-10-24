@@ -74,7 +74,6 @@ module u_code_control (
                         next_uc_addr = 8'b00000000;
                     end
                     default: begin
-
                     end
                 endcase
             end

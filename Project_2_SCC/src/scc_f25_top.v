@@ -73,6 +73,8 @@ scc scc(
 
 ); 
 
+assign halt_f = halt;
+
 
 
 
