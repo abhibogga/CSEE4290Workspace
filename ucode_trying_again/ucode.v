@@ -28,8 +28,8 @@ module ucode (
     input wire [15:0] immediate,  // Multiplier value (e.g., 3)
 
     // Outputs to pipeline MUX
-    output reg [31:0] output_instruction // The generated MOV/ADD/SUB
-
+    output reg [31:0] output_instruction, // The generated MOV/ADD/SUB
+    output reg mux_ctrl
 );
 
     // --- FSM State Definitions ---
@@ -72,7 +72,9 @@ module ucode (
         state_next = state_reg;
         count_next = count_reg;
         output_instruction = {5'b11001,27'b0}; // Default to NOP
-        
+	mux_ctrl = 0;        
+
+
         case (state_reg)
             
             sIdle: begin
@@ -95,7 +97,6 @@ module ucode (
                 // Handle immediate = 0. Issue SUB R_dest, R_dest, R_dest
                 // This results in R_dest = 0.
                 output_instruction = {SUB_OPCODE, dest_reg, dest_reg, dest_reg, 13'b0};
-                
                 state_next = sHalt; // We are done
             end
 
