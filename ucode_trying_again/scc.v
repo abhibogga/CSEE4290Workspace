@@ -47,8 +47,8 @@ module scc
 		.programCounter(programCounter), 
 		.filteredInstruction(filtered_instruction), 
 		.exeOverride(exeOverride),
-		.exeData(exeData),
-		.ucode_trigger(mul_trigger)
+		.exeData(exeData)
+//		.ucode_trigger(mul_trigger)
 	);
 
 	wire [31:0] filtered_instruction;
@@ -92,17 +92,17 @@ module scc
 		.branchInstruction(branchInstruction), 
 		.firstLevelDecode_out(firstLevelDecode), 
 		.secondLevelDecode_out(secondLevelDecode), 
-		.halt(halt),
-		.mul_trigger(mul_trigger)
+		.halt(halt)
+	//	.mul_trigger(mul_trigger)
 	);
 
-	wire mul_trigger;
+//	wire mul_trigger;
 	wire [31:0] ucode_inst;
 
 	ucode Ucode (
 		.clk(clk),
 		.rst(rst),
-		.start_mul(mul_trigger), //leaving mul type for later
+	//	.start_mul(mul_trigger), //leaving mul type for later
 		.dest_reg(out_destRegister),
 		.source_reg(out_sourceFirstReg),
 		.immediate(out_imm),
@@ -113,7 +113,7 @@ module scc
 	mux mux (
 		.filtered_instruction(filtered_instruction),
 		.ucode_instruction(ucode_inst),
-		.control(mul_trigger),
+	//	.control(mul_trigger),
 		.finalized_instruction(instructionForID)
 	);
 
