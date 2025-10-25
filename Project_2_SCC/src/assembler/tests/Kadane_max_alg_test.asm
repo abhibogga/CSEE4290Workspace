@@ -1,14 +1,14 @@
     ORG     #0x400;
-    FCB     #0x0;
-    FCB     #0x0;
-    FCB     #0x0;
-    FCB     #0x0;
-    FCB     #0x0;
-    FCB     #0x0;
-    FCB     #0x0;
-    FCB     #0x0;
-    FCB     #0x0;
-    FCB     #0x0;
+    FCB     #1;
+    FCB     #2;
+    FCB     #3;
+    FCB     #4;
+    FCB     #5;
+    FCB     #6;
+    FCB     #7;
+    FCB     #8;
+    FCB     #9;
+    FCB     #10;
 
     ORG     #0x500;
 RESULT:
@@ -30,7 +30,7 @@ initialize:
     LOAD    R0, R4;          ; first element x0
     ADD     R1, R0, #0;      ; current_sum = x0
     ADD     R2, R0, #0;      ; max_sum = x0
-    ADD     R4, R4, #1;      ; advance ptr
+    ADD     R4, R4, #4;      ; advance ptr
     SUB     R5, R5, #1;      ; remaining count
 
 kadane_loop:
@@ -50,7 +50,7 @@ check_max:
     B.le    step;
     ADD     R2, R1, #0;      ; max_sum = current_sum
 step:
-    ADD     R4, R4, #1;
+    ADD     R4, R4, #4;
     SUB     R5, R5, #1;
     B       kadane_loop;
 

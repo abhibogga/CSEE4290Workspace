@@ -171,6 +171,13 @@ module execute(
                                 writeToReg  = 1'b1;  
                             end
 
+                            3'b001: begin // MOVT
+                                readRegDest = destReg;
+                                writeData   = { imm[15:0], readDataDest[15:0] };
+
+                                writeToReg = 1'b1;
+                            end
+
                             3'b010: begin //CLR - imm
                                
                                 //Algorithm provided by chat-gpt
@@ -271,8 +278,7 @@ module execute(
                             
 
                         endcase
-                    end
-                    
+                    end   
                 endcase
             end
 
