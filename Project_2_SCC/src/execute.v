@@ -194,12 +194,28 @@ module execute(
                                 readRegDest = destReg;
                                 writeToReg = 1'b1;
                                 writeData = 32'hFFFFFFFF;
+                            end
 
+                            3'b100: begin //LSL
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                writeToReg   = 1'b1; 
+
+                                writeData = readDataFirst << imm[15:0]; // << derived from assembler
+                            end
+
+                            3'b101: begin //LSR
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                writeToReg   = 1'b1; 
+
+                                writeData = readDataFirst >> imm[15:0]; // << derived from assembler
+                            
                             end
                         endcase
                     end
 
-                    3'b001: begin 
+                    3'b001: begin  //Bit 29 is now 1
                         case (secondLevelDecode)
                             4'b1001: begin //ADDS - imm
                                 
