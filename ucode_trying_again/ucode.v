@@ -45,7 +45,8 @@ module ucode (
     // --- Internal Counter ---
     // This is your 'scratch' register, used to count down the ADDs.
     reg [15:0] count_reg, count_next;
-    
+    reg [3:0] true_source_reg;
+
     // --- Instruction Opcode ---
     localparam [6:0] MOV_OPCODE = 7'b0000000; // Mov register immediate, used for loading the immediate value in source register into destination register in the beginning
     localparam [6:0] ADD_OPCODE = 7'b0110001; // e.g., ADD Rd, Rs1, Rs2, used to 
@@ -105,6 +106,7 @@ module ucode (
             sMov: begin
                 output_instruction = {MOV_OPCODE, dest_reg, 5'b0, 16'b0};
 		//zero out Rd to start looping adder
+		true_source_reg = source_reg;
                 mux_ctrl = 1;
                 // Check if we are done (i.e., immediate was 1)
                 if (count_reg == 0) begin
@@ -116,7 +118,7 @@ module ucode (
 
             sKeep_adding: begin
                 // Issue ADD R_dest, R_dest, R_source
-                output_instruction = {ADD_OPCODE, dest_reg, dest_reg, 4'b0, 13'b0};
+                output_instruction = {ADD_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
 		//it just needs to know the register number...it doesn't actually need to read it
                 mux_ctrl = 1;                
                 // Decrement counter
