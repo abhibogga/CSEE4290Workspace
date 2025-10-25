@@ -212,6 +212,14 @@ module execute(
                                 writeData = readDataFirst >> imm[15:0]; // << derived from assembler
                             
                             end
+
+                            3'b110: begin //MOVF
+                                readRegDest = destReg;
+                                //Nibble is 4 bits!
+                                writeToReg = 1'b1;
+                                writeData = 32'b0000000; 
+                                writeData = {readDataDest[31:27] , flags[3:0]};
+                            end
                         endcase
                     end
 
