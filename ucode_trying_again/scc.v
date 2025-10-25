@@ -106,7 +106,8 @@ module scc
 		.dest_reg(out_destRegister),
 		.source_reg(out_sourceFirstReg),
 		.immediate(out_imm),
-		.output_instruction(ucode_inst)
+		.output_instruction(ucode_inst),
+		.readDataSecond(readDataSec)
 	);
 
 

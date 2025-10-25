@@ -26,6 +26,8 @@ module ucode (
     input wire [3:0] dest_reg,   // Address of R_dest (e.g., R1)
     input wire [3:0] source_reg, // Address of R_source (e.g., R0)
     input wire [15:0] immediate,  // Multiplier value (e.g., 3)
+    input wire [31:0] readDataSecond,
+    input wire [1:0] mul_type,
 
     // Outputs to pipeline MUX
     output reg [31:0] output_instruction, // The generated MOV/ADD/SUB
@@ -46,6 +48,8 @@ module ucode (
     // This is your 'scratch' register, used to count down the ADDs.
     reg [15:0] count_reg, count_next;
     reg [3:0] true_source_reg;
+    reg [31:0] register_decrementer_count, register_decrementer_count_next;
+
 
     // --- Instruction Opcode ---
     localparam [6:0] MOV_OPCODE = 7'b0000000; // Mov register immediate, used for loading the immediate value in source register into destination register in the beginning
@@ -72,6 +76,7 @@ module ucode (
         // Default assignments (safer FSM design)
         state_next = state_reg;
         count_next = count_reg;
+	register_decrementer_count_next = register_decrementer_count;
         output_instruction = {5'b11001,27'b0}; // Default to NOP
 	mux_ctrl = 0;        
 
@@ -83,15 +88,18 @@ module ucode (
                 mux_ctrl = 0;
                 if (start_mul) begin
                     // A MUL instruction has arrived. Decide what to do.
-                    if (immediate == 0) begin
+			
+                    if (immediate == 0) begin //might want to take this out because this could be true with mulr and Rs2 is R0
                         state_next = sClear;
                     end else begin
                         state_next = sMov;
                         count_next = immediate; // Load counter
+			register_decrementer_count_next = readDataSecond; //load counter
+			true_mul_type = mul_type;
                     end
                 end else begin
                     state_next = sIdle;
-		    output_instruction = 32'b0;
+		    output_instruction = {5'b11001,27'b0}; //NO OP
                 end
             end
             
@@ -107,9 +115,10 @@ module ucode (
                 output_instruction = {MOV_OPCODE, dest_reg, 5'b0, 16'b0};
 		//zero out Rd to start looping adder
 		true_source_reg = source_reg;
+		
                 mux_ctrl = 1;
                 // Check if we are done (i.e., immediate was 1)
-                if (count_reg == 0) begin
+                if (count_reg == 0 | register_decrementer_counter == 0) begin //are we done decrementing?
                     state_next = sHalt;
                 end else begin
                     state_next = sKeep_adding;
@@ -119,18 +128,28 @@ module ucode (
             sKeep_adding: begin
                 // Issue ADD R_dest, R_dest, R_source
                 output_instruction = {ADD_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
-		//it just needs to know the register number...it doesn't actually need to read it
                 mux_ctrl = 1;                
                 // Decrement counter
-                count_next = count_reg - 1;
+		if (true_mul_type == 2'd0) begin //MULI
+			count_next = count_reg - 1;
                 
-                if (count_next == 0) begin
-                    // This was the last ADD. Go to halt.
-                    state_next = sHalt;
-                end else begin
-                    // More ADDs needed. Stay in this state.
-                    state_next = sKeep_adding;
-                end
+	                if (count_next == 0) begin
+	                    // This was the last ADD. Go to halt.
+	                    state_next = sHalt;
+	                end else begin
+	                    // More ADDs needed. Stay in this state.
+	                    state_next = sKeep_adding;
+	                end	
+		end
+		else if (true_mul_type == 2'd1) begin
+			register_decrementer_count_next = register_decrementer_count - 1;
+			if (register_decrementer_count_next == 0) begin
+			    state_next = sHalt;
+			end else begin
+			    state_next = sKeep_adding;
+			end
+		end
+               
             end
 
             sHalt: begin
