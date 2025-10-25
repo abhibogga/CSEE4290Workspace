@@ -1,4 +1,4 @@
-iverilog -o test ucode_tb.v 
+iverilog -o test testbench.v 
 vvp ./test
 gtkwave dump.vcd
 
