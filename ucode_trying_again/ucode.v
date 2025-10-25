@@ -116,7 +116,7 @@ module ucode (
 
             sKeep_adding: begin
                 // Issue ADD R_dest, R_dest, R_source
-                output_instruction = {ADD_OPCODE, dest_reg, dest_reg, source_reg, 13'b0};
+                output_instruction = {ADD_OPCODE, dest_reg, dest_reg, 4'b0, 13'b0};
 		//it just needs to know the register number...it doesn't actually need to read it
                 mux_ctrl = 1;                
                 // Decrement counter

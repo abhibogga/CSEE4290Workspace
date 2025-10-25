@@ -266,7 +266,19 @@ module execute(
                                 
 
                             end
+			    
 
+			    4'b0000: begin // mul imm
+				
+				writeToReg = 1'b0;
+
+
+			    end
+
+			    default: begin
+				writeToReg =1'b0;
+
+			    end
 
                             
 
