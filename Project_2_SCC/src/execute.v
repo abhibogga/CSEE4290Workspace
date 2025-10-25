@@ -186,9 +186,14 @@ module execute(
                                 writeToReg   = 1'b1; 
 
                                 
-                                writeData = 32'b0;
+                                writeData = 32'b0000000;                             
+                            end
 
-                                
+                            3'b011: begin //SET
+                                //Sets all bits of the destination register
+                                readRegDest = destReg;
+                                writeToReg = 1'b1;
+                                writeData = 32'hFFFFFFFF;
 
                             end
                         endcase
