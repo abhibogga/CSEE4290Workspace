@@ -1,3 +1,4 @@
-	MOV R0, #2
-	MUL R1, R0, #3
+	MOV R0, #4
+	MOV R1, #5
+	MUL R2, R1, R0
 	HALT
