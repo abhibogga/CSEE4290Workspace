@@ -156,10 +156,10 @@ module execute(
                 end
             end
 
-            2'b00: begin 
+            2'b00: begin // Bits 31 and 30 are 00 (Data Immediete instructions) 
                 // ALU / MOV
                 case ({firstLevelDecode, specialEncoding})
-                    3'b000: begin //MOV functions
+                    3'b000: begin //MOV functions and Bit 29 = 0
                         case (aluFunctions)
                             3'b000: begin // MOV
                                 
@@ -223,7 +223,7 @@ module execute(
                         endcase
                     end
 
-                    3'b001: begin  //Bit 29 is now 1
+                    3'b001: begin  //Bit 29 is now 1 and this covers (Data Immedieate)
                         case (secondLevelDecode)
                             4'b1001: begin //ADDS - imm
                                 
@@ -284,9 +284,34 @@ module execute(
                                 flags_next[3] = writeData[31];           // N
                                 flags_next[2] = (writeData == 32'd0);              // Z
                                 //C and V flags are not updated
+                            end
 
-                                $display(flags_next[2]);
+                            4'b1100: begin //ORS Logical
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                writeToReg   = 1'b1;
+                                immExt   = {{16{imm[15]}}, imm};
 
+                                writeData = readDataFirst | immExt;
+
+                                //Update Flags
+                                flags_next[3] = writeData[31];           // N
+                                flags_next[2] = (writeData == 32'd0);              // Z
+                                //C and V flags are not updated
+                            end
+
+                            4'b1101: begin //XORS Logical
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                writeToReg   = 1'b1;
+                                immExt   = {{16{imm[15]}}, imm};
+
+                                writeData = readDataFirst ^ immExt;
+
+                                //Update Flags
+                                flags_next[3] = writeData[31];           // N
+                                flags_next[2] = (writeData == 32'd0);              // Z
+                                //C and V flags are not updated
                             end
 
                             4'b0011: begin // AND Logical
