@@ -23,7 +23,7 @@ module iDecode(
     output reg [3:0]  secondLevelDecode_out,
     output reg        halt,
     output reg	      mul_trigger,
-    output reg        mul_type
+    output reg [1:0]  mul_type
 );
 
     // === Field extraction ===

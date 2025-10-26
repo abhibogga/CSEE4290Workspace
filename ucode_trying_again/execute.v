@@ -373,14 +373,12 @@ module execute(
                         writeToReg = 1; 
 
                         writeData = aluRegister; 
+		    end
 
-		   // 4'b0000: begin //MULR
-		//	readRegSec = sourceSecReg;
+		    4'b0000: begin //MULR
+			readRegSec = sourceSecReg;
 
-		  //  end
-                        
-
-                    end
+		    end
                     
 
                 endcase

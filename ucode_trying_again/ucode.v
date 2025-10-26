@@ -74,6 +74,7 @@ module ucode (
         end else begin
             state_reg <= state_next;
             count_reg <= count_next;
+	    register_decrementer_count <= register_decrementer_count_next;
         end
     end
 
