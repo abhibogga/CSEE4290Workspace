@@ -28,6 +28,8 @@ module ucode (
     input wire [15:0] immediate,  // Multiplier value (e.g., 3)
     input wire [31:0] readDataSecond,
     input wire [1:0] mul_type,
+    input reg [3:0] flags_in, //from execute
+
 
     // Outputs to pipeline MUX
     output reg [31:0] output_instruction, // The generated MOV/ADD/SUB
@@ -106,6 +108,7 @@ module ucode (
 			register_decrementer_count_next = readDataSecond; //load counter
 			true_mul_type = mul_type;
 			true_source_reg = source_reg;
+			flags_hold = flags_in; //hold the old flags
                     end
                 end else begin
                     state_next = sIdle;
@@ -136,13 +139,11 @@ module ucode (
             end
 
             sKeep_adding: begin
-                // Issue ADD R_dest, R_dest, R_source
-                output_instruction = {ADD_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
                 mux_ctrl = 1;                
-                // Decrement counter
+
 		if (true_mul_type == 2'd0) begin //MULI
 			count_next = count_reg - 1;
-                
+			output_instruction = {ADD_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};              
 	                if (count_next == 0) begin
 	                    // This was the last ADD. Go to halt.
 	                    state_next = sHalt;
@@ -153,13 +154,26 @@ module ucode (
 		end
 		else if (true_mul_type == 2'd1) begin
 			register_decrementer_count_next = register_decrementer_count - 1;
+			output_instruction = {ADD_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
 			if (register_decrementer_count_next == 0) begin
 			    state_next = sHalt;
 			end else begin
 			    state_next = sKeep_adding;
 			end
-		end
-               
+		end 
+		else if (true_mul_type == 2'd2) begin //MULSI
+			count_next = count_reg - 1;
+			output_instruction = {ADDS_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
+			 if (count_next == 0) begin
+	                    // This was the last ADD. Go to halt.
+	                    state_next = sHalt;
+	                end else begin
+	                    // More ADDs needed. Stay in this state.
+	                    state_next = sKeep_adding;
+	                end 
+		end //come back to do MULSR
+
+
             end
 
             sHalt: begin
