@@ -105,6 +105,7 @@ module ucode (
                         count_next = immediate; // Load counter
 			register_decrementer_count_next = readDataSecond; //load counter
 			true_mul_type = mul_type;
+			true_source_reg = source_reg;
                     end
                 end else begin
                     state_next = sIdle;
@@ -123,7 +124,7 @@ module ucode (
             sMov: begin
                 output_instruction = {MOV_OPCODE, dest_reg, 5'b0, 16'b0};
 		//zero out Rd to start looping adder
-		true_source_reg = source_reg;
+	//	true_source_reg = source_reg;
 		
                 mux_ctrl = 1;
                 // Check if we are done (i.e., immediate was 1)
