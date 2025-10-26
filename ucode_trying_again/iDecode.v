@@ -46,7 +46,7 @@ module iDecode(
         loadStore           = 1'b0;
         dataRegister        = 1'b0;
         dataRegisterImm     = 1'b0;
-        specialEncoding     = 1'b0;
+        specialEncoding     = specialBit;
         setFlags            = 1'b0;
         aluFunction         = 3'd0;
         branchInstruction   = 4'd0;
@@ -73,6 +73,7 @@ module iDecode(
         // ---------- Main decode ----------
         case (firstLevelDecode)
             // BRANCH
+	  
             2'b11: begin
                 branch             = 1'b1;
                 branchInstruction  = branchCondition;
@@ -123,8 +124,16 @@ module iDecode(
 			mul_type = 2'b0;
 			out_sourceFirstReg = sourceFirstReg;
 			out_destRegister = destReg;
-			out_imm = imm; //send these over to ucode control			
+			out_imm = imm; //send these over to ucode control
 
+		   end
+
+		   7'b0011000: begin
+			mul_trigger = 1'b1;
+			mul_type = 2'd2;
+			out_sourceFirstReg = sourceFirstReg;
+			out_destRegister = destReg;
+			out_imm = imm; //send these over to ucode control
 		   end
 
 		endcase

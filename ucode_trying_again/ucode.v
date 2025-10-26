@@ -43,6 +43,7 @@ module ucode (
     localparam [2:0] sMov          = 3'b010; // initial state that moves a 0 into Rd
     localparam [2:0] sKeep_adding  = 3'b011; 
     localparam [2:0] sHalt         = 3'b100; 
+    localparam [2:0] sFix_it       = 3'b101; //twos comp result if corrected_imm was used
     localparam [1:0] MULI          = 2'd0;
     localparam [1:0] MULR          = 2'd1;
     localparam [1:0] MULSI         = 2'd2;
@@ -60,12 +61,17 @@ module ucode (
 
     reg [3:0] flags_hold;
     reg [1:0] true_mul_type;
+    reg [15:0] corrected_imm; //if immediate is twos comp negative
+    reg [1:0] fix, fix_next;
+    reg [3:0] dest_reg_hold;
 
     // --- Instruction Opcode ---
-    localparam [6:0] MOV_OPCODE = 7'b0000000; // Mov register immediate, used for loading the immediate value in source register into destination register in the beginning
-    localparam [6:0] ADD_OPCODE = 7'b0110001; // e.g., ADD Rd, Rs1, Rs2, used to 
-    localparam [6:0] SUB_OPCODE = 7'b0110010; // used to clear destination reg when imm is 0: SUB Rd, Rd, Rd
+    localparam [6:0] MOV_OPCODE  = 7'b0000000; // Mov register immediate, used for loading the immediate value in source register into destination register in the beginning
+    localparam [6:0] ADD_OPCODE  = 7'b0110001; // e.g., ADD Rd, Rs1, Rs2, used to 
+    localparam [6:0] SUB_OPCODE  = 7'b0110010; // used to clear destination reg when imm is 0: SUB Rd, Rd, Rd
+    localparam [6:0] SUBI_OPCODE = 7'b0010010; //used for fix it state
     localparam [6:0] ADDS_OPCODE = 7'b0111001;
+    localparam [6:0] NOT_OPCODE  = 7'b0110110;
 
     // --- Synchronous Block (State & Counter Registers) ---
     // This always block flops the 'next' values into the 'current' registers
@@ -78,6 +84,7 @@ module ucode (
             state_reg <= state_next;
             count_reg <= count_next;
 	    register_decrementer_count <= register_decrementer_count_next;
+	    fix <= fix_next;
         end
     end
 
@@ -91,7 +98,7 @@ module ucode (
 	register_decrementer_count_next = register_decrementer_count;
         output_instruction = {5'b11001,27'b0}; // Default to NOP
 	mux_ctrl = 0;        
-
+//	corrected_imm = 16'b0;
 
         case (state_reg)
             
@@ -105,11 +112,19 @@ module ucode (
                         state_next = sClear;
                     end else begin
                         state_next = sMov;
-                        count_next = immediate; // Load counter
-			register_decrementer_count_next = readDataSecond; //load counter
+                //      count_next = immediate; // Load counter
+		//	register_decrementer_count_next = readDataSecond; //load counter
+		// the above line can only be done if we are are MULR or MULSR 
 			true_mul_type = mul_type;
 			true_source_reg = source_reg;
 			flags_hold = flags_in; //hold the old flags
+			if (immediate[15] == 1) begin
+				corrected_imm = ~(immediate - 1);
+				count_next = corrected_imm;
+			end else begin
+				count_next = immediate;
+			end
+
                     end
                 end else begin
                     state_next = sIdle;
@@ -141,7 +156,7 @@ module ucode (
 
             sKeep_adding: begin
                 mux_ctrl = 1;                
-
+		dest_reg_hold = dest_reg;
 		if (true_mul_type == 2'd0) begin //MULI
 			count_next = count_reg - 1;
 			output_instruction = {ADD_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};              
@@ -153,7 +168,7 @@ module ucode (
 	                    state_next = sKeep_adding;
 	                end	
 		end
-		else if (true_mul_type == 2'd1) begin
+		else if (true_mul_type == 2'd1) begin //MULR
 			register_decrementer_count_next = register_decrementer_count - 1;
 			output_instruction = {ADD_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
 			if (register_decrementer_count_next == 0) begin
@@ -167,15 +182,33 @@ module ucode (
 			output_instruction = {ADDS_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
 			 if (count_next == 0) begin
 	                    // This was the last ADD. Go to halt.
-	                    state_next = sHalt;
+			    if (corrected_imm != 0) begin
+				state_next = sFix_it;
+				fix_next = 2'b10; 
+			    end else begin
+				state_next = sHalt;
+			    end
+
+
 	                end else begin
 	                    // More ADDs needed. Stay in this state.
 	                    state_next = sKeep_adding;
 	                end 
 		end //come back to do MULSR
-
-
             end
+
+	    sFix_it: begin
+		mux_ctrl = 1;
+		if (fix == 2'b10) begin
+			fix_next = 2'b01; //counter for fixit state
+			state_next = sFix_it;
+			output_instruction = {SUBI_OPCODE, dest_reg_hold, dest_reg_hold, 1'b0, 16'b1}; 
+		end else begin
+			state_next = sHalt; //finally done
+			output_instruction = {NOT_OPCODE, dest_reg_hold, dest_reg_hold, 17'b0};
+			
+		end
+	    end
 
             sHalt: begin
                 // Done. Hand control back to the main IF stage.

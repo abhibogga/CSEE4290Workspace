@@ -40,7 +40,7 @@ module execute(
     //other registers
     reg  signed [31:0] immExt;
     reg signed [32:0] tempDiff;
-
+    reg help_trigger;
 
     //Registers for Register additions
     reg [32:0] aluRegister;
@@ -255,7 +255,7 @@ module execute(
                             end  
 
                             4'b0010: begin //SUB - imm
-                               
+                                help_trigger = 1'b1;
                                 //Algorithm provided by chat-gpt
                                 readRegDest  = destReg;
                                 readRegFirst = sourceFirstReg; 
@@ -381,7 +381,15 @@ module execute(
 			readRegSec = sourceSecReg;
 
 		    end
-                    
+			
+
+		    4'b0110: begin //NOT
+                        readRegDest = destReg; 
+                        readRegFirst = sourceFirstReg; 
+                        writeToReg   = 1'b1;
+
+                        writeData = ~(readDataFirst);
+                    end                    
 
                 endcase
 
