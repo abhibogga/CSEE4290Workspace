@@ -272,15 +272,30 @@ module execute(
                                             //flags_next);
                             end
 
+                            4'b1011: begin //ANDS LOGICAL
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                writeToReg   = 1'b1;
+                                immExt   = {{16{imm[15]}}, imm};
+
+                                writeData = readDataFirst & immExt;
+
+                                //Update Flags
+                                flags_next[3] = writeData[31];           // N
+                                flags_next[2] = (writeData == 32'd0);              // Z
+                                //C and V flags are not updated
+
+                                $display(flags_next[2]);
+
+                            end
+
                             4'b0011: begin // AND Logical
                                 readRegDest  = destReg;
                                 readRegFirst = sourceFirstReg; 
-                                writeToReg   = 1'b1; 
+                                writeToReg   = 1'b1;
+                                immExt   = {{16{imm[15]}}, imm};
 
-                                writeData = {readDataFirst[24:21] && imm};
-                                $display(imm);
-                                $display(readDataFirst);
-                                $display(sourceFirstReg);
+                                writeData = {readDataFirst & immExt};
                             end
 
 
