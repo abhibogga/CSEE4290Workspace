@@ -403,7 +403,6 @@ module execute(
 
                         //$display("flags_next = %b (bin))",
                                             //flags_next);
-
                     end  
 
                     4'b1010: begin //SUBS
@@ -433,9 +432,76 @@ module execute(
                                             //flags_next);
                     end
                     
+                    4'b1011: begin //ANDS LOGICAL Register
+                        readRegDest  = destReg;
+                        readRegFirst = sourceFirstReg;
+                        readRegSec = sourceSecReg; 
+                        writeToReg   = 1'b1;
 
+                        writeData = readDataFirst & readDataSec;
 
-                     4'b0001: begin //ADD
+                        //Update Flags
+                        flags_next[3] = writeData[31];           // N
+                        flags_next[2] = (writeData == 32'd0);              // Z
+                        //C and V flags are not updated
+                    end
+
+                    4'b1100: begin //ORS Logical Register
+                        readRegDest  = destReg;
+                        readRegFirst = sourceFirstReg; 
+                        writeToReg   = 1'b1;
+                        readRegSec = sourceSecReg;
+
+                        writeData = readDataFirst | readDataSec;
+
+                        //Update Flags
+                        flags_next[3] = writeData[31];           // N
+                        flags_next[2] = (writeData == 32'd0);              // Z
+                        //C and V flags are not updated
+                    end
+
+                    4'b1101: begin //XORS Logical
+                        readRegDest  = destReg;
+                        readRegFirst = sourceFirstReg; 
+                        writeToReg   = 1'b1;
+                        readRegSec = sourceSecReg;
+
+                        writeData = readDataFirst ^ readDataSec;
+
+                        //Update Flags
+                        flags_next[3] = writeData[31];           // N
+                        flags_next[2] = (writeData == 32'd0);              // Z
+                        //C and V flags are not updated
+                    end
+
+                    4'b0011: begin // AND Logical
+                        readRegDest  = destReg;
+                        readRegFirst = sourceFirstReg; 
+                        writeToReg   = 1'b1;
+                        immExt   = {{16{imm[15]}}, imm};
+
+                        writeData = {readDataFirst & immExt};
+                    end
+
+                    4'b0100: begin // OR Logical
+                        readRegDest  = destReg;
+                        readRegFirst = sourceFirstReg; 
+                        writeToReg   = 1'b1;
+                        immExt   = {{16{imm[15]}}, imm};
+
+                        writeData = readDataFirst | immExt;
+                    end
+
+                    4'b0101: begin //XOR Logical
+                        readRegDest  = destReg;
+                        readRegFirst = sourceFirstReg; 
+                        writeToReg   = 1'b1;
+                        immExt   = {{16{imm[15]}}, imm};
+
+                        writeData = readDataFirst ^ immExt;
+                    end
+
+                    4'b0001: begin //ADD
                         
                         readRegDest = destReg; 
                         readRegFirst = sourceFirstReg; 
@@ -446,10 +512,6 @@ module execute(
                         writeToReg = 1; 
 
                         writeData = aluRegister; 
-
-
-                        
-
                     end  
 
                     4'b0010: begin //SUB
@@ -464,10 +526,6 @@ module execute(
                         writeToReg = 1; 
 
                         writeData = aluRegister; 
-
-
-                        
-
                     end
                     
 
