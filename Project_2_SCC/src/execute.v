@@ -526,6 +526,14 @@ module execute(
 
                         writeData = aluRegister; 
                     end
+
+                    4'b0110: begin //NOT
+                        readRegDest = destReg; 
+                        readRegFirst = sourceFirstReg; 
+                        writeToReg   = 1'b1;
+
+                        writeData = ~(readDataFirst);
+                    end
                     
 
                 endcase
