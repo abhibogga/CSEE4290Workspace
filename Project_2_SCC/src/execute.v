@@ -272,6 +272,17 @@ module execute(
                                             //flags_next);
                             end
 
+                            4'b0011: begin // AND Logical
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                writeToReg   = 1'b1; 
+
+                                writeData = {readDataFirst[24:21] && imm};
+                                $display(imm);
+                                $display(readDataFirst);
+                                $display(sourceFirstReg);
+                            end
+
 
                             4'b0001: begin //ADD - imm
                                 
@@ -283,9 +294,6 @@ module execute(
                                 immExt   = {{16{imm[15]}}, imm};
                                 tempDiff = {1'b0, readDataFirst} + {1'b0, immExt};
                                 writeData = tempDiff[31:0];
-
-                               
-
                             end  
 
                             4'b0010: begin //SUB - imm
