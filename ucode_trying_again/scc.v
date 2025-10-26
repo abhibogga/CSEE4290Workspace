@@ -91,12 +91,14 @@ module scc
 		.firstLevelDecode_out(firstLevelDecode), 
 		.secondLevelDecode_out(secondLevelDecode), 
 		.halt(halt),
-		.mul_trigger(mul_trigger)
+		.mul_trigger(mul_trigger),
+		.mul_type(mul_type)
 	);
 
 	wire mul_trigger;
 	wire [31:0] ucode_inst;
 	wire mux_ctrl;	
+	wire [1:0] mul_type;
 
 	ucode Ucode (
 		.clk(clk),
@@ -107,7 +109,8 @@ module scc
 		.source_reg(out_sourceFirstReg),
 		.immediate(out_imm),
 		.output_instruction(ucode_inst),
-		.readDataSecond(readDataSec)
+		.readDataSecond(readDataSec),
+		.mul_type(mul_type)
 	);
 
 

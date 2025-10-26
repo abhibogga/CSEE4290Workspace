@@ -374,7 +374,10 @@ module execute(
 
                         writeData = aluRegister; 
 
+		    4'b0000: begin //MULR
+			readRegSec = sourceSecReg;
 
+		    end
                         
 
                     end

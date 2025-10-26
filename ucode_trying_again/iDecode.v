@@ -22,8 +22,8 @@ module iDecode(
     output reg [1:0]  firstLevelDecode_out, 
     output reg [3:0]  secondLevelDecode_out,
     output reg        halt,
-    output reg	      mul_trigger
-
+    output reg	      mul_trigger,
+    output reg        mul_type
 );
 
     // === Field extraction ===
@@ -96,6 +96,16 @@ module iDecode(
                 out_destRegister   = destReg;
                 out_sourceFirstReg = sourceFirstReg;
                 out_sourceSecReg   = sourceSecReg;
+		
+		case (opcode)
+		   7'b0110000: begin //mulr
+			mul_trigger = 1'b1;
+			mul_type = 2'b1;
+			out_sourceFirstReg = sourceFirstReg;
+			out_destRegister = destReg;
+			//we don't need to send immediate right?
+		   end
+		endcase
             end
 
             // DATA-IMMEDIATE (R-Imm)
@@ -110,6 +120,7 @@ module iDecode(
 		case (opcode)
 		   7'b0010000: begin
 			mul_trigger = 1'b1;
+			mul_type = 2'b0;
 			out_sourceFirstReg = sourceFirstReg;
 			out_destRegister = destReg;
 			out_imm = imm; //send these over to ucode control			
