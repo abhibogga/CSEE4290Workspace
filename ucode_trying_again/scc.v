@@ -110,7 +110,8 @@ module scc
 		.immediate(out_imm),
 		.output_instruction(ucode_inst),
 		.readDataSecond(readDataSec),
-		.mul_type(mul_type)
+		.mul_type(mul_type),
+		.flags_in(flags_out) //come back to integrate sending old flags + new flags = total flags back out to exe
 	);
 
 
@@ -140,6 +141,7 @@ module scc
 	wire [31:0] readDataDest; 
 	wire [31:0] readDataFirst;
 	wire [31:0] readDataSec;
+	wire [3:0] flags_out;
 
 	execute EXE (
 	    .clk(clk),
@@ -178,7 +180,8 @@ module scc
 	    .memoryAddressOut(addressIn),
 	    .memoryWrite(writeFlag), 
 	    .memoryRead(memoryRead), 
-	    .memoryDataIn(memoryDataIn)
+	    .memoryDataIn(memoryDataIn),
+	    .flags_out(flags_out)
 	);
 
 

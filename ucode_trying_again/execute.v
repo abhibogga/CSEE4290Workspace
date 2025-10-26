@@ -22,6 +22,7 @@ module execute(
     output reg writeToReg, 
     output reg exeOverride, 
     output wire [15:0] exeData,
+    output reg [3:0] flags_out,
 
     //I/O for memory
     output reg [31:0] memoryDataOut, 
@@ -34,7 +35,7 @@ module execute(
     assign exeData = imm; 
     reg [3:0] flags; // NZCV
     reg [3:0] flags_next; 
-
+    reg [3:0] flags_out; //to ucode to save on MULS
 
     //other registers
     reg  signed [31:0] immExt;
@@ -74,7 +75,8 @@ module execute(
         immExt = 0; 
         tempDiff = 0; 
 
-        flags_next = flags; //MAYBE TAKE OUT IDK
+        flags_next = flags;
+	flags_out = flags; 
 
         case (firstLevelDecode)
             2'b11: begin 
