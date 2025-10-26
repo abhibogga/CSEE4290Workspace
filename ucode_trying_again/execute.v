@@ -35,7 +35,7 @@ module execute(
     assign exeData = imm; 
     reg [3:0] flags; // NZCV
     reg [3:0] flags_next; 
-    reg [3:0] flags_out; //to ucode to save on MULS
+   // reg [3:0] flags_out; //to ucode to save on MULS
 
     //other registers
     reg  signed [31:0] immExt;

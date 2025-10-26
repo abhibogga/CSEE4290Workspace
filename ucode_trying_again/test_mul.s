@@ -1,4 +1,5 @@
-	MOV R3, #4
-	MOV R1, #5
+	MOV R3, #0xFFFC
+	MOV R1, #3
+	ADDS R4, R3, R1
 	MUL R2, R1, R3
 	HALT

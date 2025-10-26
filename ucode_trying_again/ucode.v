@@ -28,7 +28,7 @@ module ucode (
     input wire [15:0] immediate,  // Multiplier value (e.g., 3)
     input wire [31:0] readDataSecond,
     input wire [1:0] mul_type,
-    input reg [3:0] flags_in, //from execute
+    input wire [3:0] flags_in, //from execute
 
 
     // Outputs to pipeline MUX
@@ -58,13 +58,14 @@ module ucode (
     reg [3:0] true_source_reg;
     reg [31:0] register_decrementer_count, register_decrementer_count_next;
 
-
+    reg [3:0] flags_hold;
     reg [1:0] true_mul_type;
 
     // --- Instruction Opcode ---
     localparam [6:0] MOV_OPCODE = 7'b0000000; // Mov register immediate, used for loading the immediate value in source register into destination register in the beginning
     localparam [6:0] ADD_OPCODE = 7'b0110001; // e.g., ADD Rd, Rs1, Rs2, used to 
     localparam [6:0] SUB_OPCODE = 7'b0110010; // used to clear destination reg when imm is 0: SUB Rd, Rd, Rd
+    localparam [6:0] ADDS_OPCODE = 7'b0111001;
 
     // --- Synchronous Block (State & Counter Registers) ---
     // This always block flops the 'next' values into the 'current' registers
