@@ -63,7 +63,7 @@ initial begin
     repeat (3) @(posedge clk);
     //Keep rst high for 3 clks
     rst = 0; 
-    repeat (100) @(posedge clk);
+    repeat (30) @(posedge clk);
 
     
     

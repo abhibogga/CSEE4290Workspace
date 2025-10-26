@@ -323,6 +323,24 @@ module execute(
                                 writeData = {readDataFirst & immExt};
                             end
 
+                            4'b0100: begin // OR Logical
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                writeToReg   = 1'b1;
+                                immExt   = {{16{imm[15]}}, imm};
+
+                                writeData = readDataFirst | immExt;
+                            end
+
+                            4'b0101: begin //XOR Logical
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                writeToReg   = 1'b1;
+                                immExt   = {{16{imm[15]}}, imm};
+
+                                writeData = readDataFirst ^ immExt;
+                            end
+
 
                             4'b0001: begin //ADD - imm
                                 
@@ -346,6 +364,8 @@ module execute(
                                 immExt   = {{16{imm[15]}}, imm};
                                 tempDiff = {1'b0, readDataFirst} - {1'b0, immExt};
                                 writeData = tempDiff[31:0];
+
+                            
 
                                 
 
