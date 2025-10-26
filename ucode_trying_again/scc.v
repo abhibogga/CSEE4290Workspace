@@ -158,6 +158,7 @@ module scc
 	    .sourceFirstReg(out_sourceFirstReg),
 	    .sourceSecReg(out_sourceSecReg),
 	    .setFlags(setFlags),
+	    .mul_type(mul_type),
 
 	    // Register file read values
 	    .readDataDest(readDataDest),

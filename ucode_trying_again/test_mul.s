@@ -1,4 +1,4 @@
-	MOV  R1, #3
+	MOV  R1, #4
 	MOV  R3, #0xFFFC
 	ADDS R4, R3, R1
 	MULS R2, R1, #0xFFFC

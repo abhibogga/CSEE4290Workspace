@@ -14,6 +14,7 @@ module execute(
     input [31:0] readDataDest,
     input [31:0] readDataFirst, 
     input [31:0] readDataSec,
+    input [1:0] mul_type,    
 
     output reg [3:0] readRegDest,
     output reg [3:0] readRegFirst,
@@ -158,7 +159,7 @@ module execute(
                 end
             end
 
-            2'b00: begin 
+            2'b00: begin // data imm
                 // ALU / MOV
                 case ({firstLevelDecode, specialEncoding})
                     3'b000: begin //MOV functions
@@ -274,7 +275,12 @@ module execute(
 				
 				writeToReg = 1'b0;
 
+			    end
 
+			    4'b1000: begin //mulsi
+				writeToReg = 1'b0;
+				flags_next = 4'b0; //clear out the flags for the muls algo insts
+				
 			    end
 
 			    default: begin
@@ -387,8 +393,10 @@ module execute(
                         readRegDest = destReg; 
                         readRegFirst = sourceFirstReg; 
                         writeToReg   = 1'b1;
-
                         writeData = ~(readDataFirst);
+			if (mul_type == 2'b11 | mul_type == 2'b10) begin // MULSI MULSR
+				flags_next[3] = writeData[31]; //sets N flag
+			end
                     end                    
 
                 endcase
