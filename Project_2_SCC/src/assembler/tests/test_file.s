@@ -1,19 +1,22 @@
 	ORG     #0x000
 
-caseA_zero_result:
-    ; R1 ^ R2 -> 0x00000000  → Z=1, N=0
+caseA_or_identity:
+    ; x | 0 -> x
     MOV     R1, #0x1234
-    MOV     R2, #0x1234
-    XORS    R3, R1, R2          ; expect R3 = 0x00000000
-    MOVF    R7                  ; expect R7 low nibble = 0100 (0x4)
+    MOV     R2, #0x0000
+    OR      R3, R1, R2          ; expect R3 = 0x00001234
 
-caseB_msb_set:
-    ; Build MSB mask in a register, then toggle MSB from 0 → 1
-    MOV     R4, #0x0000         ; R4 = 0
-    MOV     R5, #0x8000
-    LSL     R5, R5, #16         ; R5 = 0x80000000
-    XORS    R6, R4, R5          ; expect R6 = 0x80000000  → N=1, Z=0
-    MOVF    R8                  ; expect R8 low nibble = 1000 (0x8)
+caseB_or_disjoint_masks:
+    ; 0xF0F0 | 0x0F0F -> 0x0000FFFF
+    MOV     R4, #0xF0F0
+    MOV     R5, #0x0F0F
+    OR      R6, R4, R5          ; expect R6 = 0x0000FFFF
 
-done:
+caseC_or_set_msb:
+    ; Force MSB = 1
+    MOV     R7, #0x0000
+    MOVT    R7, #0x8000         ; R7 = 0x80000000
+    OR      R8, R7, R1          ; expect R8 = 0x80001234
+
+done_or:
     HALT

@@ -164,7 +164,7 @@ module execute(
                             3'b000: begin // MOV
                                 
                                 readRegDest = destReg; 
-                                writeData = {{16{imm[15]}}, imm};
+                                writeData = {{16'b0}, imm};
                                 //$display(imm);
                                 
                                 
@@ -476,29 +476,28 @@ module execute(
 
                     4'b0011: begin // AND Logical
                         readRegDest  = destReg;
-                        readRegFirst = sourceFirstReg; 
+                        readRegFirst = sourceFirstReg;
+                        readRegSec = sourceSecReg; 
                         writeToReg   = 1'b1;
-                        immExt   = {{16{imm[15]}}, imm};
 
-                        writeData = {readDataFirst & immExt};
+                        writeData = {readDataFirst & readDataSec};
                     end
 
                     4'b0100: begin // OR Logical
                         readRegDest  = destReg;
-                        readRegFirst = sourceFirstReg; 
+                        readRegFirst = sourceFirstReg;
+                        readRegSec = sourceSecReg; 
                         writeToReg   = 1'b1;
-                        immExt   = {{16{imm[15]}}, imm};
 
-                        writeData = readDataFirst | immExt;
+                        writeData = readDataFirst | readDataSec;
                     end
 
                     4'b0101: begin //XOR Logical
                         readRegDest  = destReg;
                         readRegFirst = sourceFirstReg; 
                         writeToReg   = 1'b1;
-                        immExt   = {{16{imm[15]}}, imm};
-
-                        writeData = readDataFirst ^ immExt;
+                        readRegSec = sourceSecReg;
+                        writeData = readDataFirst ^ readDataSec;
                     end
 
                     4'b0001: begin //ADD
