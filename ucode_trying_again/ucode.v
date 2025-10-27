@@ -216,7 +216,12 @@ module ucode (
 			register_decrementer_count_next = register_decrementer_count - 1;
 			output_instruction = {ADDS_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
 			if (register_decrementer_count_next == 0) begin
-			    state_next = sHalt;
+			   if (corrected_readDataSecond !=0) begin
+				state_next = sFix_it; 
+				fix_next = 2'b10;
+			   end else begin
+				state_next = sHalt;
+			   end
 			end else begin
 			    state_next = sKeep_adding;
 			end 
@@ -226,9 +231,9 @@ module ucode (
 	    sFix_it: begin
 		mux_ctrl = 1;
 		if (fix == 2'b10) begin
-			fix_next = 2'b01; //counter for fixit state
+			fix_next = 2'b01;
 			state_next = sFix_it;
-			output_instruction = {SUBI_OPCODE, dest_reg_hold, dest_reg_hold, 1'b0, 16'b1}; 
+			output_instruction = {SUBI_OPCODE, dest_reg_hold, dest_reg_hold, 1'b0, 16'b1}; //get it to ones comp 
 		end else begin
 			state_next = sHalt; //finally done
 			output_instruction = {NOT_OPCODE, dest_reg_hold, dest_reg_hold, 17'b0};
