@@ -112,6 +112,7 @@ module ucode (
 			
                     if (immediate == 0) begin //might want to take this out because this could be true with mulr and Rs2 is R0
                         state_next = sClear;
+			flags_hold = flags_in;
                     end else begin
                         state_next = sMov;
 			true_mul_type = mul_type;
@@ -153,6 +154,7 @@ module ucode (
                 output_instruction = {SUB_OPCODE, dest_reg, dest_reg, dest_reg, 13'b0};
                 state_next = sHalt; // We are done
 		mux_ctrl = 1;
+		flags_back_out = flags_hold;
             end
 
             sMov: begin
