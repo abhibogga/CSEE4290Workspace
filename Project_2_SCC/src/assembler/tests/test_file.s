@@ -1,17 +1,31 @@
 	ORG     #0x000
 
-caseA_invert_zero:
-    MOV     R1, #0x0000
-    NOT     R2, R1              ; expect R2 = 0xFFFFFFFF
+; --- Case A: basic add ---
+caseA_basic:
+    MOV     R1, #0x1234          ; R1 = 0x00001234
+    MOV     R2, #0x0001          ; R2 = 0x00000001
+    ADD     R3, R1, R2           ; expect R3 = 0x00001235
 
-caseB_invert_all_ones:
-    SET     R3                  ; R3 = 0xFFFFFFFF
-    NOT     R4, R3              ; expect R4 = 0x00000000
+; --- Case B: MSB remains set after add ---
+caseB_msb:
+    MOV     R4, #0x0000
+    MOVT    R4, #0x8000          ; R4 = 0x80000000
+    MOV     R5, #0x0001
+    ADD     R6, R4, R5           ; expect R6 = 0x80000001
 
-caseC_invert_pattern:
-    MOV     R5, #0x55AA
-    MOVT    R5, #0x55AA         ; R5 = 0x55AA55AA
-    NOT     R6, R5              ; expect R6 = 0xAA55AA55
+; --- Case C: wraparound (no flags since plain ADD) ---
+caseC_wrap:
+    SET     R7                    ; R7 = 0xFFFFFFFF
+    MOV     R8, #0x0001
+    ADD     R9, R7, R8           ; expect R9 = 0x00000000
+
+; --- Case D: full 32-bit add ---
+caseD_full32:
+    MOV     R10, #0xABCD
+    MOVT    R10, #0x1234         ; R10 = 0x1234ABCD
+    MOV     R11, #0x1111
+    MOVT    R11, #0x2222         ; R11 = 0x22221111
+    ADD     R12, R10, R11        ; expect R12 = 0x3456BCDE
 
 done:
     HALT
