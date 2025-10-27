@@ -48,7 +48,9 @@ module scc
 		.exeData(exeData),
 //		.mul_trigger(mul_trigger),
 //		.mul_release(mul_release),
-		.control(mux_ctrl)
+		.control(mux_ctrl),
+		.opcode(opcode),
+		.readDataFirst(readDataFirst)
 	);
 
 	wire [31:0] filtered_instruction;
@@ -71,6 +73,7 @@ module scc
 	wire [3:0] branchInstruction; 
 	wire [1:0] firstLevelDecode; 
 	wire [3:0] secondLevelDecode; 
+	wire [6:0] opcode;
 
 	//Init module
 	iDecode ID (
@@ -95,7 +98,8 @@ module scc
 		.secondLevelDecode_out(secondLevelDecode), 
 		.halt(halt),
 		.mul_trigger(mul_trigger),
-		.mul_type(mul_type)
+		.mul_type(mul_type),
+		.opcode_out(opcode)
 	);
 
 	wire mul_trigger;
@@ -192,7 +196,9 @@ module scc
 	    .memoryDataIn(memoryDataIn),
 	    .flags_out(flags_out),
 	    .mul_release(mul_release),
-	    .flags_back_in(flags_ucode_to_exe)
+	    .flags_back_in(flags_ucode_to_exe),
+
+	    .opcode_in(opcode)
 	);
 
 

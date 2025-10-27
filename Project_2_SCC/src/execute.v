@@ -17,6 +17,7 @@ module execute(
     input [1:0] mul_type,    
     input mul_release,
     input [3:0] flags_back_in,
+    input [6:0] opcode_in,
 
     output reg [3:0] readRegDest,
     output reg [3:0] readRegFirst,
@@ -24,7 +25,7 @@ module execute(
     output reg [31:0] writeData,
     output reg writeToReg, 
     output reg exeOverride, 
-    output wire [15:0] exeData,
+    output reg [15:0] exeData,
     output reg [3:0] flags_out,
 
     //I/O for memory
@@ -35,7 +36,7 @@ module execute(
     input [31:0] memoryDataIn
 );
 
-    assign exeData = imm; 
+   // assign exeData = imm; 
     reg [3:0] flags; // NZCV
     reg [3:0] flags_next; 
 
@@ -76,12 +77,18 @@ module execute(
         memoryAddressOut = 32'd0;
         immExt = 0; 
         tempDiff = 0; 
+	exeData = imm;
 
         flags_next = flags;
 	flags_out = flags; 
 
 	if (mul_release) begin
 	    flags_next = flags_back_in | flags; 
+	end
+	
+	if (opcode_in == 7'b1100010) begin //BR
+	    readRegFirst = destReg; //weird BR placement
+	    writeToReg = 0;
 	end
 
         case (firstLevelDecode)
