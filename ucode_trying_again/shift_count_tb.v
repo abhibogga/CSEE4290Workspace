@@ -1,5 +1,5 @@
 `timescale 10ms/1ms
-
+`include "scc_f25_top.v"
 
 module shift_count_tb();
 

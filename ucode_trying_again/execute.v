@@ -66,6 +66,7 @@ module execute(
     // Combinational logic
     always @(*) begin 
         // Defaults
+	exeOverrideBR   = 1'b0;
         exeOverride     = 1'b0;
         readRegDest     = 4'd0;
         readRegFirst    = 4'd0;

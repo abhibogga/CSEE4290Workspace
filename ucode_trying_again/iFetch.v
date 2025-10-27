@@ -30,6 +30,8 @@ module iFetch(
 
     wire [15:0] imm16_exe = exeData;
     wire signed [31:0] branchOffsetAddress_exe = {{16{imm16_exe[15]}}, imm16_exe};
+	
+    reg [31:0] true_for_br;
 
        
     always @(posedge clk) begin 
@@ -75,7 +77,9 @@ module iFetch(
                 end
 	
 		else if (exeOverrideBR) begin
-		    PC_next = programCounter + for_br;
+		    true_for_br = for_br;
+		    PC_next = programCounter + true_for_br;
+		 //   exeOverrideBR = 0;
 		end 
 
                 // === Unconditional branch (B) ===
