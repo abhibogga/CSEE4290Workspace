@@ -73,6 +73,8 @@ module scc_f25_top (
 
 	); 
 
+assign halt_f = halt;
+
 
 
 

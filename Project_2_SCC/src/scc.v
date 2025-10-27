@@ -1,7 +1,6 @@
 `include "iFetch.v"
 `include "iDecode.v"
 `include "execute.v"
-//`include "mem.v"
 `include "register.v"
 `include "ucode.v"
 `include "mux.v"
@@ -55,6 +54,7 @@ module scc
 	wire [31:0] filtered_instruction;
 
 	//Decode Inputs/Outputs
+
 	wire        branch;
 	wire        loadStore;
 	wire        dataRegister;
@@ -119,6 +119,7 @@ module scc
 		.mul_release(mul_release),
 		.flags_back_out(flags_ucode_to_exe)
 	);
+
 
 
 	mux mux (

@@ -1,17 +1,18 @@
-//FORMATTED CODE BY CHAT-GPT, CODE IS DONE BY GROUP 7 HOWEVER
-//COMMENTS ALSO ADDED BY CHAT-GPT
+//CODE WRITTEN BY TEAM, BUT SYNTAX ERRORS AND ADDITIONAL COMMENTS PROVIDED BY CHATGPT FOR UNDERSTANDING
+//`include "uCodeControl.v"
+//`include "uCodeROM.v"
 module iDecode(
     input  [31:0] instruction, 
     input         clk, 
     input         rst, 
 
     output reg        branch, 
-    output reg        loadStore,       // 0 = Load, 1 = Store
+    output reg        loadStore,       
     output reg        dataRegister, 
     output reg        dataRegisterImm, 
     output reg        specialEncoding,
     output reg        setFlags,  
-    output reg [2:0]  aluFunction,     // ALU function selector
+    output reg [2:0]  aluFunction,     
     output reg [3:0]  branchInstruction, 
     output reg        regWrite, 
     output reg        regRead, 
@@ -26,6 +27,7 @@ module iDecode(
     output reg [1:0]  mul_type
 );
 
+<<<<<<< HEAD
     // === Field extraction ===
     wire [1:0] firstLevelDecode     = instruction[31:30]; 
     wire       specialBit           = instruction[29]; 
@@ -67,31 +69,20 @@ module iDecode(
         // Special / Flags
         setFlags        = secondLevelDecode[4]; // bit 28 is set flags
 
-        // Common immediate (for data-imm path)
-        out_imm = imm;
-
-        // ---------- Main decode ----------
         case (firstLevelDecode)
-            // BRANCH
-	  
             2'b11: begin
                 branch             = 1'b1;
                 branchInstruction  = branchCondition;
-                // If your branch uses two regs, expose them:
                 out_sourceFirstReg = sourceFirstReg; 
                 out_sourceSecReg   = sourceSecReg;
                 regRead            = 1'b1;
                 regWrite           = 1'b0;
             end
-
-            // LOAD / STORE
             2'b10: begin
                 loadStore          = 1'b1;
-                out_destRegister   = destReg;          // for LOAD dest, for STORE may be base
-                out_sourceFirstReg = sourceFirstReg;   // base register
+                out_destRegister   = destReg;
+                out_sourceFirstReg = sourceFirstReg;
             end
-
-            // DATA-REGISTER (R-R)
             2'b01: begin
                 dataRegister       = 1'b1;
                 out_destRegister   = destReg;
@@ -116,14 +107,12 @@ module iDecode(
 		   end
 		endcase
             end
-
-            // DATA-IMMEDIATE (R-Imm)
             2'b00: begin
                 dataRegisterImm    = 1'b1;
                 out_destRegister   = destReg;
                 out_sourceFirstReg = sourceFirstReg;
-                // out_imm already set to imm above
                 regRead            = 1'b1;
+
                 regWrite           = 1'b1; // ALU result will be written
            
 		case (opcode)
@@ -151,6 +140,7 @@ module iDecode(
 
             default: begin
                 // all defaults already safe       
+
             end
         endcase
     end
