@@ -1,5 +1,5 @@
 $date
-	Sun Oct 26 23:46:07 2025
+	Sun Oct 26 23:52:22 2025
 $end
 $version
 	Icarus Verilog
@@ -240,37 +240,38 @@ $var parameter 2 n" MULSI $end
 $var parameter 2 o" MULSR $end
 $var parameter 7 p" NOT_OPCODE $end
 $var parameter 7 q" SUBI_OPCODE $end
-$var parameter 7 r" SUB_OPCODE $end
-$var parameter 3 s" sClear $end
-$var parameter 3 t" sFix_it $end
-$var parameter 3 u" sHalt $end
-$var parameter 3 v" sIdle $end
-$var parameter 3 w" sKeep_adding $end
-$var parameter 3 x" sMov $end
-$var reg 16 y" corrected_imm [15:0] $end
-$var reg 32 z" corrected_readDataSecond [31:0] $end
-$var reg 16 {" count_next [15:0] $end
-$var reg 16 |" count_reg [15:0] $end
-$var reg 4 }" dest_reg_hold [3:0] $end
-$var reg 2 ~" fix [1:0] $end
-$var reg 2 !# fix_next [1:0] $end
-$var reg 4 "# flags_back_out [3:0] $end
-$var reg 4 ## flags_hold [3:0] $end
+$var parameter 7 r" SUBS_OPCODE $end
+$var parameter 7 s" SUB_OPCODE $end
+$var parameter 3 t" sClear $end
+$var parameter 3 u" sFix_it $end
+$var parameter 3 v" sHalt $end
+$var parameter 3 w" sIdle $end
+$var parameter 3 x" sKeep_adding $end
+$var parameter 3 y" sMov $end
+$var reg 16 z" corrected_imm [15:0] $end
+$var reg 32 {" corrected_readDataSecond [31:0] $end
+$var reg 16 |" count_next [15:0] $end
+$var reg 16 }" count_reg [15:0] $end
+$var reg 4 ~" dest_reg_hold [3:0] $end
+$var reg 2 !# fix [1:0] $end
+$var reg 2 "# fix_next [1:0] $end
+$var reg 4 ## flags_back_out [3:0] $end
+$var reg 4 $# flags_hold [3:0] $end
 $var reg 1 S mul_release $end
 $var reg 1 P mux_ctrl $end
-$var reg 32 $# output_instruction [31:0] $end
-$var reg 32 %# register_decrementer_count [31:0] $end
-$var reg 32 &# register_decrementer_count_next [31:0] $end
-$var reg 3 '# state_next [2:0] $end
-$var reg 3 (# state_reg [2:0] $end
-$var reg 2 )# true_mul_type [1:0] $end
-$var reg 4 *# true_source_reg [3:0] $end
+$var reg 32 %# output_instruction [31:0] $end
+$var reg 32 &# register_decrementer_count [31:0] $end
+$var reg 32 '# register_decrementer_count_next [31:0] $end
+$var reg 3 (# state_next [2:0] $end
+$var reg 3 )# state_reg [2:0] $end
+$var reg 2 *# true_mul_type [1:0] $end
+$var reg 4 +# true_source_reg [3:0] $end
 $upscope $end
 $scope module mux $end
 $var wire 1 P control $end
-$var wire 32 +# filtered_instruction [31:0] $end
-$var wire 32 ,# ucode_instruction [31:0] $end
-$var reg 32 -# finalized_instruction [31:0] $end
+$var wire 32 ,# filtered_instruction [31:0] $end
+$var wire 32 -# ucode_instruction [31:0] $end
+$var reg 32 .# finalized_instruction [31:0] $end
 $upscope $end
 $upscope $end
 $upscope $end
@@ -278,13 +279,14 @@ $upscope $end
 $enddefinitions $end
 $comment Show the parameter values. $end
 $dumpall
-b10 x"
-b11 w"
-b0 v"
-b100 u"
-b101 t"
-b1 s"
-b110010 r"
+b10 y"
+b11 x"
+b0 w"
+b100 v"
+b101 u"
+b1 t"
+b110010 s"
+b111010 r"
 b10010 q"
 b110110 p"
 b11 o"
@@ -299,25 +301,25 @@ b1 C"
 $end
 #0
 $dumpvars
-bx -#
-b11001000000000000000000000000000 ,#
+bx .#
+b11001000000000000000000000000000 -#
+bx ,#
 bx +#
 bx *#
-bx )#
+b0 )#
 b0 (#
-b0 '#
+bx '#
 bx &#
-bx %#
-b11001000000000000000000000000000 $#
+b11001000000000000000000000000000 %#
+bx $#
 bx ##
 bx "#
 bx !#
 bx ~"
-bx }"
+b0 }"
 b0 |"
-b0 {"
+bx {"
 bx z"
-bx y"
 bx h"
 b0 g"
 bx f"
@@ -562,10 +564,10 @@ xD
 0e
 b1000000000000000000000 U
 b1000000000000000000000 ."
-b1000000000000000000000 -#
+b1000000000000000000000 .#
 b1000000000000000000000 Y
 b1000000000000000000000 G"
-b1000000000000000000000 +#
+b1000000000000000000000 ,#
 b100 F"
 b1 I"
 1%
@@ -602,12 +604,12 @@ xD
 1a
 b11000001111111111111100 U
 b11000001111111111111100 ."
-b11000001111111111111100 -#
+b11000001111111111111100 .#
 b11111111111111111111111111111100 B"
 b1111111111111100 @"
 b11000001111111111111100 Y
 b11000001111111111111100 G"
-b11000001111111111111100 +#
+b11000001111111111111100 ,#
 b11000001111111111111100 ,
 b11000001111111111111100 <
 b11000001111111111111100 @
@@ -680,12 +682,12 @@ xD
 0a
 b1110010100001100010000000000000 U
 b1110010100001100010000000000000 ."
-b1110010100001100010000000000000 -#
+b1110010100001100010000000000000 .#
 b10000000000000 B"
 b10000000000000 @"
 b1110010100001100010000000000000 Y
 b1110010100001100010000000000000 G"
-b1110010100001100010000000000000 +#
+b1110010100001100010000000000000 ,#
 b1110010100001100010000000000000 ,
 b1110010100001100010000000000000 <
 b1110010100001100010000000000000 @
@@ -711,30 +713,31 @@ b11111111111111111111111111111100 T"
 #65
 0%
 #70
-b1000 ##
-b1 '#
-b0 Q
-b0 s
-b0 7"
-b0 f"
+b1000 $#
+b1 (#
+b0 |
+b10 Q
+b10 s
+b10 7"
+b10 f"
 1R
 1F
 1G
 1a
-b0 E
-b0 o
-b0 <"
+b1000 E
+b1000 o
+b1000 <"
 b0 X
 b0 v
 b0 6"
-b10000 -"
+b11000 -"
 b0 /"
 b0 *"
 b1 +"
 b10 1"
 b10 2"
 b0 3"
-b0 ,"
+b1000 ,"
 b0 0"
 b0 A"
 b0 ?"
@@ -761,18 +764,18 @@ b0 y
 b0 4"
 xD
 0b
-b100000010000100000000000000000 U
-b100000010000100000000000000000 ."
-b100000010000100000000000000000 -#
+b110000010000100000000000000000 U
+b110000010000100000000000000000 ."
+b110000010000100000000000000000 .#
 b0 B"
 b0 @"
-b100000010000100000000000000000 Y
-b100000010000100000000000000000 G"
-b100000010000100000000000000000 +#
-b100000010000100000000000000000 ,
-b100000010000100000000000000000 <
-b100000010000100000000000000000 @
-b100000010000100000000000000000 >"
+b110000010000100000000000000000 Y
+b110000010000100000000000000000 G"
+b110000010000100000000000000000 ,#
+b110000010000100000000000000000 ,
+b110000010000100000000000000000 <
+b110000010000100000000000000000 @
+b110000010000100000000000000000 >"
 b1000 W
 b1000 }
 b1000 d"
@@ -809,11 +812,12 @@ b1100 E"
 #80
 b11010000000000000000000000000000 Y
 b11010000000000000000000000000000 G"
-b11010000000000000000000000000000 +#
+b11010000000000000000000000000000 ,#
 b11010000000000000000000000000000 ,
 b11010000000000000000000000000000 <
 b11010000000000000000000000000000 @
 b11010000000000000000000000000000 >"
+b110 |
 1Z
 b0 z
 b10 \
@@ -841,18 +845,18 @@ b100000000000000 e"
 b10 f
 b10 y
 b10 4"
-b10 E
-b10 o
-b10 <"
+b1010 E
+b1010 o
+b1010 <"
 b1 X
 b1 v
 b1 6"
-b110010 -"
+b111010 -"
 b100000000000000 /"
 b10 *"
 b10 +"
 b10 3"
-b10 ,"
+b1010 ,"
 b1 0"
 0R
 b10 M
@@ -867,19 +871,23 @@ b10 c"
 0F
 xD
 0a
-b1100100010001000100000000000000 U
-b1100100010001000100000000000000 ."
-b1100100010001000100000000000000 -#
+b1110100010001000100000000000000 U
+b1110100010001000100000000000000 ."
+b1110100010001000100000000000000 .#
 b1000 V
 b1000 u
-b1000 "#
+b1000 ##
 1P
-b100 '#
-b1100100010001000100000000000000 B
-b1100100010001000100000000000000 $#
-b1100100010001000100000000000000 ,#
+b100 (#
+b1110100010001000100000000000000 B
+b1110100010001000100000000000000 %#
+b1110100010001000100000000000000 -#
+b0 W
+b0 }
+b0 d"
 b10100 F"
-b1 (#
+b1 )#
+b0 {
 b10000 *
 b10000 4
 b10000 K
@@ -893,11 +901,12 @@ bx B"
 bx @"
 bx Y
 bx G"
-bx +#
+bx ,#
 bx ,
 bx <
 bx @
 bx >"
+0_
 0G
 0e
 bx E
@@ -949,6 +958,13 @@ bx y
 bx 4"
 xD
 0b
+bx U
+bx ."
+bx .#
+b1110 |
+b110 W
+b110 }
+b110 d"
 0Z
 b0 \
 b0 &"
@@ -959,17 +975,15 @@ b0 _"
 b0 ^
 b0 $"
 b0 ^"
-bx U
-bx ."
-bx -#
-b0 '#
+b0 (#
 1S
 0P
 b11001000000000000000000000000000 B
-b11001000000000000000000000000000 $#
-b11001000000000000000000000000000 ,#
+b11001000000000000000000000000000 %#
+b11001000000000000000000000000000 -#
 b11000 F"
-b100 (#
+b110 {
+b100 )#
 b10100 *
 b10100 4
 b10100 K
@@ -980,8 +994,12 @@ b10100 E"
 0%
 #100
 0S
+b1110 W
+b1110 }
+b1110 d"
 b11100 F"
-b0 (#
+b0 )#
+b1110 {
 b11000 *
 b11000 4
 b11000 K

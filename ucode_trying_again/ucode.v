@@ -73,6 +73,7 @@ module ucode (
     localparam [6:0] ADD_OPCODE  = 7'b0110001; // e.g., ADD Rd, Rs1, Rs2, used to 
     localparam [6:0] SUB_OPCODE  = 7'b0110010; // used to clear destination reg when imm is 0: SUB Rd, Rd, Rd
     localparam [6:0] SUBI_OPCODE = 7'b0010010; //used for fix it state
+    localparam [6:0] SUBS_OPCODE = 7'b0111010; //used for multiplying by zero
     localparam [6:0] ADDS_OPCODE = 7'b0111001;
     localparam [6:0] NOT_OPCODE  = 7'b0110110;
 
@@ -151,7 +152,7 @@ module ucode (
             sClear: begin
                 // Handle immediate = 0. Issue SUB R_dest, R_dest, R_dest
                 // This results in R_dest = 0.
-                output_instruction = {SUB_OPCODE, dest_reg, dest_reg, dest_reg, 13'b0};
+                output_instruction = {SUBS_OPCODE, dest_reg, dest_reg, dest_reg, 13'b0};
                 state_next = sHalt; // We are done
 		mux_ctrl = 1;
 		flags_back_out = flags_hold;
