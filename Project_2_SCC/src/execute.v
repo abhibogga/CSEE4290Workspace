@@ -307,7 +307,7 @@ module execute(
                                 //Nibble is 4 bits!
                                 writeToReg = 1'b1;
                                 writeData = 32'b0000000; 
-                                writeData = {readDataDest[31:27] , flags[3:0]};
+                                writeData = {readDataDest[31:24] , flags[3:0]};
                             end
                         endcase
                     end
@@ -453,11 +453,6 @@ module execute(
                                 immExt   = {{16{imm[15]}}, imm};
                                 tempDiff = {1'b0, readDataFirst} - {1'b0, immExt};
                                 writeData = tempDiff[31:0];
-
-                            
-
-                                
-
                             end
 
 
@@ -469,9 +464,8 @@ module execute(
             end
 
 
-            2'b01: begin 
+            2'b01: begin
                 case (secondLevelDecode) // Since all of them are 011 we just need the second level decode
-                    
                     4'b1001: begin //ADDS
                         
                         readRegDest = destReg; 
