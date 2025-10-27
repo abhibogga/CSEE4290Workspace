@@ -25,6 +25,7 @@ module execute(
     output reg [31:0] writeData,
     output reg writeToReg, 
     output reg exeOverride, 
+    output reg exeOverrideBR,
     output wire [15:0] exeData,
     output reg [3:0] flags_out,
 

@@ -37,7 +37,8 @@ module scc
 
 	//Lets intialize IF module
 	wire [31:0] instructionForID;
-	wire [6:0] opcode,
+	wire [6:0] opcode;
+	wire exeOverrideBR;
 	iFetch IF (
 		.clk(clk), 
 		.rst(rst), 
@@ -45,6 +46,7 @@ module scc
 		.programCounter(programCounter), 
 		.filteredInstruction(filtered_instruction), 
 		.exeOverride(exeOverride),
+		.exeOverrideBR(exeOverrideBR),
 		.exeData(exeData),
 //		.mul_trigger(mul_trigger),
 //		.mul_release(mul_release),
@@ -183,6 +185,7 @@ module scc
 
 	    // Branch control (to IF)
 	    .exeOverride(exeOverride),
+	    .exeOverrideBR(exeOverrideBR),
 	    .exeData(exeData),
 
 	    // Memory interface (to instruction_and_data)
