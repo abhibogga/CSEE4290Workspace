@@ -113,6 +113,7 @@ module ucode (
 			
                     if (immediate == 0) begin //might want to take this out because this could be true with mulr and Rs2 is R0
                         state_next = sClear;
+			register_decrementer_count_next = immediate;
 			flags_hold = flags_in;
                     end else begin
                         state_next = sMov;

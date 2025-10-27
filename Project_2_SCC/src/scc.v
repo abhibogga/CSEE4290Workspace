@@ -116,7 +116,7 @@ module scc
 		.mux_ctrl(mux_ctrl),
 		.dest_reg(out_destRegister),
 		.source_reg(out_sourceFirstReg),
-		.immediate(out_imm),
+		.immediate(exeData),
 		.output_instruction(ucode_inst),
 		.readDataSecond(readDataSec),
 		.mul_type(mul_type),

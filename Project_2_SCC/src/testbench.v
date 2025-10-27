@@ -37,7 +37,7 @@ end
 
 //Define testbench action
 initial begin 
-<<<<<<< HEAD:Project_2_SCC/src/testbench.v
+
     $dumpfile("dump.vcd");
     $dumpvars(0, testbench);
     $dumpvars(0,
