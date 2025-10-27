@@ -57,7 +57,7 @@ module iDecode(
         out_destRegister    = 4'd0;
         out_sourceFirstReg  = 4'd0;
         out_sourceSecReg    = 4'd0;
-        out_imm             = 16'd0;
+        out_imm             = imm;
         firstLevelDecode_out= firstLevelDecode;
         secondLevelDecode_out = secondLevelDecode;
         aluFunction         = aluOperationCommands;
