@@ -103,6 +103,10 @@ module ucode (
         output_instruction = {5'b11001,27'b0}; // Default to NOP
 	mux_ctrl = 0;        
 	mul_release = 1'b0;
+	
+	corrected_imm = 16'b0;
+	corrected_readDataSecond = 32'b0;
+
         case (state_reg)
             
             sIdle: begin
@@ -185,14 +189,16 @@ module ucode (
 	       
 			if (count_next == 0) begin
 	                    // This was the last ADD. Go to halt.
+		 
 			    if (corrected_imm != 0) begin
 				state_next = sFix_it;
 				fix_next = 2'b10; 
 			    end else begin
 				state_next = sHalt;
-			    end
+			    end else begin
 	                    // More ADDs needed. Stay in this state.
-	                    state_next = sKeep_adding;
+	                    	state_next = sKeep_adding;
+			    end
 	                end	
 		end
 		else if (true_mul_type == 2'd1) begin //MULR

@@ -1,0 +1,35 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Mon Oct 27 12:45:16 2025
+[*]
+[dumpfile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/dump.vcd"
+[dumpfile_mtime] "Mon Oct 27 12:42:32 2025"
+[dumpfile_size] 163333
+[savefile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/counter_cooked.gtkw"
+[timestart] 135
+[size] 1854 1001
+[pos] -51 -51
+*-7.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] shift_count_tb.
+[treeopen] shift_count_tb.top.
+[treeopen] shift_count_tb.top.scc.
+[sst_width] 278
+[signals_width] 246
+[sst_expanded] 1
+[sst_vpaned_height] 297
+@22
+shift_count_tb.top.scc.mux.finalized_instruction[31:0]
+shift_count_tb.top.scc.mux.ucode_instruction[31:0]
+@28
+shift_count_tb.top.scc.Ucode.state_next[2:0]
+shift_count_tb.top.scc.Ucode.state_reg[2:0]
+shift_count_tb.top.scc.Ucode.true_mul_type[1:0]
+shift_count_tb.top.scc.Ucode.mul_type[1:0]
+@22
+shift_count_tb.top.scc.Ucode.count_next[15:0]
+@23
+shift_count_tb.top.scc.Ucode.count_reg[15:0]
+@22
+shift_count_tb.top.scc.Ucode.dest_reg[3:0]
+[pattern_trace] 1
+[pattern_trace] 0

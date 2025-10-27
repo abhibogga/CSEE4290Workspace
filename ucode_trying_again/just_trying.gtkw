@@ -1,0 +1,36 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Mon Oct 27 12:25:23 2025
+[*]
+[dumpfile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/dump.vcd"
+[dumpfile_mtime] "Mon Oct 27 12:25:04 2025"
+[dumpfile_size] 36833
+[savefile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/just_trying.gtkw"
+[timestart] 163
+[size] 927 1001
+[pos] 876 -51
+*-4.653164 305 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] testbench.
+[treeopen] testbench.topMod.
+[treeopen] testbench.topMod.scc.
+[sst_width] 400
+[signals_width] 246
+[sst_expanded] 1
+[sst_vpaned_height] 297
+@28
+testbench.topMod.scc.IF.stateNext[1:0]
+testbench.topMod.scc.IF.state[1:0]
+testbench.topMod.scc.IF.control
+testbench.topMod.scc.mux.control
+@22
+testbench.topMod.scc.mux.finalized_instruction[31:0]
+testbench.topMod.scc.mux.filtered_instruction[31:0]
+testbench.topMod.scc.mux.ucode_instruction[31:0]
+@28
+testbench.topMod.scc.Ucode.mul_type[1:0]
+@22
+testbench.topMod.scc.REGFILE.dbg_R2[31:0]
+@29
+testbench.topMod.scc.Ucode.state_reg[2:0]
+[pattern_trace] 1
+[pattern_trace] 0
