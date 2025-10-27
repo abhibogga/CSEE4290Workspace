@@ -46,7 +46,7 @@ integer fd, mem;
 reg [31:0] addr, value;
 reg [255:0] line; 
 
-always @(posedge clk or posedge rst) begin
+always @(posedge clk or posedge rst) begin //Problem here is that halt_f doesn't stay on long enough for wait to see. So we captured halt_f to use
   if (rst) seen_halt <= 1'b0;
   else if (halt_f) seen_halt <= 1'b1;
 end
@@ -77,24 +77,24 @@ initial begin
         end
 
     // Skip first line (ALgorithim below credit to Group 1)
-        line = ($fgets(line, fd));
-        while ($fgets(line, fd)) begin
-            mem = $sscanf(line, "0x%h,0x%h", addr, value);
-            if (mem == 2) begin
-                if (addr == 32'h00000500) begin
-                    test_output = value;
-                end
+    line = ($fgets(line, fd));
+    while ($fgets(line, fd)) begin
+        mem = $sscanf(line, "0x%h,0x%h", addr, value);
+        if (mem == 2) begin
+            if (addr == 32'h00000500) begin
+                test_output = value;
             end
         end
+    end
 
-        // Self-checking
-        if (correct_value == test_output) begin
-            $display("TEST PASSED: Kadane ALG SUCCESS");
-        end else begin
-            $display("TEST FAILED: NOOOOOOOOO");
-        end
-            $display("Expected Value: 0x00000037");
-            $display("Actual Value: 0x%h\n", test_output);
+    // Self-checking
+    if (correct_value == test_output) begin
+        $display("TEST PASSED: Kadane ALG SUCCESS");
+    end else begin
+        $display("TEST FAILED: NOOOOOOOOO");
+    end
+        $display("Expected Value: 0x00000037");
+        $display("Actual Value: 0x%h\n", test_output);
     $finish; 
     
 end
