@@ -1,5 +1,5 @@
     ORG     #0x400;
-    FCB     #0x39; Your input to encrypt (4 bytes)
+    FCB     #0x41; Your input to encrypt (4 bytes)
 
 
     ORG #0x0

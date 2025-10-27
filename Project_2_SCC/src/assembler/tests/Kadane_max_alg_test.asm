@@ -10,7 +10,7 @@
     FCB     #7,  #0, #0, #0
     FCB     #8,  #0, #0, #0
     FCB     #9,  #0, #0, #0
-    FCB     #10, #0, #0, #0
+    FCB     #11, #0, #0, #0
 
     ; ^^All FCB's formatted like that such that we can provide 4 bytes vs just 1
 
