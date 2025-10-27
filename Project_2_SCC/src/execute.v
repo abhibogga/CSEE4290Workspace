@@ -14,6 +14,9 @@ module execute(
     input [31:0] readDataDest,
     input [31:0] readDataFirst, 
     input [31:0] readDataSec,
+    input [1:0] mul_type,    
+    input mul_release,
+    input [3:0] flags_back_in,
 
     output reg [3:0] readRegDest,
     output reg [3:0] readRegFirst,
@@ -22,6 +25,7 @@ module execute(
     output reg writeToReg, 
     output reg exeOverride, 
     output wire [15:0] exeData,
+    output reg [3:0] flags_out,
 
     //I/O for memory
     output reg [31:0] memoryDataOut, 
@@ -35,11 +39,10 @@ module execute(
     reg [3:0] flags; // NZCV
     reg [3:0] flags_next; 
 
-
     //other registers
     reg  signed [31:0] immExt;
     reg signed [32:0] tempDiff;
-
+    reg help_trigger;
 
     //Registers for Register additions
     reg [32:0] aluRegister;
@@ -74,7 +77,12 @@ module execute(
         immExt = 0; 
         tempDiff = 0; 
 
-        flags_next = flags; //MAYBE TAKE OUT IDK
+        flags_next = flags;
+	flags_out = flags; 
+
+	if (mul_release) begin
+	    flags_next = flags_back_in | flags; 
+	end
 
         case (firstLevelDecode)
             2'b11: begin 
@@ -156,7 +164,7 @@ module execute(
                 end
             end
 
-            2'b00: begin 
+            2'b00: begin // data imm
                 // ALU / MOV
                 case ({firstLevelDecode, specialEncoding})
                     3'b000: begin //MOV functions
@@ -253,7 +261,7 @@ module execute(
                             end  
 
                             4'b0010: begin //SUB - imm
-                               
+                                help_trigger = 1'b1;
                                 //Algorithm provided by chat-gpt
                                 readRegDest  = destReg;
                                 readRegFirst = sourceFirstReg; 
@@ -266,7 +274,24 @@ module execute(
                                 
 
                             end
+			    
 
+			    4'b0000: begin // mul imm
+				
+				writeToReg = 1'b0;
+
+			    end
+
+			    4'b1000: begin //mulsi
+				writeToReg = 1'b0;
+				flags_next = 4'b0; //clear out the flags for the muls algo insts
+				
+			    end
+
+			    default: begin
+				writeToReg =1'b0;
+
+			    end
 
                             
 
@@ -361,12 +386,27 @@ module execute(
                         writeToReg = 1; 
 
                         writeData = aluRegister; 
+		    end
 
+		    4'b0000: begin //MULR
+			readRegSec = sourceSecReg;
 
-                        
+		    end
 
-                    end
-                    
+		    4'b1000: begin //MULSR
+			readRegSec = sourceSecReg;
+		    end
+			
+
+		    4'b0110: begin //NOT
+                        readRegDest = destReg; 
+                        readRegFirst = sourceFirstReg; 
+                        writeToReg   = 1'b1;
+                        writeData = ~(readDataFirst);
+			if (mul_type == 2'b11 | mul_type == 2'b10) begin // MULSI MULSR
+				flags_next[3] = writeData[31]; //sets N flag
+			end
+                    end                    
 
                 endcase
 

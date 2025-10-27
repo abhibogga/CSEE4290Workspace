@@ -9,6 +9,9 @@
 # Addition: Support to use XZR register as a shortcut for the value zero OR shortcut for R14
 # Addition: CMP now "stores" to R14 (XZR) and SUBS can be used to store to a destination register
 
+
+# python3 parser/assembler.py tests/BabyTest.asm parser/instructions.json
+#: 
 import re
 import json
 import sys
@@ -512,6 +515,10 @@ def assemble_opcode(dict):
                         if type(arg["Imm"]) == str:
                             try:
                                 temp = labels[arg["Imm"]] - line["addr"]
+                                # Uses absolute address for mov instruction (for loading addresses into registers)
+                                if line["mnemonic"].lower() == "mov":
+                                    temp = labels[arg["Imm"]]
+                                # Converts to 2's complement if negative
                                 if temp < 0:
                                     temp = int(hex(((abs(temp) ^ 0xffff) + 1) & 0xffff),16)
                                 opcode = opcode | temp

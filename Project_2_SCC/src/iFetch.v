@@ -6,16 +6,18 @@ module iFetch(
     input [31:0] fetchedInstruction,
     input exeOverride, 
     input [15:0] exeData, //15 bit imm
+//    input mul_trigger,
+  //  input mul_release,
+    input control,
     output reg [31:0] programCounter,
     output reg [31:0] filteredInstruction
 );
 
     //Registers/States here: 
     reg [1:0] state, stateNext; 
-    parameter sIdle = 0, sFilter = 1;
-
-    reg [31:0] PC; 
-    reg [31:0] PC_next;  // <--- added
+    parameter sIdle = 0, sFilter = 1, sUcode = 2;
+ 
+    reg [31:0] PC_next;
 
     //Branching offset things
     wire [15:0] imm16 = fetchedInstruction[15:0];
@@ -24,21 +26,17 @@ module iFetch(
     wire [15:0] imm16_exe = exeData;
     wire signed [31:0] branchOffsetAddress_exe = {{16{imm16_exe[15]}}, imm16_exe};
 
-    //====================
-    // Sequential Logic
-    //====================
+       
     always @(posedge clk) begin 
         state <= stateNext; 
 
         if (rst) begin 
-            PC <= 0; 
             programCounter <= 0; 
             state <= sIdle; 
         end 
+
         else begin 
             if (state == sFilter) begin 
-                // Update PC and programCounter together
-                PC <= PC_next;
                 programCounter <= PC_next;
             end
         end
@@ -47,9 +45,10 @@ module iFetch(
     //====================
     // Combinational Logic
     //====================
+
     always @(*) begin 
         // default
-        PC_next = PC + 4;
+        PC_next = programCounter + 4;
 
         case (state)
             sIdle: begin 
@@ -57,7 +56,7 @@ module iFetch(
                     stateNext = sIdle; 
                 end else begin 
                     stateNext = sFilter; 
-                    PC_next = 0; 
+                    programCounter = 0; 
                 end
             end
 
@@ -67,26 +66,41 @@ module iFetch(
 
                 // === Conditional branch override from EXE ===
                 if (exeOverride) begin 
-                    PC_next = PC + branchOffsetAddress_exe;
+                    PC_next = programCounter + branchOffsetAddress_exe;
                 end 
 
                 // === Unconditional branch (B) ===
                 else if (fetchedInstruction[31:25] == 7'b1100000) begin
-                    PC_next = PC + branchOffsetAddress;
+                    PC_next = programCounter + branchOffsetAddress;
                 end 
 
                 // === NOP ===
                 else if (fetchedInstruction[31:25] == 7'b1100100) begin 
-                    PC_next = PC + 4; 
+                    PC_next = programCounter + 4; 
                 end 
+
+		else if (control) begin
+		    PC_next = programCounter; //freeze PC
+		    stateNext = sUcode;
+		end
 
                 // === Default ===
                 else begin 
-                    PC_next = PC + 4; 
+                    PC_next = programCounter + 4; 
                 end
             end
 
-            default: 
+	   sUcode: begin
+		if (control) begin
+		    stateNext = sUcode;
+		end
+		else begin
+		    stateNext = sFilter;
+		end
+
+	   end
+
+           default: 
                 stateNext = sIdle;
         endcase
     end

@@ -1,3 +1,0 @@
-	MOV R1,#4
-	MUL R2,R1,#3
-	HALT

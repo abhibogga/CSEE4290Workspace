@@ -21,10 +21,12 @@ module iDecode(
     output reg [15:0] out_imm, 
     output reg [1:0]  firstLevelDecode_out, 
     output reg [3:0]  secondLevelDecode_out,
-    output reg        halt
+    output reg        halt,
+    output reg	      mul_trigger,
+    output reg [1:0]  mul_type
 );
 
-    // === Field extraction (adjust bit slices if your ISA differs) ===
+    // === Field extraction ===
     wire [1:0] firstLevelDecode     = instruction[31:30]; 
     wire       specialBit           = instruction[29]; 
     wire [3:0] secondLevelDecode    = instruction[28:25];
@@ -34,6 +36,8 @@ module iDecode(
     wire [3:0] sourceFirstReg       = instruction[20:17]; 
     wire [3:0] sourceSecReg         = instruction[16:13]; 
     wire [15:0] imm                 = instruction[15:0];
+    wire [6:0] opcode		    = instruction[31:25];
+
 
     always @(*) begin
         //$display("Instr raw = %h", instruction);
@@ -42,7 +46,7 @@ module iDecode(
         loadStore           = 1'b0;
         dataRegister        = 1'b0;
         dataRegisterImm     = 1'b0;
-        specialEncoding     = 1'b0;
+        specialEncoding     = specialBit;
         setFlags            = 1'b0;
         aluFunction         = 3'd0;
         branchInstruction   = 4'd0;
@@ -55,13 +59,13 @@ module iDecode(
         firstLevelDecode_out= firstLevelDecode;
         secondLevelDecode_out = secondLevelDecode;
         aluFunction         = aluOperationCommands;
-
+	
+	mul_trigger         = 1'b0; //default
         // Halt detect (keep your pattern)
         halt = (instruction[31:25] == 7'b1101000);
 
         // Special / Flags
-        specialEncoding = specialBit;
-        setFlags        = secondLevelDecode[0]; // use LSB as S-bit (adjust if needed)
+        setFlags        = secondLevelDecode[4]; // bit 28 is set flags
 
         // Common immediate (for data-imm path)
         out_imm = imm;
@@ -69,6 +73,7 @@ module iDecode(
         // ---------- Main decode ----------
         case (firstLevelDecode)
             // BRANCH
+	  
             2'b11: begin
                 branch             = 1'b1;
                 branchInstruction  = branchCondition;
@@ -92,6 +97,24 @@ module iDecode(
                 out_destRegister   = destReg;
                 out_sourceFirstReg = sourceFirstReg;
                 out_sourceSecReg   = sourceSecReg;
+		
+		case (opcode)
+		   7'b0110000: begin //mulr
+			mul_trigger = 1'b1;
+			mul_type = 2'b1;
+			out_sourceFirstReg = sourceFirstReg;
+			out_destRegister = destReg;
+			//we don't need to send immediate right?
+		   end
+	
+		   7'b0111000: begin //mulsr
+			mul_trigger = 1'b1;
+			mul_type = 2'd3;
+			out_sourceFirstReg = sourceFirstReg;
+			out_destRegister = destReg;
+			//do we need to send the second register?
+		   end
+		endcase
             end
 
             // DATA-IMMEDIATE (R-Imm)
@@ -102,11 +125,32 @@ module iDecode(
                 // out_imm already set to imm above
                 regRead            = 1'b1;
                 regWrite           = 1'b1; // ALU result will be written
-            end
+           
+		case (opcode)
+		   7'b0010000: begin // muli
+			mul_trigger = 1'b1;
+			mul_type = 2'b0;
+			out_sourceFirstReg = sourceFirstReg;
+			out_destRegister = destReg;
+			out_imm = imm; //send these over to ucode control
+
+		   end
+
+		   7'b0011000: begin //mulsi
+			mul_trigger = 1'b1;
+			mul_type = 2'd2;
+			out_sourceFirstReg = sourceFirstReg;
+			out_destRegister = destReg;
+			out_imm = imm; //send these over to ucode control
+		   end
+
+		endcase
+
+		
+	     end
 
             default: begin
-                // all defaults already safe
-               
+                // all defaults already safe       
             end
         endcase
     end
