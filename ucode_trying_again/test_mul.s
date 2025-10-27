@@ -1,5 +1,5 @@
-	MOV  R1, #0
+	MOV  R1, #6
 	MOV  R3, #0xFFFC
 	ADDS R4, R3, R1
-	MULS  R2, R1, #0
+	MUL  R2, R1, #0xFFFC
 	HALT

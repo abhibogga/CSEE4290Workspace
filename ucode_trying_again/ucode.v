@@ -182,10 +182,15 @@ module ucode (
 		if (true_mul_type == 2'd0) begin //MULI
 			count_next = count_reg - 1;
 			output_instruction = {ADD_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};              
-	                if (count_next == 0) begin
+	       
+			if (count_next == 0) begin
 	                    // This was the last ADD. Go to halt.
-	                    state_next = sHalt;
-	                end else begin
+			    if (corrected_imm != 0) begin
+				state_next = sFix_it;
+				fix_next = 2'b10; 
+			    end else begin
+				state_next = sHalt;
+			    end
 	                    // More ADDs needed. Stay in this state.
 	                    state_next = sKeep_adding;
 	                end	
@@ -193,11 +198,19 @@ module ucode (
 		else if (true_mul_type == 2'd1) begin //MULR
 			register_decrementer_count_next = register_decrementer_count - 1;
 			output_instruction = {ADD_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
+		
+
 			if (register_decrementer_count_next == 0) begin
-			    state_next = sHalt;
+			   if (corrected_readDataSecond !=0) begin
+				state_next = sFix_it; 
+				fix_next = 2'b10;
+			   end else begin
+				state_next = sHalt;
+			   end
 			end else begin
 			    state_next = sKeep_adding;
 			end
+
 		end 
 		else if (true_mul_type == 2'd2) begin //MULSI
 			count_next = count_reg - 1;
@@ -210,7 +223,6 @@ module ucode (
 			    end else begin
 				state_next = sHalt;
 			    end
-	                end else begin
 	                    // More ADDs needed. Stay in this state.
 	                    state_next = sKeep_adding;
 	                end 
