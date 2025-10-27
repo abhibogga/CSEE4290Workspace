@@ -47,8 +47,9 @@ module scc
 		.filteredInstruction(filtered_instruction), 
 		.exeOverride(exeOverride),
 		.exeData(exeData),
-		.mul_trigger(mul_trigger),
-		.mul_release(mul_release)
+//		.mul_trigger(mul_trigger),
+//		.mul_release(mul_release)
+		.control(mux_ctrl)
 	);
 
 	wire [31:0] filtered_instruction;
