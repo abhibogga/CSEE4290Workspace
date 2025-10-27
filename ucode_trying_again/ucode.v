@@ -180,87 +180,102 @@ module ucode (
 		end
             end
 
-            sKeep_adding: begin
-                mux_ctrl = 1;                
-		dest_reg_hold = dest_reg;
-		if (true_mul_type == 2'd0) begin //MULI
-			count_next = count_reg - 1;
-			output_instruction = {ADD_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};              
-	       
-			if (count_next == 0) begin
-	                    // This was the last ADD. Go to halt.
-		 
-			    if (corrected_imm != 0) begin
-				state_next = sFix_it;
-				fix_next = 2'b10; 
-			    end else begin
-				state_next = sHalt;
-			    end else begin
-	                    // More ADDs needed. Stay in this state.
-	                    	state_next = sKeep_adding;
-			    end
-	                end	
-		end
-		else if (true_mul_type == 2'd1) begin //MULR
-			register_decrementer_count_next = register_decrementer_count - 1;
-			output_instruction = {ADD_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
-		
+	    sKeep_adding: begin
+	        mux_ctrl = 1;
+	        dest_reg_hold = dest_reg;
 
-			if (register_decrementer_count_next == 0) begin
-			   if (corrected_readDataSecond !=0) begin
-				state_next = sFix_it; 
-				fix_next = 2'b10;
-			   end else begin
-				state_next = sHalt;
-			   end
-			end else begin
-			    state_next = sKeep_adding;
-			end
+	    /********** MULI (immediate, plain) **********/
+	        if (true_mul_type == MULI) begin
+	        // decrement counter and emit an ADD
+	             count_next = count_reg - 1;
+	             output_instruction = {ADD_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
 
-		end 
-		else if (true_mul_type == 2'd2) begin //MULSI
-			count_next = count_reg - 1;
-			output_instruction = {ADDS_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
-			 if (count_next == 0) begin
-	                    // This was the last ADD. Go to halt.
-			    if (corrected_imm != 0) begin
-				state_next = sFix_it;
-				fix_next = 2'b10; 
-			    end else begin
-				state_next = sHalt;
-			    end
-	                    // More ADDs needed. Stay in this state.
-	                    state_next = sKeep_adding;
-	                end 
-		end
-		else if (true_mul_type == 2'd3) begin //MULSR
-			register_decrementer_count_next = register_decrementer_count - 1;
-			output_instruction = {ADDS_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
-			if (register_decrementer_count_next == 0) begin
-			   if (corrected_readDataSecond !=0) begin
-				state_next = sFix_it; 
-				fix_next = 2'b10;
-			   end else begin
-				state_next = sHalt;
-			   end
-			end else begin
-			    state_next = sKeep_adding;
-			end 
-		end
-            end
-
-	    sFix_it: begin
-		mux_ctrl = 1;
-		if (fix == 2'b10) begin
-			fix_next = 2'b01;
-			state_next = sFix_it;
-			output_instruction = {SUBI_OPCODE, dest_reg_hold, dest_reg_hold, 1'b0, 16'b1}; //get it to ones comp 
-		end else begin
-			state_next = sHalt; //finally done
-			output_instruction = {NOT_OPCODE, dest_reg_hold, dest_reg_hold, 17'b0};
-			
-		end
+	        if (count_next == 0) begin
+	            // last ADD was emitted
+	            if (corrected_imm != 0) begin
+	                state_next = sFix_it;
+	                fix_next = 2'b10;
+	            end else begin
+	                state_next = sHalt;
+	            end
+	        end else begin
+	            // more ADDs needed
+	            state_next = sKeep_adding;
+	        end
 	    end
+
+	    /********** MULR (register count in readDataSecond) **********/
+	    else if (true_mul_type == MULR) begin
+	        register_decrementer_count_next = register_decrementer_count - 1;
+	        output_instruction = {ADD_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
+
+	        if (register_decrementer_count_next == 0) begin
+	            if (corrected_readDataSecond != 0) begin
+	                state_next = sFix_it;
+	                fix_next = 2'b10;
+	            end else begin
+	                state_next = sHalt;
+	            end
+	        end else begin
+	            state_next = sKeep_adding;
+	        end
+	    end
+
+	    /********** MULSI (signed immediate with flags update) **********/
+	    else if (true_mul_type == MULSI) begin
+	        count_next = count_reg - 1;
+	        output_instruction = {ADDS_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
+
+	        if (count_next == 0) begin
+	            if (corrected_imm != 0) begin
+	                state_next = sFix_it;
+	                fix_next = 2'b10;
+	            end else begin
+	                state_next = sHalt;
+	            end
+	        end else begin
+	            state_next = sKeep_adding;
+	        end
+	    end
+
+	    /********** MULSR (signed register count with flags update) **********/
+	    else if (true_mul_type == MULSR) begin
+	        register_decrementer_count_next = register_decrementer_count - 1;
+	        output_instruction = {ADDS_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
+
+	        if (register_decrementer_count_next == 0) begin
+	            if (corrected_readDataSecond != 0) begin
+	                state_next = sFix_it;
+	                fix_next = 2'b10;
+	            end else begin
+	                state_next = sHalt;
+	            end
+	        end else begin
+	            state_next = sKeep_adding;
+	        end
+	    end
+
+	    else begin
+	        // safe default: stay or go to halt
+	        state_next = sKeep_adding;
+	    end
+	end
+
+	sFix_it: begin
+	    mux_ctrl = 1;
+	    // Use fix as state-step: emit SUBI first iteration, then NOT next
+	    if (fix == 2'b10) begin
+	        // First fix instruction -> produce SUBI to convert to one's complement (as you intended)
+	        fix_next = 2'b01;
+	        state_next = sFix_it; // stay here so next cycle will do the NOT
+	        output_instruction = {SUBI_OPCODE, dest_reg_hold, dest_reg_hold, 1'b0, 16'b1};
+	    end else begin
+	        // Second fix instruction -> NOT to finish
+	        state_next = sHalt;
+	        output_instruction = {NOT_OPCODE, dest_reg_hold, dest_reg_hold, 17'b0};
+	    end
+	end
+
 
             sHalt: begin
                 // Done. Hand control back to the main IF stage.

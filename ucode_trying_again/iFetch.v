@@ -78,8 +78,10 @@ module iFetch(
 	
 		else if (exeOverrideBR) begin
 		    true_for_br = for_br;
-		    PC_next = programCounter + true_for_br;
+		    PC_next = true_for_br;
 		 //   exeOverrideBR = 0;
+
+//		    PC_next = true_for_br;
 		end 
 
                 // === Unconditional branch (B) ===

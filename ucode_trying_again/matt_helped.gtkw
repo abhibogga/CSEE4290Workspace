@@ -1,0 +1,33 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Mon Oct 27 14:07:15 2025
+[*]
+[dumpfile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/dump.vcd"
+[dumpfile_mtime] "Mon Oct 27 14:06:21 2025"
+[dumpfile_size] 346747
+[savefile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/matt_helped.gtkw"
+[timestart] 7253
+[size] 1854 1001
+[pos] -51 -51
+*-6.000000 7300 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] shift_count_tb.
+[treeopen] shift_count_tb.top.
+[treeopen] shift_count_tb.top.scc.
+[sst_width] 321
+[signals_width] 380
+[sst_expanded] 1
+[sst_vpaned_height] 297
+@22
+shift_count_tb.top.scc.IF.programCounter[31:0]
+shift_count_tb.top.scc.ID.instruction[31:0]
+@28
+shift_count_tb.top.scc.Ucode.state_reg[2:0]
+@22
+shift_count_tb.top.scc.Ucode.register_decrementer_count[31:0]
+@28
+shift_count_tb.top.halt_f
+shift_count_tb.top.halt
+@23
+shift_count_tb.top.scc.REGFILE.dbg_R11[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

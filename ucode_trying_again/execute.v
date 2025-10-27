@@ -98,133 +98,138 @@ module execute(
 		        exeOverrideBR = 1'b1;
 			help_trigger = 1'b1;
 		    end
-		endcase
-                case (branchInstruction)
-                    //$display("t=%0t | flags_next = %b (bin) | old flags = %b",$time, flags_next, flags);
-                    4'b0000: begin //BEQ
-                        //$display("beq considered");
-                        if (flags[2] == 1'b1) begin 
-                            //$display("beq taken");
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end   
+		    7'b1100001: begin
+			case (branchInstruction)
+                   
+	                    4'b0000: begin //BEQ
+	                        //$display("beq considered");
+	                        if (flags[2] == 1'b1) begin 
+	                            //$display("beq taken");
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end   
 
-                    4'b0001: begin  //BNE
-                       
-                        if (flags[2] == 1'b0) begin 
-                            //$display("Non Zero Flag Branch Taken");
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end
-		
+	                    4'b0001: begin  //BNE
+	                       
+	                        if (flags[2] == 1'b0) begin 
+	                            //$display("Non Zero Flag Branch Taken");
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end
+			
 
-		    4'b0010: begin  //B.hs
-                       
-                        if (flags[1] == 1'b1) begin 
-                            //$display("Non Zero Flag Branch Taken");
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end
+			    4'b0010: begin  //B.hs
+	                       
+	                        if (flags[1] == 1'b1) begin 
+	                            //$display("Non Zero Flag Branch Taken");
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end
 
-                   4'b0011: begin  //B.lo
-                       
-                        if (flags[1] == 1'b0) begin 
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end
+	                   4'b0011: begin  //B.lo
+	                       
+	                        if (flags[1] == 1'b0) begin 
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end
 
-                    4'b0100: begin //BMI
-                        //$display("BMI? flags=%b | N=%b Z=%b C=%b V=%b", flags, flags[3], flags[2], flags[1], flags[0]);
-                       
-                        if (flags[3] == 1'b1) begin 
-                            //$display("BMI? flags=%b | N=%b Z=%b C=%b V=%b", flags, flags[3], flags[2], flags[1], flags[0]);
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end
-                
-		     4'b0101: begin  //B.pl
-                       
-                        if (flags[3] == 1'b0) begin 
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end
+	                    4'b0100: begin //BMI
+	                        //$display("BMI? flags=%b | N=%b Z=%b C=%b V=%b", flags, flags[3], flags[2], flags[1], flags[0]);
+	                       
+	                        if (flags[3] == 1'b1) begin 
+	                            //$display("BMI? flags=%b | N=%b Z=%b C=%b V=%b", flags, flags[3], flags[2], flags[1], flags[0]);
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end
+	                
+			     4'b0101: begin  //B.pl
+	                       
+	                        if (flags[3] == 1'b0) begin 
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end
 
-                    4'b0110: begin  //B.vs
-                        if (flags[0] == 1'b1) begin 
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end
+	                    4'b0110: begin  //B.vs
+	                        if (flags[0] == 1'b1) begin 
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end
 
-                    4'b0111: begin  //B.vc
-                        if (flags[0] == 1'b0) begin 
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end
+	                    4'b0111: begin  //B.vc
+	                        if (flags[0] == 1'b0) begin 
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end
 
-                    4'b1000: begin  //B.hi
-                        if (flags[2] == 1'b0 && flags[1] == 1'b1) begin 
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end
+	                    4'b1000: begin  //B.hi
+	                        if (flags[2] == 1'b0 && flags[1] == 1'b1) begin 
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end
 
-                    4'b1001: begin  //B.ls
-                        if (!(flags[2] == 1'b0 && flags[1] == 1'b1)) begin 
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end
+	                    4'b1001: begin  //B.ls
+	                        if (!(flags[2] == 1'b0 && flags[1] == 1'b1)) begin 
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end
 
-                    4'b1010: begin  //B.ge
-                        if (flags[3] == flags[0]) begin 
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end
+	                    4'b1010: begin  //B.ge
+	                        if (flags[3] == flags[0]) begin 
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end
 
-                    4'b1011: begin  //B.lt
-                        if (!(flags[3] == flags[0])) begin 
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end
+	                    4'b1011: begin  //B.lt
+	                        if (!(flags[3] == flags[0])) begin 
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end
 
-                    4'b1100: begin  //B.gt
-                        if (flags[2] == 1'b0 && flags[3] == flags[0]) begin 
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end
+	                    4'b1100: begin  //B.gt
+	                        if (flags[2] == 1'b0 && flags[3] == flags[0]) begin 
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end
 
-                    4'b1101: begin  //B.le
-                        if (!(flags[2] == 1'b0 && flags[3] == flags[0])) begin 
-                            exeOverride = 1; 
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
-                    end
-                endcase                
+	                    4'b1101: begin  //B.le
+	                        if (!(flags[2] == 1'b0 && flags[3] == flags[0])) begin 
+	                            exeOverride = 1; 
+	                        end else begin 
+	                            exeOverride = 0; 
+	                        end 
+	                    end
+			    default: begin
+				exeOverride = 0;
+			    end
+	                endcase		
+		    end
+		endcase  
             end
 
                 
