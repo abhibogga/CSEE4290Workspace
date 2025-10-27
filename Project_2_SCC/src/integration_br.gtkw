@@ -1,0 +1,37 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Mon Oct 27 09:14:02 2025
+[*]
+[dumpfile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/Project_2_SCC/src/dump.vcd"
+[dumpfile_mtime] "Mon Oct 27 09:08:58 2025"
+[dumpfile_size] 44573
+[savefile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/Project_2_SCC/src/integration_br.gtkw"
+[timestart] 367
+[size] 927 1001
+[pos] 876 -51
+*-4.000000 413 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] shift_count_tb.
+[treeopen] shift_count_tb.top.
+[treeopen] shift_count_tb.top.scc.
+[sst_width] 278
+[signals_width] 225
+[sst_expanded] 1
+[sst_vpaned_height] 645
+@22
+shift_count_tb.top.scc.ID.instruction[31:0]
+shift_count_tb.top.scc.REGFILE.dbg_R13[31:0]
+shift_count_tb.top.scc.EXE.opcode_in[6:0]
+shift_count_tb.top.scc.EXE.readRegFirst[3:0]
+shift_count_tb.top.scc.EXE.destReg[3:0]
+shift_count_tb.top.scc.EXE.branchInstruction[3:0]
+shift_count_tb.top.scc.IF.programCounter[31:0]
+@200
+-
+@22
+shift_count_tb.top.scc.IF.opcode[6:0]
+shift_count_tb.top.scc.IF.for_br[31:0]
+shift_count_tb.top.scc.IF.PC_next[31:0]
+@29
+shift_count_tb.top.scc.IF.exeOverride
+[pattern_trace] 1
+[pattern_trace] 0

@@ -24,7 +24,8 @@ module execute(
     output reg [3:0] readRegSec,
     output reg [31:0] writeData,
     output reg writeToReg, 
-    output reg exeOverride, 
+    output reg exeOverride,
+    output reg exeOverrideBR, 
     output reg [15:0] exeData,
     output reg [3:0] flags_out,
 
@@ -66,6 +67,7 @@ module execute(
     always @(*) begin 
         // Defaults
         exeOverride     = 1'b0;
+	exeOverrideBR   = 1'b0;
         readRegDest     = 4'd0;
         readRegFirst    = 4'd0;
         readRegSec      = 4'd0;
@@ -86,14 +88,20 @@ module execute(
 	    flags_next = flags_back_in | flags; 
 	end
 	
-	if (opcode_in == 7'b1100010) begin //BR
-	    readRegFirst = destReg; //weird BR placement
-	    writeToReg = 0;
-	end
+
 
         case (firstLevelDecode)
             2'b11: begin 
                 // Branch logic
+		case (opcode_in)
+		     7'h62: begin
+			    readRegFirst = branchInstruction;
+		            writeToReg = 1'b0;
+			    exeOverrideBR = 1'b1;
+			    help_trigger = 1'b1;
+			end
+		endcase
+
                 case (branchInstruction)
                     //$display("t=%0t | flags_next = %b (bin) | old flags = %b",$time, flags_next, flags);
                     4'b0000: begin //BEQ
@@ -460,7 +468,7 @@ module execute(
                             end  
 
                             4'b0010: begin //SUB - imm
-                                help_trigger = 1'b1;
+                               // help_trigger = 1'b1;
                                 //Algorithm provided by chat-gpt
                                 readRegDest  = destReg;
                                 readRegFirst = sourceFirstReg; 

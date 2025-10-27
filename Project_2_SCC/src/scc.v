@@ -45,6 +45,7 @@ module scc
 		.programCounter(programCounter), 
 		.filteredInstruction(filtered_instruction), 
 		.exeOverride(exeOverride),
+		.exeOverrideBR(exeOverrideBR),
 		.exeData(exeData),
 //		.mul_trigger(mul_trigger),
 //		.mul_release(mul_release),
@@ -141,6 +142,7 @@ module scc
 	wire [31:0] exe_writeData;
 	wire        exe_writeToReg;
 	wire        exeOverride;
+	wire        exeOverrideBR;
 	wire [15:0] exeData;
 
 	// Memory interface outputs
@@ -186,6 +188,7 @@ module scc
 
 	    // Branch control (to IF)
 	    .exeOverride(exeOverride),
+	    .exeOverrideBR(exeOverrideBR),
 	    .exeData(exeData),
 
 	    // Memory interface (to instruction_and_data)

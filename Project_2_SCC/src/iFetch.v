@@ -5,6 +5,7 @@ module iFetch(
     input rst, 
     input [31:0] fetchedInstruction,
     input exeOverride, 
+    input exeOverrideBR,
     input [15:0] exeData, //15 bit imm
 //    input mul_trigger,
   //  input mul_release,
@@ -68,14 +69,14 @@ module iFetch(
                 stateNext = sFilter;
 
                 // === Conditional branch override from EXE ===
-                if (exeOverride) begin
-		    if (opcode == 7'b1100010) begin
+                if (exeOverrideBR) begin
 			PC_next = programCounter + for_br;
+		end
 
-		    end else begin 
-                        PC_next = programCounter + branchOffsetAddress_exe;
-                    end
-		end 
+		else if (exeOverride) begin
+			PC_next = programCounter + branchOffsetAddress_exe;
+		end
+
 
                 // === Unconditional branch (B) ===
                 else if (fetchedInstruction[31:25] == 7'b1100000) begin
