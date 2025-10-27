@@ -69,6 +69,8 @@ DONE:
     ADD R7, R7, #4
     MUL R11, R2, R2
     NOP
+    NOP
+    NOP
     MUL R12, R3, R3
 
     STOR  R11, R7, #0
