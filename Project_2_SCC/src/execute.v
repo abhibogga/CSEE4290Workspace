@@ -579,8 +579,8 @@ module execute(
                     4'b0101: begin //XOR Logical
                         readRegDest  = destReg;
                         readRegFirst = sourceFirstReg; 
-                        writeToReg   = 1'b1;
                         readRegSec = sourceSecReg;
+                        writeToReg   = 1'b1;
                         writeData = readDataFirst ^ readDataSec;
                     end
 

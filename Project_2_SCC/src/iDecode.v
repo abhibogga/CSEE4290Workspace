@@ -1,6 +1,4 @@
 //CODE WRITTEN BY TEAM, BUT SYNTAX ERRORS AND ADDITIONAL COMMENTS PROVIDED BY CHATGPT FOR UNDERSTANDING
-`include "uCodeControl.v"
-`include "uCodeROM.v"
 module iDecode(
     input  [31:0] instruction, 
     input         clk, 
@@ -51,36 +49,19 @@ module iDecode(
     wire [7:0]  uc_addr;
 
     // Instruction seen by the rest of decode
-    wire [31:0] instruction_eff = (uc_active) ? uc_instr : ifid_instr;
+    wire [31:0] instruction;
 
-    // Controller (exposes hold_if, uc_active, uc_addr)
-    u_code_control Ucontrol (
-        .clk        (clk),
-        .rst        (rst),
-        .ifid_instr (ifid_instr),
-        .hold_if    (hold_if),
-        .uc_active  (uc_active),
-        .uc_addr    (uc_addr)
-    );
-
-    // Microcode ROM (address from controller, data to instruction mux)
-    u_Code_Rom URom (
-        .clk      (clk),
-        .rst      (rst),
-        .uc_instr (uc_instr),
-        .u_addr   (uc_addr)
-    );
 
     // Field extraction from effective instruction
-    wire [1:0]  firstLevelDecode     = instruction_eff[31:30]; 
-    wire        specialBit           = instruction_eff[29]; 
-    wire [3:0]  secondLevelDecode    = instruction_eff[28:25];
-    wire [2:0]  aluOperationCommands = instruction_eff[27:25];
-    wire [3:0]  branchCondition      = instruction_eff[24:21]; 
-    wire [3:0]  destReg              = instruction_eff[24:21]; 
-    wire [3:0]  sourceFirstReg       = instruction_eff[20:17]; 
-    wire [3:0]  sourceSecReg         = instruction_eff[16:13]; 
-    wire [15:0] imm                  = instruction_eff[15:0];
+    wire [1:0]  firstLevelDecode     = instruction[31:30]; 
+    wire        specialBit           = instruction[29]; 
+    wire [3:0]  secondLevelDecode    = instruction[28:25];
+    wire [2:0]  aluOperationCommands = instruction[27:25];
+    wire [3:0]  branchCondition      = instruction[24:21]; 
+    wire [3:0]  destReg              = instruction[24:21]; 
+    wire [3:0]  sourceFirstReg       = instruction[20:17]; 
+    wire [3:0]  sourceSecReg         = instruction[16:13]; 
+    wire [15:0] imm                  = instruction[15:0];
 
     always @(*) begin
         branch                = 1'b0;
@@ -101,7 +82,7 @@ module iDecode(
         secondLevelDecode_out = secondLevelDecode;
         aluFunction           = aluOperationCommands;
 
-        halt = (instruction_eff[31:25] == 7'b1101000);
+        halt = (instruction[31:25] == 7'b1101000);
 
         specialEncoding = specialBit;
         setFlags        = secondLevelDecode[0];
