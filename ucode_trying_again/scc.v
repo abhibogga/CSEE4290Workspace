@@ -99,6 +99,7 @@ module scc
 	wire [31:0] ucode_inst;
 	wire mux_ctrl;	
 	wire [1:0] mul_type;
+	wire mul_release;
 
 	ucode Ucode (
 		.clk(clk),
@@ -111,7 +112,9 @@ module scc
 		.output_instruction(ucode_inst),
 		.readDataSecond(readDataSec),
 		.mul_type(mul_type),
-		.flags_in(flags_out) //come back to integrate sending old flags + new flags = total flags back out to exe
+		.flags_in(flags_out), //come back to integrate sending old flags + new flags = total flags back out to exe
+		.mul_release(mul_release),
+		.flags_back_out(flags_ucode_to_exe)
 	);
 
 
@@ -142,6 +145,7 @@ module scc
 	wire [31:0] readDataFirst;
 	wire [31:0] readDataSec;
 	wire [3:0] flags_out;
+	wire [3:0] flags_ucode_to_exe;
 
 	execute EXE (
 	    .clk(clk),
@@ -182,7 +186,9 @@ module scc
 	    .memoryWrite(writeFlag), 
 	    .memoryRead(memoryRead), 
 	    .memoryDataIn(memoryDataIn),
-	    .flags_out(flags_out)
+	    .flags_out(flags_out),
+	    .mul_release(mul_release),
+	    .flags_back_in(flags_ucode_to_exe)
 	);
 
 

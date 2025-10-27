@@ -33,7 +33,9 @@ module ucode (
 
     // Outputs to pipeline MUX
     output reg [31:0] output_instruction, // The generated MOV/ADD/SUB
-    output reg mux_ctrl
+    output reg mux_ctrl,
+    output reg mul_release,
+    output reg [3:0] flags_back_out
 );
 
     // --- FSM State Definitions ---
@@ -99,7 +101,7 @@ module ucode (
         output_instruction = {5'b11001,27'b0}; // Default to NOP
 	mux_ctrl = 0;        
 //	corrected_imm = 16'b0;
-
+	mul_release = 1'b0;
         case (state_reg)
             
             sIdle: begin
@@ -213,7 +215,10 @@ module ucode (
             sHalt: begin
                 // Done. Hand control back to the main IF stage.
                 mux_ctrl = 0;
+		output_instruction = {5'b11001, 27'b0}; //NOOP
+		mul_release = 1'b1;
                 state_next = sIdle; // Wait for the next MUL
+		flags_back_out = flags_hold; //send out the old flags
             end
 
             default: begin

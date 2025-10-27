@@ -15,6 +15,8 @@ module execute(
     input [31:0] readDataFirst, 
     input [31:0] readDataSec,
     input [1:0] mul_type,    
+    input mul_release,
+    input [3:0] flags_back_in
 
     output reg [3:0] readRegDest,
     output reg [3:0] readRegFirst,
@@ -36,7 +38,6 @@ module execute(
     assign exeData = imm; 
     reg [3:0] flags; // NZCV
     reg [3:0] flags_next; 
-   // reg [3:0] flags_out; //to ucode to save on MULS
 
     //other registers
     reg  signed [31:0] immExt;
@@ -78,6 +79,10 @@ module execute(
 
         flags_next = flags;
 	flags_out = flags; 
+
+	if (mul_release) begin
+	    flags_next = flags_back_in | flags 
+	end
 
         case (firstLevelDecode)
             2'b11: begin 
