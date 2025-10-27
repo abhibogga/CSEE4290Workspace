@@ -1,1 +1,1 @@
-python assembler.py shift_count.s instructions.json
+python assembler.py test_mul.s instructions.json

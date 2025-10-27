@@ -1,4 +1,4 @@
-iverilog -o test shift_count_tb.v 
+iverilog -o test testbench.v 
 vvp ./test
 gtkwave dump.vcd
 
