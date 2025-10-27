@@ -27,7 +27,7 @@ module iDecode(
     output reg [1:0]  mul_type
 );
 
-<<<<<<< HEAD
+
     // === Field extraction ===
     wire [1:0] firstLevelDecode     = instruction[31:30]; 
     wire       specialBit           = instruction[29]; 
