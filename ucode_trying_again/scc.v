@@ -46,7 +46,9 @@ module scc
 		.programCounter(programCounter), 
 		.filteredInstruction(filtered_instruction), 
 		.exeOverride(exeOverride),
-		.exeData(exeData)
+		.exeData(exeData),
+		.mul_trigger(mul_trigger),
+		.mul_release(mul_release)
 	);
 
 	wire [31:0] filtered_instruction;
