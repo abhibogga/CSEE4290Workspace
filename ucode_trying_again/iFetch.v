@@ -6,10 +6,13 @@ module iFetch(
     input [31:0] fetchedInstruction,
     input exeOverride, 
     input [15:0] exeData, //15 bit imm
+    input exeOverrideBR,
 //    input mul_trigger,
 //    input mul_release,
  
     input control,
+    input [31:0] readDataFirst,
+    input [6:0] opcode,
     output reg [31:0] programCounter,
     output reg [31:0] filteredInstruction
 );
@@ -23,6 +26,7 @@ module iFetch(
     //Branching offset things
     wire [15:0] imm16 = fetchedInstruction[15:0];
     wire signed [31:0] branchOffsetAddress = {{16{imm16[15]}}, imm16};
+    wire signed [31:0] for_br = {{16{readDataFirst[15]}}, readDataFirst};
 
     wire [15:0] imm16_exe = exeData;
     wire signed [31:0] branchOffsetAddress_exe = {{16{imm16_exe[15]}}, imm16_exe};
@@ -68,7 +72,11 @@ module iFetch(
                 // === Conditional branch override from EXE ===
                 if (exeOverride) begin 
                     PC_next = programCounter + branchOffsetAddress_exe;
-                end 
+                end
+	
+		else if (exeOverrideBR) begin
+		    PC_next = programCounter + for_br;
+		end 
 
                 // === Unconditional branch (B) ===
                 else if (fetchedInstruction[31:25] == 7'b1100000) begin

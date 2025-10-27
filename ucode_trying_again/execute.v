@@ -17,6 +17,7 @@ module execute(
     input [1:0] mul_type,    
     input mul_release,
     input [3:0] flags_back_in,
+    input [6:0] opcode_in,
 
     output reg [3:0] readRegDest,
     output reg [3:0] readRegFirst,
@@ -87,6 +88,15 @@ module execute(
         case (firstLevelDecode)
             2'b11: begin 
                 // Branch logic
+
+		case (opcode_in)
+		    7'h62: begin
+			readRegFirst = branchInstruction;
+		        writeToReg = 1'b0;
+		        exeOverrideBR = 1'b1;
+			help_trigger = 1'b1;
+		    end
+		endcase
                 case (branchInstruction)
                     //$display("t=%0t | flags_next = %b (bin) | old flags = %b",$time, flags_next, flags);
                     4'b0000: begin //BEQ

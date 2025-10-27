@@ -23,7 +23,8 @@ module iDecode(
     output reg [3:0]  secondLevelDecode_out,
     output reg        halt,
     output reg	      mul_trigger,
-    output reg [1:0]  mul_type
+    output reg [1:0]  mul_type,
+    output reg [6:0]  opcode_out
 );
 
     // === Field extraction ===
@@ -59,7 +60,7 @@ module iDecode(
         firstLevelDecode_out= firstLevelDecode;
         secondLevelDecode_out = secondLevelDecode;
         aluFunction         = aluOperationCommands;
-	
+	opcode_out = opcode;
 	mul_trigger         = 1'b0; //default
         // Halt detect (keep your pattern)
         halt = (instruction[31:25] == 7'b1101000);
@@ -82,6 +83,7 @@ module iDecode(
                 out_sourceSecReg   = sourceSecReg;
                 regRead            = 1'b1;
                 regWrite           = 1'b0;
+		out_imm            = imm;
             end
 
             // LOAD / STORE

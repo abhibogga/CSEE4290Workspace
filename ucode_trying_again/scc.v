@@ -1,7 +1,6 @@
 `include "iFetch.v"
 `include "iDecode.v"
 `include "execute.v"
-//`include "mem.v"
 `include "register.v"
 `include "ucode.v"
 `include "mux.v"
@@ -22,14 +21,14 @@ module scc
 
 	output wire [31:0] programCounter, 
 
-    //Outputs to talk to instruction_and_data.v
-    output wire writeFlag, 
-    output wire [31:0] dataOut, 
-    output wire [31:0] addressIn, 
-    output wire memoryRead,
-    input [31:0] memoryDataIn,
+        //Outputs to talk to instruction_and_data.v
+        output wire writeFlag, 
+        output wire [31:0] dataOut, 
+        output wire [31:0] addressIn, 
+        output wire memoryRead,
+        input [31:0] memoryDataIn,
     
-    output wire halt
+        output wire halt
 
 
 	
@@ -38,7 +37,7 @@ module scc
 
 	//Lets intialize IF module
 	wire [31:0] instructionForID;
-
+	wire [6:0] opcode,
 	iFetch IF (
 		.clk(clk), 
 		.rst(rst), 
@@ -48,8 +47,10 @@ module scc
 		.exeOverride(exeOverride),
 		.exeData(exeData),
 //		.mul_trigger(mul_trigger),
-//		.mul_release(mul_release)
-		.control(mux_ctrl)
+//		.mul_release(mul_release),
+		.control(mux_ctrl),
+		.opcode(opcode),
+		.readDataFirst(readDataFirst)
 	);
 
 	wire [31:0] filtered_instruction;
@@ -95,7 +96,8 @@ module scc
 		.secondLevelDecode_out(secondLevelDecode), 
 		.halt(halt),
 		.mul_trigger(mul_trigger),
-		.mul_type(mul_type)
+		.mul_type(mul_type),
+		.opcode_out(opcode)
 	);
 
 	wire mul_trigger;
@@ -191,7 +193,9 @@ module scc
 	    .memoryDataIn(memoryDataIn),
 	    .flags_out(flags_out),
 	    .mul_release(mul_release),
-	    .flags_back_in(flags_ucode_to_exe)
+	    .flags_back_in(flags_ucode_to_exe),
+
+	    .opcode_in(opcode)
 	);
 
 
