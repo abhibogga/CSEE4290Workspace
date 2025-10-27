@@ -1,6 +1,4 @@
 //CODE WRITTEN BY TEAM, BUT SYNTAX ERRORS AND ADDITIONAL COMMENTS PROVIDED BY CHATGPT FOR UNDERSTANDING
-//`include "uCodeControl.v"
-//`include "uCodeROM.v"
 module iDecode(
     input  [31:0] instruction, 
     input         clk, 
