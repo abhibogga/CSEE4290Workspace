@@ -16,7 +16,7 @@ module execute(
     input [31:0] readDataSec,
     input [1:0] mul_type,    
     input mul_release,
-    input [3:0] flags_back_in
+    input [3:0] flags_back_in,
 
     output reg [3:0] readRegDest,
     output reg [3:0] readRegFirst,
@@ -81,7 +81,7 @@ module execute(
 	flags_out = flags; 
 
 	if (mul_release) begin
-	    flags_next = flags_back_in | flags 
+	    flags_next = flags_back_in | flags; 
 	end
 
         case (firstLevelDecode)
