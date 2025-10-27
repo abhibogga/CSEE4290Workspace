@@ -129,7 +129,7 @@ module ucode (
 
 			end
 
-			else if (mul_type == MULR | mul_type == MULSR) begin
+			else if (mul_type == MULR || mul_type == MULSR) begin
 				if (readDataSecond[31] == 1) begin
 				    corrected_readDataSecond = ~(readDataSecond - 1);
 				    register_decrementer_count_next = corrected_readDataSecond;
