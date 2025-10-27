@@ -100,7 +100,7 @@
 
     ; Degree options for each quadrant
     ;MOV R1, #0x2D           ; 45, Q1
-    MOV R1, #0x100           ;150, Q2
+    MOV R1, #0x96           ;150, Q2
     ;MOV R1, #0xB5           ; 181, Q3
     ;MOV R1, #0x10F          ; 271, Q4
 
