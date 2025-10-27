@@ -1,5 +1,5 @@
-    ORG     0x400           ; 0x400
-; 10 x 32-bit ints: 1..10 (little-endian bytes via FCB)
+    ORG     #0x400
+
     FCB     #1,  #0, #0, #0
     FCB     #2,  #0, #0, #0
     FCB     #3,  #0, #0, #0
@@ -11,21 +11,21 @@
     FCB     #9,  #0, #0, #0
     FCB     #10, #0, #0, #0
 
-    ORG     #1280           ; 0x500
+    ORG     #0x500
 RESULT:
-    FCB     #0, #0, #0, #0  ; space for result (word)
+    FCB     #0, #0, #0, #0
 
     ORG     #0
 
 setup:
     CLR     R4
-    ADD     R4, R4, #1024      ; base ptr = 0x400
+    ADD     R4, R4, #0x400
 
     CLR     R5
-    ADD     R5, R5, #10        ; length = 10
+    ADD     R5, R5, #10 //Counter
 
     CLR     R6
-    ADD     R6, R6, #1280      ; RESULT address = 0x500
+    ADD     R6, R6, #0x500 //Result Address
 
 initialize:
     LOAD    R0, R4             ; first element x0
