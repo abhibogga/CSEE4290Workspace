@@ -112,7 +112,7 @@ module iDecode(
                 out_destRegister   = destReg;
                 out_sourceFirstReg = sourceFirstReg;
                 regRead            = 1'b1;
-
+		out_imm = imm;
                 regWrite           = 1'b1; // ALU result will be written
            
 		case (opcode)
