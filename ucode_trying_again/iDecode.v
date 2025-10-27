@@ -106,6 +106,14 @@ module iDecode(
 			out_destRegister = destReg;
 			//we don't need to send immediate right?
 		   end
+	
+		   7'b0111000: begin //mulsr
+			mul_trigger = 1'b1;
+			mul_type = 2'd3;
+			out_sourceFirstReg = sourceFirstReg;
+			out_destRegister = destReg;
+			//do we need to send the second register?
+		   end
 		endcase
             end
 
@@ -119,7 +127,7 @@ module iDecode(
                 regWrite           = 1'b1; // ALU result will be written
            
 		case (opcode)
-		   7'b0010000: begin
+		   7'b0010000: begin // muli
 			mul_trigger = 1'b1;
 			mul_type = 2'b0;
 			out_sourceFirstReg = sourceFirstReg;
@@ -128,7 +136,7 @@ module iDecode(
 
 		   end
 
-		   7'b0011000: begin
+		   7'b0011000: begin //mulsi
 			mul_trigger = 1'b1;
 			mul_type = 2'd2;
 			out_sourceFirstReg = sourceFirstReg;

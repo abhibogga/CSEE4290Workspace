@@ -392,6 +392,10 @@ module execute(
 			readRegSec = sourceSecReg;
 
 		    end
+
+		    4'b1000: begin //MULSR
+			readRegSec = sourceSecReg;
+		    end
 			
 
 		    4'b0110: begin //NOT

@@ -64,6 +64,7 @@ module ucode (
     reg [3:0] flags_hold;
     reg [1:0] true_mul_type;
     reg [15:0] corrected_imm; //if immediate is twos comp negative
+    reg [31:0] corrected_readDataSecond;
     reg [1:0] fix, fix_next;
     reg [3:0] dest_reg_hold;
 
@@ -100,7 +101,6 @@ module ucode (
 	register_decrementer_count_next = register_decrementer_count;
         output_instruction = {5'b11001,27'b0}; // Default to NOP
 	mux_ctrl = 0;        
-//	corrected_imm = 16'b0;
 	mul_release = 1'b0;
         case (state_reg)
             
@@ -114,18 +114,31 @@ module ucode (
                         state_next = sClear;
                     end else begin
                         state_next = sMov;
-                //      count_next = immediate; // Load counter
-		//	register_decrementer_count_next = readDataSecond; //load counter
-		// the above line can only be done if we are are MULR or MULSR 
 			true_mul_type = mul_type;
 			true_source_reg = source_reg;
 			flags_hold = flags_in; //hold the old flags
-			if (immediate[15] == 1) begin
-				corrected_imm = ~(immediate - 1);
-				count_next = corrected_imm;
-			end else begin
-				count_next = immediate;
+			
+			
+			if (mul_type == MULI || mul_type == MULSI) begin
+				if (immediate[15] == 1) begin
+				    corrected_imm = ~(immediate - 1);
+				    count_next = corrected_imm;
+			        end else begin
+				    count_next = immediate;
+			        end
+
 			end
+
+			else if (mul_type == MULR | mul_type == MULSR) begin
+				if (readDataSecond[31] == 1) begin
+				    corrected_readDataSecond = ~(readDataSecond - 1);
+				    register_decrementer_count_next = corrected_readDataSecond;
+				end else begin
+				    register_decrementer_count_next = readDataSecond;
+				end
+			end
+
+
 
                     end
                 end else begin
@@ -143,17 +156,21 @@ module ucode (
             end
 
             sMov: begin
-                output_instruction = {MOV_OPCODE, dest_reg, 5'b0, 16'b0};
-		//zero out Rd to start looping adder
-	//	true_source_reg = source_reg;
-		
+                output_instruction = {MOV_OPCODE, dest_reg, 5'b0, 16'b0};	
                 mux_ctrl = 1;
-                // Check if we are done (i.e., immediate was 1)
-                if (count_reg == 0 | register_decrementer_count == 0) begin //are we done decrementing?
-                    state_next = sHalt;
-                end else begin
-                    state_next = sKeep_adding;
-                end
+                if (mul_type == MULI || mul_type == MULSI) begin
+			if (count_reg == 0) begin
+				state_next = sHalt;
+			end else begin
+				state_next = sKeep_adding;
+			end
+		end else if (mul_type == MULR || mul_type == MULSR) begin
+			if (register_decrementer_count == 0) begin
+				state_next = sHalt;
+			end else begin
+				state_next = sKeep_adding;
+			end
+		end
             end
 
             sKeep_adding: begin
@@ -190,13 +207,20 @@ module ucode (
 			    end else begin
 				state_next = sHalt;
 			    end
-
-
 	                end else begin
 	                    // More ADDs needed. Stay in this state.
 	                    state_next = sKeep_adding;
 	                end 
-		end //come back to do MULSR
+		end
+		else if (true_mul_type == 2'd3) begin //MULSR
+			register_decrementer_count_next = register_decrementer_count - 1;
+			output_instruction = {ADDS_OPCODE, dest_reg, dest_reg, true_source_reg, 13'b0};
+			if (register_decrementer_count_next == 0) begin
+			    state_next = sHalt;
+			end else begin
+			    state_next = sKeep_adding;
+			end 
+		end
             end
 
 	    sFix_it: begin
