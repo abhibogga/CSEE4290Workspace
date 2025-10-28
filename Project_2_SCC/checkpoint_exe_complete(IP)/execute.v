@@ -184,29 +184,6 @@ module execute(
                                 
 
                             end
-
-
-                            3'b100: begin //LSL
-
-                                //Set Registers
-                                readRegDest = destReg; 
-                                readRegFirst = sourceFirstReg; 
-
-                                writeData = readDataFirst << {{16{imm[15]}}, imm};
-
-                            end
-
-                            3'b101: begin //LSR
-
-                                //Set Registers
-                                readRegDest = destReg; 
-                                readRegFirst = sourceFirstReg; 
-
-                                writeData = readDataFirst >> {{16{imm[15]}}, imm};
-
-                            end
-
-
                         endcase
                     end
 
@@ -290,11 +267,10 @@ module execute(
 
                             end
 
+
                             
 
                         endcase
-
-
                     end
                     
                 endcase

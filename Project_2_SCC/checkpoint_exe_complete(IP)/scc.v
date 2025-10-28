@@ -36,7 +36,6 @@ module scc
 
     //Lets intialize IF module
     wire [31:0] instrcutionForID; 
-    wire switchReg; 
     iFetch IF (
         .clk(clk), 
         .rst(rst), 
@@ -44,8 +43,7 @@ module scc
         .programCounter(programCounter), 
         .filteredInstruction(instrcutionForID), 
         .exeOverride(exeOverride),
-        .exeData(exeData), 
-        .switchReg(switchReg)
+        .exeData(exeData)
     );
 
 
@@ -168,9 +166,7 @@ register REGFILE (
     // Read outputs
     .out_rd(readDataDest),
     .out_rs1(readDataFirst),
-    .out_rs2(readDataSec), 
-
-    .uCodeFlag(switchReg)
+    .out_rs2(readDataSec)
 );
 
 
