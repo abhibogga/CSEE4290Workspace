@@ -1,4 +1,4 @@
-module register(clk, rst, rd, rs1, rs2, write, writeData, out_rd, out_rs1, out_rs2);
+module register(clk, rst, rd, rs1, rs2, write, writeData, out_rd, out_rs1, out_rs2, uCodeFlag);
     //define inputs here
     input clk; 
     input rst; 
@@ -7,6 +7,8 @@ module register(clk, rst, rd, rs1, rs2, write, writeData, out_rd, out_rs1, out_r
     input [3:0] rs2;  
     input write;
     input [31:0] writeData;  
+
+    input uCodeFlag; 
 
     //define outputs here
     output wire [31:0] out_rd;
