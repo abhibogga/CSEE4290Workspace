@@ -1,0 +1,4 @@
+something wrong with mul multiply, mul immediate is fine
+
+mov can't put a negative number in a register, because it ensures the top 16 bits zero
+you need MOV + MOVT or MOV32 to really put in a negative number

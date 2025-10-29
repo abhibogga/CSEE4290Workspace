@@ -2,5 +2,6 @@
 	MOV  R3, #6
 	ADDS R4, R3, R1
 	MUL  R2, R1, R3
+	MUL  R6, R3, R4
 	MOV  R5, #1
 	HALT

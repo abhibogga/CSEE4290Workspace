@@ -66,7 +66,7 @@ module iDecode(
         halt = (instruction[31:25] == 7'b1101000);
 
         // Special / Flags
-        setFlags        = secondLevelDecode[4]; // bit 28 is set flags
+        setFlags        = secondLevelDecode[3]; // bit 28 is set flags
 
         // Common immediate (for data-imm path)
         out_imm = imm;
@@ -99,6 +99,8 @@ module iDecode(
                 out_destRegister   = destReg;
                 out_sourceFirstReg = sourceFirstReg;
                 out_sourceSecReg   = sourceSecReg;
+		regRead            = 1'b1;
+		regWrite           = 1'b1;
 		
 		case (opcode)
 		   7'b0110000: begin //mulr
@@ -107,6 +109,7 @@ module iDecode(
 			out_sourceFirstReg = sourceFirstReg;
 			out_destRegister = destReg;
 			//we don't need to send immediate right?
+			out_sourceSecReg = sourceSecReg;
 		   end
 	
 		   7'b0111000: begin //mulsr
