@@ -6,7 +6,7 @@
 * just as the Emulator CSV does. 
 */
 `timescale 1ns/1ns
-
+`include "scc_f25_top.v"
 module scc_tb_simple_crc();
 
     // dump waveform event

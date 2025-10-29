@@ -14,9 +14,9 @@ switch ($Profile.ToLower()) {
         $AsmFile = "assembler/tests/ALU_Test.asm"
         $VerilogFile = "alu_tb.v"
     }
-    "mem" {
-        $AsmFile = "assembler/tests/MemTest.asm"
-        $VerilogFile = "memory_tb.v"
+    "bubble" {
+        $AsmFile = "BubbleSort.asm"
+        $VerilogFile = "Final_testbench.v"
     }
 
     "" {
@@ -31,7 +31,7 @@ switch ($Profile.ToLower()) {
 python3 assembler/parser/assembler.py assembler/tests/$AsmFile assembler/parser/instructions.json
 
 
-iverilog -o test $VerilogFile 
+iverilog -o test testbenches/$VerilogFile 
 vvp ./test
 gtkwave dump.vcd
 

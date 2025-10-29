@@ -67,7 +67,7 @@ module execute(
     always @(*) begin 
         // Defaults
         exeOverride     = 1'b0;
-	exeOverrideBR   = 1'b0;
+	    exeOverrideBR   = 1'b0;
         readRegDest     = 4'd0;
         readRegFirst    = 4'd0;
         readRegSec      = 4'd0;
@@ -79,10 +79,10 @@ module execute(
         memoryAddressOut = 32'd0;
         immExt = 0; 
         tempDiff = 0; 
-	exeData = imm;
+	    exeData = imm;
 
         flags_next = flags;
-	flags_out = flags; 
+	    flags_out = flags; 
 
 	if (mul_release) begin
 	    flags_next = flags_back_in | flags; 
@@ -93,14 +93,15 @@ module execute(
         case (firstLevelDecode)
             2'b11: begin 
                 // Branch logic
-		case (opcode_in)
-		     7'h62: begin
-			    readRegFirst = branchInstruction;
-		            writeToReg = 1'b0;
-			    exeOverrideBR = 1'b1;
-			    help_trigger = 1'b1;
-			end
-		endcase
+                case (opcode_in)
+                    7'h62: begin
+                        $display("BR reached");
+                        readRegFirst = branchInstruction;
+                        writeToReg = 1'b0;
+                        exeOverrideBR = 1'b1;
+                        help_trigger = 1'b1;
+                    end
+                endcase
 
                 case (branchInstruction)
                     //$display("t=%0t | flags_next = %b (bin) | old flags = %b",$time, flags_next, flags);
@@ -269,7 +270,27 @@ module execute(
             end
 
             2'b00: begin // Bits 31 and 30 are 00 (Data Immediete instructions) 
+                case (secondLevelDecode)
+                    4'b1110: begin //SAVF
+                        
+                        //First we want to set the flags to the lowest nibble of first register
+                        readRegFirst = sourceFirstReg; 
 
+
+                        //Read data off first reg
+                        flags_next = readDataFirst[3:0]; 
+
+
+                        //Clear out the register
+                        readRegDest = sourceFirstReg; 
+                        
+                        writeData = {{28'b0}, readDataFirst[3:0]}; 
+
+                        writeToReg = 1'b1;
+
+                    end
+
+                endcase
                 // ALU / MOV
                 case ({firstLevelDecode, specialEncoding})
                     3'b000: begin //MOV functions and Bit 29 = 0
@@ -305,33 +326,39 @@ module execute(
                             3'b011: begin //SET
                                 //Sets all bits of the destination register
                                 readRegDest = destReg;
-                                writeToReg = 1'b1;
                                 writeData = 32'hFFFFFFFF;
+                                writeToReg = 1'b1;
                             end
 
                             3'b100: begin //LSL
                                 readRegDest  = destReg;
                                 readRegFirst = sourceFirstReg; 
-                                writeToReg   = 1'b1; 
+                                
 
                                 writeData = readDataFirst << imm[15:0]; // << derived from assembler
+
+                                writeToReg   = 1'b1; 
                             end
 
                             3'b101: begin //LSR
                                 readRegDest  = destReg;
                                 readRegFirst = sourceFirstReg; 
-                                writeToReg   = 1'b1; 
+                                
 
                                 writeData = readDataFirst >> imm[15:0]; // << derived from assembler
+
+                                writeToReg   = 1'b1; 
                             
                             end
 
                             3'b110: begin //MOVF
                                 readRegDest = destReg;
                                 //Nibble is 4 bits!
-                                writeToReg = 1'b1;
+                                
                                 writeData = 32'b0000000; 
                                 writeData = {readDataDest[31:24] , flags[3:0]};
+
+                                writeToReg = 1'b1;
                             end
                         endcase
                     end
