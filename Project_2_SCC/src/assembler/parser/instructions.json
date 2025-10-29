@@ -47,6 +47,18 @@
         ],
         "instr": "0000110"
     },
+    "savf": {
+        "op_code": "savf",
+        "args": [
+            {
+                "Reg": [
+                    24,
+                    21
+                ]
+            }
+        ],
+        "instr": "0001110"
+    },
     "nop": {
         "op_code": "nop",
         "args": null,

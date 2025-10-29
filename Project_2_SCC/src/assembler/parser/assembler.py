@@ -5,13 +5,13 @@
 ## Changes Fall25 ##
 ####################
 #
-# Addition: Support for 16 registers by extending register field to 4 bits
-# Addition: Support to use XZR register as a shortcut for the value zero OR shortcut for R14
-# Addition: CMP now "stores" to R14 (XZR) and SUBS can be used to store to a destination register
+# Support for 16 registers by extending register field to 4 bits
+# Support to use XZR register as a shortcut for the value zero OR shortcut for R14
+# CMP now "stores" to R14 (XZR) and SUBS can be used to store to a destination register
+# New instructions MOVF and SAVF added
+# Immediate values can now be negative (#0x-1) - This now also works for MOV32
+# Labels can be used as immediate values for MOV instructions
 
-
-# python3 parser/assembler.py tests/BabyTest.asm parser/instructions.json
-#: 
 import re
 import json
 import sys
@@ -172,13 +172,9 @@ def parse_arguments(line, cond):
     #convert hex string to int
     for i,arg in enumerate(args):
 
-
-
         if '#0x' in arg:
             temp = {'Imm': None}
             temp['Imm']= int(arg[3:],16)
-            if (temp['Imm'] < 0):
-                temp['Imm'] = 0xFFFF + temp['Imm'] + 1
             args[i] = temp
             continue
 
@@ -350,10 +346,6 @@ def load_asm(filename):
         d["line number"] = i + 1
         line_data.append(d)
 
-
-
-    
-
     try:
         lines, line_data = parse_comments(lines, line_data)
     except:
@@ -409,6 +401,8 @@ def pseudo_mnemonics(index, lines):
         lines[index]["opcode"] = 0
         return False 
     elif lines[index]["mnemonic"] == "MOV32":
+        if lines[index]["args"][1]["Imm"] < 0:
+            lines[index]["args"][1]["Imm"] = 0xFFFFFFFF + lines[index]["args"][1]["Imm"] + 1
         lines.insert(index + 1, copy.deepcopy(lines[index]))
         lines[index]["mnemonic"] = "MOV"
         lines[index]["args"][1]["Imm"] &= 0xFFFF
@@ -508,6 +502,7 @@ def assemble_opcode(dict):
                         opcode_len = opcode_len + 4
                         # Encodes the Immediate value
                     elif arg.get("Imm"):
+                        # make sure immediate is 2's compliment if negative (16 bit here)
                         # Shifts the op_code to make the immediate bits 15-0
                         offset = 32 - opcode_len
                         opcode = (opcode << offset)
@@ -529,6 +524,8 @@ def assemble_opcode(dict):
                                 print("I don't know how but you broke it. Line: ",line["line number"])
                                 continue
                         else:
+                            if arg["Imm"] < 0:
+                                arg["Imm"] = 0xFFFF + arg["Imm"] + 1
                             opcode = opcode | arg["Imm"]
                             # print("Something wrong with Imm")
                 # Ensures to opcode is 32 bits if it does not have leading zeros
