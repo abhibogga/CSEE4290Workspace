@@ -42,7 +42,22 @@ module register(clk, rst, rd, rs1, rs2, write, writeData, out_rd, out_rs1, out_r
 
     
 
-
+    wire [31:0] dbg_R0  = registerFile[0];
+    wire [31:0] dbg_R1  = registerFile[1];
+    wire [31:0] dbg_R2  = registerFile[2];
+    wire [31:0] dbg_R3  = registerFile[3];
+    wire [31:0] dbg_R4  = registerFile[4];
+    wire [31:0] dbg_R5  = registerFile[5];
+    wire [31:0] dbg_R6  = registerFile[6];
+    wire [31:0] dbg_R7  = registerFile[7];
+    wire [31:0] dbg_R8  = registerFile[8];
+    wire [31:0] dbg_R9  = registerFile[9];
+    wire [31:0] dbg_R10 = registerFile[10];
+    wire [31:0] dbg_R11 = registerFile[11];
+    wire [31:0] dbg_R12 = registerFile[12];
+    wire [31:0] dbg_R13 = registerFile[13];
+    wire [31:0] dbg_R14 = registerFile[14];
+    wire [31:0] dbg_R15 = registerFile[15];
 
 
 endmodule

@@ -14,14 +14,20 @@ module execute(
     input [31:0] readDataDest,
     input [31:0] readDataFirst, 
     input [31:0] readDataSec,
+    //input [1:0] mul_type,    
+    //input mul_release,
+    input [3:0] flags_back_in,
+    input [6:0] opcode_in,
 
     output reg [3:0] readRegDest,
     output reg [3:0] readRegFirst,
     output reg [3:0] readRegSec,
     output reg [31:0] writeData,
     output reg writeToReg, 
-    output reg exeOverride, 
-    output wire [15:0] exeData,
+    output reg exeOverride,
+    //output reg exeOverrideBR, 
+    output reg [15:0] exeData,
+    output reg [3:0] flags_out,
 
     //I/O for memory
     output reg [31:0] memoryDataOut, 
@@ -31,15 +37,14 @@ module execute(
     input [31:0] memoryDataIn
 );
 
-    assign exeData = imm; 
+   // assign exeData = imm; 
     reg [3:0] flags; // NZCV
     reg [3:0] flags_next; 
-
 
     //other registers
     reg  signed [31:0] immExt;
     reg signed [32:0] tempDiff;
-
+    reg help_trigger;
 
     //Registers for Register additions
     reg [32:0] aluRegister;
@@ -55,6 +60,21 @@ module execute(
         end
     end
 
+    // Add at top-level
+    reg [31:0] loadDataReg;
+    reg loadValid;
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            loadValid <= 1'b0;
+            loadDataReg <= 32'd0;
+        end else begin
+            loadValid   <= memoryRead;
+            loadDataReg <= memoryDataIn;
+        end
+    end
+
+
 
     
 
@@ -62,6 +82,7 @@ module execute(
     always @(*) begin 
         // Defaults
         exeOverride     = 1'b0;
+	    //exeOverrideBR   = 1'b0;
         readRegDest     = 4'd0;
         readRegFirst    = 4'd0;
         readRegSec      = 4'd0;
@@ -73,19 +94,40 @@ module execute(
         memoryAddressOut = 32'd0;
         immExt = 0; 
         tempDiff = 0; 
+	    
 
-        flags_next = flags; //MAYBE TAKE OUT IDK
+        flags_next = flags;
+	    flags_out = flags; 
+
+	/*if (mul_release) begin
+	    flags_next = flags_back_in | flags; 
+	end*/
+	
+
 
         case (firstLevelDecode)
             2'b11: begin 
                 // Branch logic
+
                 case (branchInstruction)
+
+                    4'b0010: begin  //BR
+                        exeOverride = 1; 
+
+                        //Grab data from source reg
+                        readRegFirst = branchInstruction; 
+
+
+                        exeData = readDataFirst + {{16{imm[15]}}, imm};
+                    end
+
                     //$display("t=%0t | flags_next = %b (bin) | old flags = %b",$time, flags_next, flags);
                     4'b0000: begin //BEQ
                         //$display("beq considered");
                         if (flags[2] == 1'b1) begin 
                             //$display("beq taken");
                             exeOverride = 1; 
+                            exeData = imm;
                         end else begin 
                             exeOverride = 0; 
                         end 
@@ -96,11 +138,32 @@ module execute(
                         if (flags[2] == 1'b0) begin 
                             //$display("Non Zero Flag Branch Taken");
                             exeOverride = 1; 
+                            exeData = imm;
                         end else begin 
                             exeOverride = 0; 
                         end 
                     end
 
+                    4'b0010: begin  //B.hs
+                       
+                        if (flags[1] == 1'b1) begin 
+                            //$display("Non Zero Flag Branch Taken");
+                            exeOverride = 1; 
+                            exeData = imm;
+                        end else begin 
+                            exeOverride = 0; 
+                        end 
+                    end
+
+                    4'b0011: begin  //B.lo
+                       
+                        if (flags[1] == 1'b0) begin 
+                            exeOverride = 1; 
+                            exeData = imm;
+                        end else begin 
+                            exeOverride = 0; 
+                        end 
+                    end
 
                     4'b0100: begin //BMI
                         //$display("BMI? flags=%b | N=%b Z=%b C=%b V=%b", flags, flags[3], flags[2], flags[1], flags[0]);
@@ -108,17 +171,99 @@ module execute(
                         if (flags[3] == 1'b1) begin 
                             //$display("BMI? flags=%b | N=%b Z=%b C=%b V=%b", flags, flags[3], flags[2], flags[1], flags[0]);
                             exeOverride = 1; 
+                            exeData = imm;
                         end else begin 
                             exeOverride = 0; 
                         end 
                     end
-                endcase
 
-                
+                    4'b0101: begin  //B.pl
+                       
+                        if (flags[3] == 1'b0) begin 
+                            exeOverride = 1; 
+                            exeData = imm;
+                        end else begin 
+                            exeOverride = 0; 
+                        end 
+                    end
+
+                    4'b0110: begin  //B.vs
+                        if (flags[0] == 1'b1) begin 
+                            exeOverride = 1; 
+                            exeData = imm;
+                        end else begin 
+                            exeOverride = 0; 
+                        end 
+                    end
+
+                    4'b0111: begin  //B.vc
+                        if (flags[0] == 1'b0) begin 
+                            exeOverride = 1;
+                            exeData = imm; 
+                        end else begin 
+                            exeOverride = 0; 
+                        end 
+                    end
+
+                    4'b1000: begin  //B.hi
+                        if (flags[2] == 1'b0 && flags[1] == 1'b1) begin 
+                            exeOverride = 1; 
+                            exeData = imm;
+                        end else begin 
+                            exeOverride = 0; 
+                        end 
+                    end
+
+                    4'b1001: begin  //B.ls
+                        if (!(flags[2] == 1'b0 && flags[1] == 1'b1)) begin 
+                            exeOverride = 1; 
+                            exeData = imm;
+                        end else begin 
+                            exeOverride = 0; 
+                        end 
+                    end
+
+                    4'b1010: begin  //B.ge
+                        if (flags[3] == flags[0]) begin 
+                            exeOverride = 1; 
+                            exeData = imm;
+                        end else begin 
+                            exeOverride = 0; 
+                        end 
+                    end
+
+                    4'b1011: begin  //B.lt
+                        if (!(flags[3] == flags[0])) begin 
+                            exeOverride = 1; 
+                            exeData = imm;
+                        end else begin 
+                            exeOverride = 0; 
+                        end 
+                    end
+
+                    4'b1100: begin  //B.gt
+                        if (flags[2] == 1'b0 && flags[3] == flags[0]) begin 
+                            exeOverride = 1; 
+                            exeData = imm;
+                        end else begin 
+                            exeOverride = 0; 
+                        end 
+                    end
+
+                    4'b1101: begin  //B.le
+                        if (!(flags[2] == 1'b0 && flags[3] == flags[0])) begin 
+                            exeOverride = 1; 
+                            exeData = imm;
+                        end else begin 
+                            exeOverride = 0; 
+                        end 
+                    end
+                endcase                
             end
 
             2'b10: begin 
                 if (aluFunctions[0] == 1) begin //Stor
+                    
                     readRegFirst = sourceFirstReg; // base
                     readRegDest   = destReg;   // data to store
 
@@ -128,47 +273,67 @@ module execute(
                     memoryWrite   = 1'b1;
 
                     writeToReg   = 1'b0; // store doesn’t write back
-
+                    
                     
                 end else begin //Load
                     
 
-                    //First we get the calculate the address
-                    readRegFirst = sourceFirstReg; // base
+                    readRegFirst = sourceFirstReg;
                     memoryAddressOut = readDataFirst + {{16{imm[15]}}, imm};
-                    //$display(imm);
-                    //$display("memory address out = %0d (dec) = 0x%0h (hex)", memoryAddressOut, memoryAddressOut);
+                    memoryRead = 1'b1;
+                    readRegDest = destReg;
 
-                    //Then we use that address to look into memory, so load that address into an output
-                    memoryRead = 1; 
-                    //Read that value
-                    readRegDest = destReg; 
-                    writeData = memoryDataIn;
-                    
-                    
-                    writeToReg  = 1'b1; 
-                    //Load it into the desination register
-
-                    
-
-
-
+                    if (loadValid) begin
+                        writeData = loadDataReg;
+                        writeToReg = 1'b1;
+                    end else begin
+                        writeToReg = 1'b0;
+                    end     
+                    //Load it into the desination registe
                 end
             end
 
-            2'b00: begin 
+            2'b00: begin // Bits 31 and 30 are 00 (Data Immediete instructions) 
+                case (secondLevelDecode)
+                    4'b1110: begin //SAVF
+                        
+                        //First we want to set the flags to the lowest nibble of first register
+                        readRegFirst = sourceFirstReg; 
+
+
+                        //Read data off first reg
+                        flags_next = readDataFirst[3:0]; 
+
+
+                        //Clear out the register
+                        readRegDest = sourceFirstReg; 
+                        
+                        writeData = {{28'b0}, readDataFirst[3:0]}; 
+
+                        writeToReg = 1'b1;
+
+                    end
+
+                endcase
                 // ALU / MOV
                 case ({firstLevelDecode, specialEncoding})
-                    3'b000: begin //MOV functions
+                    3'b000: begin //MOV functions and Bit 29 = 0
                         case (aluFunctions)
                             3'b000: begin // MOV
                                 
                                 readRegDest = destReg; 
-                                writeData = {{16{imm[15]}}, imm};
+                                writeData = {{16'b0}, imm};
                                 //$display(imm);
                                 
                                 
                                 writeToReg  = 1'b1;  
+                            end
+
+                            3'b001: begin // MOVT
+                                readRegDest = destReg;
+                                writeData   = { imm[15:0], readDataDest[15:0] };
+
+                                writeToReg = 1'b1;
                             end
 
                             3'b010: begin //CLR - imm
@@ -179,15 +344,51 @@ module execute(
                                 writeToReg   = 1'b1; 
 
                                 
-                                writeData = 32'b0;
+                                writeData = 32'b0000000;                             
+                            end
 
+                            3'b011: begin //SET
+                                //Sets all bits of the destination register
+                                readRegDest = destReg;
+                                writeData = 32'hFFFFFFFF;
+                                writeToReg = 1'b1;
+                            end
+
+                            3'b100: begin //LSL
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
                                 
 
+                                writeData = readDataFirst << imm[15:0]; // << derived from assembler
+
+                                writeToReg   = 1'b1; 
+                            end
+
+                            3'b101: begin //LSR
+                           
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                
+
+                                writeData = readDataFirst >> imm[15:0]; // << derived from assembler
+
+                                writeToReg   = 1'b1; 
+                            
+                            end
+
+                            3'b110: begin //MOVF
+                                readRegDest = destReg;
+                                //Nibble is 4 bits!
+                                
+                                writeData = 32'b0000000; 
+                                writeData = {readDataDest[31:24] , flags[3:0]};
+
+                                writeToReg = 1'b1;
                             end
                         endcase
                     end
 
-                    3'b001: begin 
+                    3'b001: begin  //Bit 29 is now 1 and this covers (Data Immedieate)
                         case (secondLevelDecode)
                             4'b1001: begin //ADDS - imm
                                 
@@ -236,48 +437,132 @@ module execute(
                                             //flags_next);
                             end
 
+                            4'b1011: begin //ANDS LOGICAL - IMM
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                writeToReg   = 1'b1;
+                                immExt   = {{16{imm[15]}}, imm};
+
+                                writeData = readDataFirst & immExt;
+
+                                //Update Flags
+                                flags_next[3] = writeData[31];           // N
+                                flags_next[2] = (writeData == 32'd0);              // Z
+                                //C and V flags are not updated
+                            end
+
+                            4'b1100: begin //ORS Logical
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                writeToReg   = 1'b1;
+                                immExt   = {{16{imm[15]}}, imm};
+
+                                writeData = readDataFirst | immExt;
+
+                                //Update Flags
+                                flags_next[3] = writeData[31];           // N
+                                flags_next[2] = (writeData == 32'd0);              // Z
+                                //C and V flags are not updated
+                            end
+
+                            4'b1101: begin //XORS Logical - IMM
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                writeToReg   = 1'b1;
+                                immExt   = {{16{imm[15]}}, imm};
+
+                                writeData = readDataFirst ^ immExt;
+
+                                //Update Flags
+                                flags_next[3] = writeData[31];           // N
+                                flags_next[2] = (writeData == 32'd0);              // Z
+                                //C and V flags are not updated
+                            end
+
+                            4'b0011: begin // AND Logical
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                               
+                                immExt   = {{16{imm[15]}}, imm};
+
+                                writeData = {readDataFirst & immExt};
+                                 writeToReg   = 1'b1;
+                            end
+
+                            4'b0100: begin // OR Logical
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                
+                                immExt   = {{16{imm[15]}}, imm};
+
+                                writeData = readDataFirst | immExt;
+                                writeToReg   = 1'b1;
+                            end
+
+                            4'b0101: begin //XOR Logical - IMM
+                                readRegDest  = destReg;
+                                readRegFirst = sourceFirstReg; 
+                                
+                                immExt   = {{16{imm[15]}}, imm};
+
+                                writeData = readDataFirst ^ immExt;
+                                writeToReg   = 1'b1;
+                            end
+
 
                             4'b0001: begin //ADD - imm
                                 
                                 readRegDest  = destReg;
                                 readRegFirst = sourceFirstReg; 
-                                writeToReg   = 1'b1; 
+                                
 
                                 
                                 immExt   = {{16{imm[15]}}, imm};
                                 tempDiff = {1'b0, readDataFirst} + {1'b0, immExt};
                                 writeData = tempDiff[31:0];
-
-                               
-
+                                writeToReg   = 1'b1; 
                             end  
 
                             4'b0010: begin //SUB - imm
-                               
+                               // help_trigger = 1'b1;
                                 //Algorithm provided by chat-gpt
                                 readRegDest  = destReg;
                                 readRegFirst = sourceFirstReg; 
-                                writeToReg   = 1'b1; 
-
+                               
                                 immExt   = {{16{imm[15]}}, imm};
                                 tempDiff = {1'b0, readDataFirst} - {1'b0, immExt};
                                 writeData = tempDiff[31:0];
-
-                                
+                                writeToReg   = 1'b1; 
 
                             end
+			    
 
+			    4'b0000: begin // mul imm
+				
+				writeToReg = 1'b0;
+
+			    end
+
+			    4'b1000: begin //mulsi
+				writeToReg = 1'b0;
+				flags_next = 4'b0; //clear out the flags for the muls algo insts
+				
+			    end
+
+			    default: begin
+				writeToReg =1'b0;
+
+			    end
 
                             
 
                         endcase
-                    end
-                    
+                    end   
                 endcase
             end
 
 
-            2'b01: begin 
+            2'b01: begin
                 case (secondLevelDecode) // Since all of them are 011 we just need the second level decode
                     4'b1001: begin //ADDS
                         
@@ -300,7 +585,6 @@ module execute(
 
                         //$display("flags_next = %b (bin))",
                                             //flags_next);
-
                     end  
 
                     4'b1010: begin //SUBS
@@ -314,9 +598,11 @@ module execute(
                         
 
                         //$display("Source Reg First in SUBS:   %b", readRegFirst); 
-                        writeToReg = 1; 
+                        
 
                         writeData = aluRegister; 
+
+                        writeToReg = 1; 
 
 
                         //Update the flags
@@ -330,9 +616,80 @@ module execute(
                                             //flags_next);
                     end
                     
+                    4'b1011: begin //ANDS LOGICAL Register
+                        readRegDest  = destReg;
+                        readRegFirst = sourceFirstReg;
+                        readRegSec = sourceSecReg; 
+                        writeToReg   = 1'b1;
 
+                        writeData = readDataFirst & readDataSec;
 
-                     4'b0001: begin //ADD
+                        //Update Flags
+                        flags_next[3] = writeData[31];           // N
+                        flags_next[2] = (writeData == 32'd0);              // Z
+                        //C and V flags are not updated
+                    end
+
+                    4'b1100: begin //ORS Logical Register
+                        readRegDest  = destReg;
+                        readRegFirst = sourceFirstReg; 
+                       
+                        readRegSec = sourceSecReg;
+
+                        writeData = readDataFirst | readDataSec;
+                        writeToReg   = 1'b1;
+
+                        //Update Flags
+                        flags_next[3] = writeData[31];           // N
+                        flags_next[2] = (writeData == 32'd0);              // Z
+                        //C and V flags are not updated
+                    end
+
+                    4'b1101: begin //XORS Logical - REG
+                        readRegDest  = destReg;
+                        readRegFirst = sourceFirstReg; 
+                        
+                        readRegSec = sourceSecReg;
+
+                        writeData = readDataFirst ^ readDataSec;
+                        writeToReg   = 1'b1;
+
+                        //Update Flags
+                        flags_next[3] = writeData[31];           // N
+                        flags_next[2] = (writeData == 32'd0);              // Z
+                        //C and V flags are not updated
+                    end
+
+                    4'b0011: begin // AND Logical
+                        readRegDest  = destReg;
+                        readRegFirst = sourceFirstReg;
+                        readRegSec = sourceSecReg; 
+                        
+
+                        writeData = {readDataFirst & readDataSec};
+                        writeToReg   = 1'b1;
+                    end
+
+                    4'b0100: begin // OR Logical
+                        readRegDest  = destReg;
+                        readRegFirst = sourceFirstReg;
+                        readRegSec = sourceSecReg; 
+                       
+
+                        writeData = readDataFirst | readDataSec;
+                        writeToReg   = 1'b1;
+                    end
+
+                    4'b0101: begin //XOR Logical - REG
+                        readRegDest  = destReg;
+                        readRegFirst = sourceFirstReg; 
+                        readRegSec = sourceSecReg;
+                        
+                        writeData = readDataFirst ^ readDataSec;
+                        writeToReg   = 1'b1;
+                    end
+
+                    4'b0001: begin //ADD
                         
                         readRegDest = destReg; 
                         readRegFirst = sourceFirstReg; 
@@ -343,10 +700,6 @@ module execute(
                         writeToReg = 1; 
 
                         writeData = aluRegister; 
-
-
-                        
-
                     end  
 
                     4'b0010: begin //SUB
@@ -361,14 +714,28 @@ module execute(
                         writeToReg = 1; 
 
                         writeData = aluRegister; 
+		    end
 
+		    4'b0000: begin //MULR
+			readRegSec = sourceSecReg;
 
-                        
+		    end
 
-                    end
-                    
+		    4'b1000: begin //MULSR
+			readRegSec = sourceSecReg;
+		    end
+			
 
-                endcase
+		    4'b0110: begin //NOT
+                readRegDest = destReg; 
+                readRegFirst = sourceFirstReg; 
+                writeToReg   = 1'b1;
+                writeData = ~(readDataFirst);
+                /*if (mul_type == 2'b11 | mul_type == 2'b10) begin // MULSI MULSR
+                    flags_next[3] = writeData[31]; //sets N flag
+                end*/
+            end                    
+        endcase
 
             end
         endcase
