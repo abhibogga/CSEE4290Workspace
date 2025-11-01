@@ -3,5 +3,4 @@
 	MUL  R2, R1, #5
 	NOP
 	MUL  R3, R1, R3
-	NOP
 	HALT
