@@ -4,4 +4,5 @@
 	NOP
 	ADDS R4, R3, R2
 	MUL  R3, R1, R3
+	SUB  R4, R4, #2
 	HALT
