@@ -106,7 +106,7 @@ module iFetch(
             end
 
 	   sUcode: begin
-		PC_next = PC_next;
+		PC_next = programCounter; //tryna keep it frozen
 		if (mul_release) begin
 		    stateNext = sFilter;
 		  

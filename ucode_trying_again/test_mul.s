@@ -1,6 +1,6 @@
 	MOV  R1, #4
 	MUL  R2, R1, #5
 	NOP
-	MUL  R3, R1, #3
+	MUL  R3, R1, R1
 	NOP
 	HALT
