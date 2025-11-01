@@ -95,7 +95,7 @@ module iFetch(
                 end 
 
 		else if (mul_trigger) begin
-		    PC_next = programCounter; //freeze PC
+		    PC_next = programCounter + 4; 
 		    stateNext = sUcode;
 		end
 
@@ -106,6 +106,7 @@ module iFetch(
             end
 
 	   sUcode: begin
+		filteredInstruction = fetchedInstruction;
 		PC_next = programCounter; //tryna keep it frozen
 		if (mul_release) begin
 		    stateNext = sFilter;

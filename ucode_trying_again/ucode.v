@@ -115,7 +115,7 @@ module ucode (
                 if (start_mul) begin
                     // A MUL instruction has arrived. Decide what to do.
 			
-                    if (immediate == 0) begin //might want to take this out because this could be true with mulr and Rs2 is R0
+                    if (mul_type == MULI && immediate == 0) begin //might want to take this out because this could be true with mulr and Rs2 is R0
                         state_next = sClear;
 			flags_hold = flags_in;
                     end else begin
