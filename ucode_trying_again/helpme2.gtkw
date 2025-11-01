@@ -1,0 +1,70 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Sat Nov  1 23:18:21 2025
+[*]
+[dumpfile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/dump.vcd"
+[dumpfile_mtime] "Sat Nov  1 23:16:54 2025"
+[dumpfile_size] 27305
+[savefile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/helpme2.gtkw"
+[timestart] 61
+[size] 1854 1001
+[pos] -38 -38
+*-5.166809 238 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] testbench.
+[treeopen] testbench.topMod.
+[treeopen] testbench.topMod.scc.
+[sst_width] 278
+[signals_width] 377
+[sst_expanded] 1
+[sst_vpaned_height] 309
+@28
+testbench.topMod.scc.Ucode.clk
+testbench.topMod.scc.IF.mul_trigger
+@29
+testbench.topMod.scc.IF.mul_release
+@22
+testbench.topMod.scc.IF.PC_next[31:0]
+testbench.topMod.scc.IF.programCounter[31:0]
+@28
+testbench.topMod.scc.IF.stateNext[1:0]
+testbench.topMod.scc.IF.state[1:0]
+testbench.topMod.scc.IF.mul_release
+@22
+testbench.topMod.scc.ID.instruction[31:0]
+@200
+-
+@28
+testbench.topMod.scc.mux.control
+@22
+testbench.topMod.scc.mux.finalized_instruction[31:0]
+testbench.topMod.scc.mux.ucode_instruction[31:0]
+testbench.topMod.scc.IF.fetchedInstruction[31:0]
+testbench.topMod.scc.mux.filtered_instruction[31:0]
+@200
+-
+-
+@28
+testbench.topMod.scc.Ucode.mux_ctrl
+testbench.topMod.scc.Ucode.mul_type[1:0]
+testbench.topMod.scc.Ucode.true_mul_type[1:0]
+testbench.topMod.scc.Ucode.mul_release
+testbench.topMod.scc.Ucode.state_reg[2:0]
+@420
+testbench.topMod.scc.Ucode.MULR
+@22
+testbench.topMod.scc.Ucode.register_decrementer_count_next[31:0]
+testbench.topMod.scc.Ucode.corrected_readDataSecond[31:0]
+@28
+testbench.topMod.scc.Ucode.state_next[2:0]
+testbench.topMod.scc.Ucode.state_reg[2:0]
+@420
+testbench.topMod.scc.Ucode.sHalt
+testbench.topMod.scc.Ucode.sClear
+testbench.topMod.scc.Ucode.sFix_it
+@28
+testbench.topMod.scc.Ucode.rst
+@22
+testbench.topMod.scc.Ucode.count_next[15:0]
+testbench.topMod.scc.Ucode.count_reg[15:0]
+[pattern_trace] 1
+[pattern_trace] 0

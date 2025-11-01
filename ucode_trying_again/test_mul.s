@@ -2,5 +2,7 @@
 	MOV  R3, #3
 	MUL  R2, R1, #5
 	NOP
+	NOP
+	NOP
 	MUL  R3, R1, R3
 	HALT
