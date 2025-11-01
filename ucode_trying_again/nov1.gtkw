@@ -1,0 +1,30 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Sat Nov  1 21:09:27 2025
+[*]
+[dumpfile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/dump.vcd"
+[dumpfile_mtime] "Sat Nov  1 21:07:02 2025"
+[dumpfile_size] 15960
+[savefile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/nov1.gtkw"
+[timestart] 36
+[size] 927 1001
+[pos] -51 -51
+*-4.291256 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] testbench.
+[treeopen] testbench.topMod.
+[treeopen] testbench.topMod.scc.
+[sst_width] 278
+[signals_width] 246
+[sst_expanded] 1
+[sst_vpaned_height] 297
+@22
+testbench.topMod.scc.IF.PC_next[31:0]
+@28
+testbench.topMod.scc.mux.control
+@22
+testbench.topMod.scc.IF.programCounter[31:0]
+testbench.topMod.scc.mux.ucode_instruction[31:0]
+@23
+testbench.topMod.scc.mux.finalized_instruction[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

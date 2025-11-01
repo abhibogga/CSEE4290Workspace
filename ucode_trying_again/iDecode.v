@@ -109,6 +109,7 @@ module iDecode(
 			out_sourceFirstReg = sourceFirstReg;
 			out_destRegister = destReg;
 			//we don't need to send immediate right?
+			out_imm = 0;
 			out_sourceSecReg = sourceSecReg;
 		   end
 	

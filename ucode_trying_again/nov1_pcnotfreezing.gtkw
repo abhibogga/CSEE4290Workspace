@@ -1,0 +1,32 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Sat Nov  1 21:32:32 2025
+[*]
+[dumpfile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/dump.vcd"
+[dumpfile_mtime] "Sat Nov  1 21:29:43 2025"
+[dumpfile_size] 23840
+[savefile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/nov1_pcnotfreezing.gtkw"
+[timestart] 35
+[size] 1854 1001
+[pos] -51 -51
+*-4.000000 55 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] testbench.
+[treeopen] testbench.topMod.
+[treeopen] testbench.topMod.scc.
+[sst_width] 278
+[signals_width] 326
+[sst_expanded] 1
+[sst_vpaned_height] 297
+@28
+testbench.topMod.scc.IF.mul_release
+@22
+testbench.topMod.scc.IF.opcode[6:0]
+@28
+testbench.topMod.scc.IF.mul_trigger
+@22
+testbench.topMod.scc.IF.PC_next[31:0]
+testbench.topMod.scc.IF.programCounter[31:0]
+@29
+testbench.topMod.scc.mux.control
+[pattern_trace] 1
+[pattern_trace] 0

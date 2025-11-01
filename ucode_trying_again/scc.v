@@ -48,9 +48,9 @@ module scc
 		.exeOverride(exeOverride),
 		.exeOverrideBR(exeOverrideBR),
 		.exeData(exeData),
-//		.mul_trigger(mul_trigger),
-//		.mul_release(mul_release),
-		.control(mux_ctrl),
+		.mul_trigger(mul_trigger),
+		.mul_release(mul_release),
+//		.control(mux_ctrl),
 		.opcode(opcode),
 		.readDataFirst(readDataFirst)
 	);

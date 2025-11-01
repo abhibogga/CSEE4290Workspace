@@ -7,10 +7,10 @@ module iFetch(
     input exeOverride, 
     input [15:0] exeData, //15 bit imm
     input exeOverrideBR,
-//    input mul_trigger,
-//    input mul_release,
+    input mul_trigger,
+    input mul_release,
  
-    input control,
+//    input control,
     input [31:0] readDataFirst,
     input [6:0] opcode,
     output reg [31:0] programCounter,
@@ -43,7 +43,7 @@ module iFetch(
         end 
 
         else begin 
-            if (state == sFilter) begin 
+            if (state != sIdle) begin 
                 programCounter <= PC_next;
             end
         end
@@ -94,7 +94,7 @@ module iFetch(
                     PC_next = programCounter + 4; 
                 end 
 
-		else if (control) begin
+		else if (mul_trigger) begin
 		    PC_next = programCounter; //freeze PC
 		    stateNext = sUcode;
 		end
@@ -106,11 +106,13 @@ module iFetch(
             end
 
 	   sUcode: begin
-		if (control) begin
-		    stateNext = sUcode;
+		PC_next = PC_next;
+		if (mul_release) begin
+		    stateNext = sFilter;
+		  
 		end
 		else begin
-		    stateNext = sFilter;
+		    stateNext = sUcode;
 		end
 
 	   end
