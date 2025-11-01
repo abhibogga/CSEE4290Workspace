@@ -68,7 +68,8 @@ DONE:
     ; R12 = (# of zeros)^2
     ADD R7, R7, #4
     MUL R11, R2, R2
-    MUL R12, R3, R3
+;    NOP
+ ;   MUL R12, R3, R3
 
     STOR  R11, R7, #0
     STOR  R12, R7, #4
