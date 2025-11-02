@@ -102,7 +102,7 @@ module ucode (
 	register_decrementer_count_next = register_decrementer_count;
         output_instruction = {5'b11001,27'b0}; // Default to NOP
 	mux_ctrl = 0;        
-	mul_release = 1'b0;
+//	mul_release = 0;
 	
 	corrected_imm = 16'b0;
 	corrected_readDataSecond = 32'b0;
@@ -111,7 +111,7 @@ module ucode (
             
             sIdle: begin
                 // Wait for the decoder to signal 'start_mul'
-                mul_release = 1;
+//                mul_release = 1;
 		mux_ctrl = 0;
                 if (start_mul) begin
                     // A MUL instruction has arrived. Decide what to do.
@@ -282,7 +282,7 @@ module ucode (
                 // Done. Hand control back to the main IF stage.
                 mux_ctrl = 0;
 		output_instruction = {5'b11001, 27'b0}; //NOOP
-//		mul_release = 1'b1;
+		mul_release = 1'b1;
                 state_next = sIdle; // Wait for the next MUL
 		flags_back_out = flags_hold; //send out the old flags
             end
