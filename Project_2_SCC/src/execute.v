@@ -152,7 +152,7 @@ module execute(
                     4'b0001: begin  //BNE
                        
                         if (flags[2] == 1'b0) begin 
-                            //$display("Non Zero Flag Branch Taken");
+                            $display("Non Zero Flag Branch Taken");
                             exeOverride = 1; 
                             exeData = imm;
                         end else begin 
@@ -316,32 +316,12 @@ module execute(
             end
 
             2'b00: begin // Bits 31 and 30 are 00 (Data Immediete instructions) 
-                case (secondLevelDecode)
-                    4'b1110: begin //SAVF
-                        
-                        //First we want to set the flags to the lowest nibble of first register
-                        readRegFirst = sourceFirstReg; 
-
-
-                        //Read data off first reg
-                        flags_next = readDataFirst[3:0]; 
-
-
-                        //Clear out the register
-                        readRegDest = sourceFirstReg; 
-                        
-                        writeData = {{28'b0}, readDataFirst[3:0]}; 
-
-                        writeToReg = 1'b1;
-
-                    end
-
-                endcase
+                
                 // ALU / MOV
                 case ({firstLevelDecode, specialEncoding})
                     3'b000: begin //MOV functions and Bit 29 = 0
-                        case (aluFunctions)
-                            3'b000: begin // MOV
+                        case ({secondLevelDecode[3],aluFunctions})
+                            4'b0000: begin // MOV
                                 
                                 readRegDest = destReg; 
                                 writeData = {{16'b0}, imm};
@@ -351,14 +331,14 @@ module execute(
                                 writeToReg  = 1'b1;  
                             end
 
-                            3'b001: begin // MOVT
+                            4'b0001: begin // MOVT
                                 readRegDest = destReg;
                                 writeData   = { imm[15:0], readDataDest[15:0] };
 
                                 writeToReg = 1'b1;
                             end
 
-                            3'b010: begin //CLR - imm
+                            4'b010: begin //CLR - imm
                                
                                 //Algorithm provided by chat-gpt
                                 readRegDest  = destReg;
@@ -402,10 +382,27 @@ module execute(
                                 readRegDest = destReg;
                                 //Nibble is 4 bits!
                                 
-                                writeData = 32'b0000000; 
-                                writeData = {readDataDest[31:24] , flags[3:0]};
+                                 
+                                writeData = {{28'b0} , flags[3:0]};
 
                                 writeToReg = 1'b1;
+                            end
+
+                            3'b111: begin //SAVF
+                                $display("savf");
+                                //First we want to set the flags to the lowest nibble of first register
+                                readRegDest = destReg; 
+
+
+                                //Read data off first reg
+                                flags_next = readDataDest[3:0]; 
+
+                                
+                                //writeData = {{28'b0}, readDataDest[3:0]}; 
+
+                                // writeToReg = 1'b1; 
+                                
+
                             end
                         endcase
                     end

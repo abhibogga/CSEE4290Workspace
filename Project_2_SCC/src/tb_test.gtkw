@@ -1,0 +1,27 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Sun Nov 02 23:11:53 2025
+[*]
+[dumpfile] "C:\CSEE4290Workspace\Project_2_SCC\src\dump.vcd"
+[dumpfile_mtime] "Sun Nov 02 23:09:42 2025"
+[dumpfile_size] 155255
+[savefile] "C:\CSEE4290Workspace\Project_2_SCC\src\tb_test.gtkw"
+[timestart] 0
+[size] 1000 600
+[pos] -1 -1
+*0.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] scc_tb_simple_crc.
+[treeopen] scc_tb_simple_crc.top.
+[treeopen] scc_tb_simple_crc.top.scc.
+[sst_width] 197
+[signals_width] 174
+[sst_expanded] 1
+[sst_vpaned_height] 153
+@22
+scc_tb_simple_crc.top.scc.ID.instruction[31:0]
+scc_tb_simple_crc.top.scc.EXE.destReg[3:0]
+scc_tb_simple_crc.top.scc.EXE.readDataDest[31:0]
+@23
+scc_tb_simple_crc.top.scc.EXE.readRegDest[3:0]
+[pattern_trace] 1
+[pattern_trace] 0
