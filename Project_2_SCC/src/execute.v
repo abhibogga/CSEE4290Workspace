@@ -338,7 +338,7 @@ module execute(
                                 writeToReg = 1'b1;
                             end
 
-                            4'b010: begin //CLR - imm
+                            4'b0010: begin //CLR - imm
                                
                                 //Algorithm provided by chat-gpt
                                 readRegDest  = destReg;
@@ -349,14 +349,14 @@ module execute(
                                 writeData = 32'b0000000;                             
                             end
 
-                            3'b011: begin //SET
+                            4'b0011: begin //SET
                                 //Sets all bits of the destination register
                                 readRegDest = destReg;
                                 writeData = 32'hFFFFFFFF;
                                 writeToReg = 1'b1;
                             end
 
-                            3'b100: begin //LSL
+                            4'b0100: begin //LSL
                                 readRegDest  = destReg;
                                 readRegFirst = sourceFirstReg; 
                                 
@@ -366,7 +366,7 @@ module execute(
                                 writeToReg   = 1'b1; 
                             end
 
-                            3'b101: begin //LSR
+                            4'b0101: begin //LSR
                            
                                 readRegDest  = destReg;
                                 readRegFirst = sourceFirstReg; 
@@ -378,7 +378,8 @@ module execute(
                             
                             end
 
-                            3'b110: begin //MOVF
+                            4'b0110: begin //MOVF
+                                $display("movf");
                                 readRegDest = destReg;
                                 //Nibble is 4 bits!
                                 
@@ -388,7 +389,7 @@ module execute(
                                 writeToReg = 1'b1;
                             end
 
-                            3'b111: begin //SAVF
+                            4'b1110: begin //SAVF
                                 $display("savf");
                                 //First we want to set the flags to the lowest nibble of first register
                                 readRegDest = destReg; 
