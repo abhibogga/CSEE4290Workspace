@@ -73,4 +73,6 @@ UndoLoop:
 ; -------- 6) STORE Final Checksum --------
         MOV32  R5, #0x0000D520
         STOR   R1, R5, #0x0
+
+
         HALT
