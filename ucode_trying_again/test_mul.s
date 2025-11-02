@@ -1,10 +1,8 @@
 	MOV  R1, #4
 	MOV  R3, #3
 	MUL  R2, R1, #5
-;	NOP
 	ADDS R4, R3, R2
 	ADD  R1, R1, #4
 	MUL  R3, R1, R3
-	NOP
 	MUL  R5, R4, R1
 	HALT
