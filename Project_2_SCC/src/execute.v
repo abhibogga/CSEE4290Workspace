@@ -61,7 +61,7 @@ module execute(
     end
 
     // Add at top-level
-    reg [31:0] loadDataReg;
+    /*reg [31:0] loadDataReg;
     reg loadValid;
 
     always @(posedge clk or posedge rst) begin
@@ -72,25 +72,40 @@ module execute(
             loadValid   <= memoryRead;
             loadDataReg <= memoryDataIn;
         end
-    end
+    end*/
 
-    // --- Latch store operations (for synchronous memory stability) ---
-    reg [31:0] storeAddrNext, storeDataNext;
-    reg storeWriteNext;
-    reg memoryWrite_prev;
+    // Registers for latching store
+    reg [3:0]  readFirstRegister_next; 
+    reg [3:0]  readDestinationRegister_next; 
+    reg [31:0] memoryAddressOut_next; 
+    reg [31:0] memoryDataOut_next; 
+    reg        memoryWrite_next; 
+    reg        writeToReg_next;
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
-            memoryAddressOut <= 32'd0;
-            memoryDataOut    <= 32'd0;
-            memoryWrite      <= 1'b0;
+            readRegFirst       <= 4'd0;
+            readRegDest        <= 4'd0;
+            memoryAddressOut   <= 32'd0;
+            memoryDataOut      <= 32'd0;
+            memoryWrite        <= 1'b0;
+            writeToReg         <= 1'b0;
         end else begin
-            memoryAddressOut <= storeAddrNext;
-            memoryDataOut    <= storeDataNext;
-            memoryWrite      <= storeWriteNext;
+            readRegFirst       <= readFirstRegister_next;
+            readRegDest        <= readDestinationRegister_next;
+            memoryAddressOut   <= memoryAddressOut_next;
+            memoryDataOut      <= memoryDataOut_next;
+            memoryWrite        <= memoryWrite_next;
+            writeToReg         <= writeToReg_next;
+
+            //display
+            if (memoryWrite_next) begin
+                $display("STORE -> Mem[0x%08h] <= 0x%08h (from R%d)",
+                        memoryAddressOut_next, memoryDataOut_next, readDestinationRegister_next);
+            end
         end
     end
-    
+
     
 
 
@@ -101,28 +116,30 @@ module execute(
     // Combinational logic
     always @(*) begin 
         // Defaults
-        exeOverride     = 1'b0;
-        readRegDest     = 4'd0;
-        readRegFirst    = 4'd0;
-        readRegSec      = 4'd0;
-        writeToReg      = 1'b0;
-        writeData       = 32'd0;
+        exeOverride          = 1'b0;
+        readRegDest          = 4'd0;
+        readRegFirst         = 4'd0;
+        readRegSec           = 4'd0;
+        writeToReg           = 1'b0;
+        writeData            = 32'd0;
 
-        memoryRead      = 1'b0;
+        immExt               = 32'd0;
+        tempDiff             = 33'd0;
 
-        storeAddrNext   = memoryAddressOut; // hold last known store
-        storeDataNext   = memoryDataOut;
-        storeWriteNext  = 1'b0;
+        flags_next           = flags;
+        flags_out            = flags;
 
-        immExt   = 32'd0;
-        tempDiff = 33'd0;
+        // --- Memory bus (latched version will update on posedge clk) ---
+        memoryAddressOut_next          = memoryAddressOut;   // hold previous address
+        memoryDataOut_next         = memoryDataOut;      // hold previous write data
+        memoryWrite_next         = 1'b0;               // default: no write
+        //memoryRead          = 1'b0;               // default: no read
 
-        flags_next = flags;
-        flags_out  = flags; 
+        // --- Register pipeline defaults (if you have next versions) ---
+        readFirstRegister_next       = 4'd0;
+        readDestinationRegister_next = 4'd0;
+        writeToReg_next              = 1'b0;
 
-	/*if (mul_release) begin
-	    flags_next = flags_back_in | flags; 
-	end*/
 	
 
 
@@ -285,33 +302,32 @@ module execute(
             2'b10: begin 
                 if (aluFunctions[0] == 1) begin //Stor
                     
-                    readRegFirst = sourceFirstReg;
-                    readRegDest  = destReg;
+                    // Latch outputs for next clock edge
+                    readFirstRegister_next       = sourceFirstReg;
+                    readDestinationRegister_next = destReg;
 
-                    storeAddrNext  = readDataFirst + {{16{imm[15]}}, imm};
-                    storeDataNext  = readDataDest;
-                    storeWriteNext = 1'b1;  // stays valid for one full clock
-
-                    writeToReg = 1'b0;
+                    memoryAddressOut_next = readDataFirst + {{16{imm[15]}}, imm};
+                    memoryDataOut_next    = readDataDest;
+                    memoryWrite_next      = 1'b1;
+                    writeToReg_next       = 1'b0;
                     
                     
                 end else begin //Load
                     
-                    
-                    readRegFirst = sourceFirstReg;
-                    memoryAddressOut = readDataFirst + {{16{imm[15]}}, imm};
-                    memoryRead = 1'b1;
-                    readRegDest = destReg;
+
+                    readRegFirst = sourceFirstReg; //Output
+                    memoryAddressOut = readDataFirst + {{16{imm[15]}}, imm}; //Output
+                    memoryRead = 1'b1; //Output
+                    readRegDest = destReg; //Output
 
                     
+                    writeData = memoryDataIn; //Output
+                
+                    writeToReg = 1'b1; //Output
+                       
 
-                    
-                    writeData = loadDataReg;
-                    writeToReg = 1'b1;
-                        
-                    
-
-                    $display("READ -> Mem[0x%08h] = 0x%08h -> R%d", memoryAddressOut, readDataDest, destReg);   
+                    //$display("READ -> Mem[0x%08h] = 0x%08h -> R%d", memoryAddressOut, readDataDest, destReg);
+ 
                     //Load it into the desination registe
                 end
             end
