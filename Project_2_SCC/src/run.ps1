@@ -33,4 +33,4 @@ python3 assembler/parser/assembler.py assembler/tests/$AsmFile assembler/parser/
 
 iverilog -o test testbenches/$VerilogFile 
 vvp ./test
-#gtkwave dump.vcd
+gtkwave dump.vcd

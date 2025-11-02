@@ -59,56 +59,37 @@ module execute(
             flags <= flags_next;
         end
     end
+    
 
-    // Add at top-level
-    /*reg [31:0] loadDataReg;
-    reg loadValid;
+    //Stor Latch registers
+    reg [31:0] mem_addr_latched;
+    reg [31:0] mem_data_latched;
+    reg        mem_write_latched;
 
+    // --- LATCH STORE SIGNALS ---
     always @(posedge clk or posedge rst) begin
         if (rst) begin
-            loadValid <= 1'b0;
-            loadDataReg <= 32'd0;
+            mem_addr_latched  <= 32'd0;
+            mem_data_latched  <= 32'd0;
+            mem_write_latched <= 1'b0;
         end else begin
-            loadValid   <= memoryRead;
-            loadDataReg <= memoryDataIn;
-        end
-    end*/
-
-    // Registers for latching store
-    reg [3:0]  readFirstRegister_next; 
-    reg [3:0]  readDestinationRegister_next; 
-    reg [31:0] memoryAddressOut_next; 
-    reg [31:0] memoryDataOut_next; 
-    reg        memoryWrite_next; 
-    reg        writeToReg_next;
-
-    always @(posedge clk or posedge rst) begin
-        if (rst) begin
-            readRegFirst       <= 4'd0;
-            readRegDest        <= 4'd0;
-            memoryAddressOut   <= 32'd0;
-            memoryDataOut      <= 32'd0;
-            memoryWrite        <= 1'b0;
-            writeToReg         <= 1'b0;
-        end else begin
-            readRegFirst       <= readFirstRegister_next;
-            readRegDest        <= readDestinationRegister_next;
-            memoryAddressOut   <= memoryAddressOut_next;
-            memoryDataOut      <= memoryDataOut_next;
-            memoryWrite        <= memoryWrite_next;
-            writeToReg         <= writeToReg_next;
-
-            //display
-            if (memoryWrite_next) begin
-                $display("STORE -> Mem[0x%08h] <= 0x%08h (from R%d)",
-                        memoryAddressOut_next, memoryDataOut_next, readDestinationRegister_next);
+            // Capture only on a store instruction
+            if (firstLevelDecode == 2'b10 && aluFunctions[0] == 1) begin
+                mem_addr_latched  <= readDataFirst + {{16{imm[15]}}, imm};
+                mem_data_latched  <= readDataDest;
+                mem_write_latched <= 1'b1;
+            end else begin
+                mem_write_latched <= 1'b0;  // default low
             end
         end
     end
 
-    
-
-
+    always @(*) begin
+        memoryAddressOut = mem_addr_latched;
+        memoryDataOut    = mem_data_latched;
+        memoryWrite      = mem_write_latched;
+    end
+   
 
 
     
@@ -116,30 +97,27 @@ module execute(
     // Combinational logic
     always @(*) begin 
         // Defaults
-        exeOverride          = 1'b0;
-        readRegDest          = 4'd0;
-        readRegFirst         = 4'd0;
-        readRegSec           = 4'd0;
-        writeToReg           = 1'b0;
-        writeData            = 32'd0;
+        exeOverride     = 1'b0;
+	    //exeOverrideBR   = 1'b0;
+        readRegDest     = 4'd0;
+        readRegFirst    = 4'd0;
+        readRegSec      = 4'd0;
+        writeToReg      = 1'b0; 
+        writeData       = 32'd0;
+        memoryWrite     = 1'b0;
+        memoryDataOut   = 32'd0;
+        memoryRead      = 1'b0; 
+        memoryAddressOut = 32'd0;
+        immExt = 0; 
+        tempDiff = 0; 
+	    
 
-        immExt               = 32'd0;
-        tempDiff             = 33'd0;
+        flags_next = flags;
+	    flags_out = flags; 
 
-        flags_next           = flags;
-        flags_out            = flags;
-
-        // --- Memory bus (latched version will update on posedge clk) ---
-        memoryAddressOut_next          = memoryAddressOut;   // hold previous address
-        memoryDataOut_next         = memoryDataOut;      // hold previous write data
-        memoryWrite_next         = 1'b0;               // default: no write
-        //memoryRead          = 1'b0;               // default: no read
-
-        // --- Register pipeline defaults (if you have next versions) ---
-        readFirstRegister_next       = 4'd0;
-        readDestinationRegister_next = 4'd0;
-        writeToReg_next              = 1'b0;
-
+	/*if (mul_release) begin
+	    flags_next = flags_back_in | flags; 
+	end*/
 	
 
 
@@ -301,34 +279,39 @@ module execute(
 
             2'b10: begin 
                 if (aluFunctions[0] == 1) begin //Stor
-                    
-                    // Latch outputs for next clock edge
-                    readFirstRegister_next       = sourceFirstReg;
-                    readDestinationRegister_next = destReg;
 
-                    memoryAddressOut_next = readDataFirst + {{16{imm[15]}}, imm};
-                    memoryDataOut_next    = readDataDest;
-                    memoryWrite_next      = 1'b1;
-                    writeToReg_next       = 1'b0;
+                    readRegFirst = sourceFirstReg; // base
+                    readRegDest  = destReg;        // data to store
+                    
+                    /*readRegFirst = sourceFirstReg; // base
+                    readRegDest   = destReg;   // data to store
+
+                    
+                    memoryAddressOut = readDataFirst + {{16{imm[15]}}, imm};
+                    memoryDataOut = readDataDest;
+                    memoryWrite   = 1'b1;*/
+
+                    writeToReg   = 1'b0; // store doesn’t write back
                     
                     
                 end else begin //Load
                     
 
-                    readRegFirst = sourceFirstReg; //Output
-                    memoryAddressOut = readDataFirst + {{16{imm[15]}}, imm}; //Output
-                    memoryRead = 1'b1; //Output
-                    readRegDest = destReg; //Output
+                    //First we get the calculate the address
+                    readRegFirst = sourceFirstReg; // base
+                    memoryAddressOut = readDataFirst + {{16{imm[15]}}, imm};
+                    //$display(imm);
+                    //$display("memory address out = %0d (dec) = 0x%0h (hex)", memoryAddressOut, memoryAddressOut);
 
+                    //Then we use that address to look into memory, so load that address into an output
+                    memoryRead = 1; 
+                    //Read that value
+                    readRegDest = destReg; 
+                    writeData = memoryDataIn;
                     
-                    writeData = memoryDataIn; //Output
-                
-                    writeToReg = 1'b1; //Output
-                       
-
-                    //$display("READ -> Mem[0x%08h] = 0x%08h -> R%d", memoryAddressOut, readDataDest, destReg);
- 
-                    //Load it into the desination registe
+                    
+                    writeToReg  = 1'b1; 
+                    //Load it into the desination register
                 end
             end
 
