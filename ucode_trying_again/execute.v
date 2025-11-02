@@ -275,7 +275,29 @@ module execute(
             end
 
             2'b00: begin // data imm
-                // ALU / MOV
+        	case (secondLevelDecode)
+                    4'b1110: begin //SAVF
+                        
+                        //First we want to set the flags to the lowest nibble of first register
+                        readRegFirst = sourceFirstReg; 
+
+
+                        //Read data off first reg
+                        flags_next = readDataFirst[3:0]; 
+
+
+                        //Clear out the register
+                        readRegDest = sourceFirstReg; 
+                        
+                        writeData = {{28'b0}, readDataFirst[3:0]}; 
+
+                        writeToReg = 1'b1;
+
+                    end
+
+                endcase      
+
+	  // ALU / MOV
                 case ({firstLevelDecode, specialEncoding})
                     3'b000: begin //MOV functions
                         case (aluFunctions)
