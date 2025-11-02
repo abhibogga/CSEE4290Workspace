@@ -111,7 +111,8 @@ module ucode (
             
             sIdle: begin
                 // Wait for the decoder to signal 'start_mul'
-                mux_ctrl = 0;
+                mul_release = 1;
+		mux_ctrl = 0;
                 if (start_mul) begin
                     // A MUL instruction has arrived. Decide what to do.
 			
@@ -281,7 +282,7 @@ module ucode (
                 // Done. Hand control back to the main IF stage.
                 mux_ctrl = 0;
 		output_instruction = {5'b11001, 27'b0}; //NOOP
-		mul_release = 1'b1;
+//		mul_release = 1'b1;
                 state_next = sIdle; // Wait for the next MUL
 		flags_back_out = flags_hold; //send out the old flags
             end
