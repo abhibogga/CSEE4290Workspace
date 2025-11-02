@@ -10,7 +10,7 @@
 
 ; --- Seed input word (0xF0F0F0F0) at 0x0800 ---
     MOV   R0, #0x0800
-    MOV32 R1, #0x1
+    MOV32 R1, #0xF0F0F0F0
     STOR  R1, R0, #0
 
     ; --- Init counters and load value ---
@@ -68,8 +68,7 @@ DONE:
     ; R12 = (# of zeros)^2
     ADD R7, R7, #4
     MUL R11, R2, R2
-;    NOP
- ;   MUL R12, R3, R3
+    MUL R12, R3, R3
 
     STOR  R11, R7, #0
     STOR  R12, R7, #4
