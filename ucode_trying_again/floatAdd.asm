@@ -40,15 +40,15 @@ START:
 	;//R12 Result
 	;//0x40400000: 3 0x41400000: 12 0xC1200000: -10
 LoadNum:
-	MOV R2, #0;
-	MOV R3, #0;
-	MOV R4, #0;
-	MOV R5, #0;
-	MOV R6, #0;
-	MOV R7, #0;
-	MOV R8, #0;
+	MOV32 R2, #0;
+	MOV32 R3, #0;
+	MOV32 R4, #0;
+	MOV32 R5, #0;
+	MOV32 R6, #0;
+	MOV32 R7, #0;
+	MOV32 R8, #0;
 	MOV32 R9, #0x00800000;
-	MOV R12, #0;	
+	MOV32 R12, #0;	
 	LOAD R0, r11; //op1
 	LOAD R1, r11,#4; //op2
 	ors r5,r5,r5

@@ -18,6 +18,8 @@
  * Creates "testbench.vcd" file for viewing simulation waveforms with GTKWave
  * or similar tools. Dumps all testbench signals and all 16 registers.
  ******************************************************************************/
+`timescale 1ps/1ps
+`include "scc_f25_top.v"
 
 module scc_encrypt_tb;
     /***************************************************************************
