@@ -7,6 +7,8 @@ module lut_tb;
     reg clk_en;
     reg rst;
 
+    reg seen_halt;
+
     wire halt_f;
     wire [1:0] err_bits;
     wire [31:0] instruction_memory_v;
@@ -36,6 +38,11 @@ module lut_tb;
     reg [31:0] addr, value;
     reg [255:0] line; 
 
+    always @(posedge clk or posedge rst) begin //Problem here is that halt_f doesn't stay on long enough for wait to see. So we captured halt_f to use
+        if (rst) seen_halt <= 1'b0;
+        else if (halt_f) seen_halt <= 1'b1;
+    end
+
     // Test sequence
     initial begin
         $dumpvars(0, lut_tb);
@@ -48,7 +55,7 @@ module lut_tb;
         rst    = 1'b0;   // release reset
         #1000;            // let the CPU run a few cycles
 
-        wait (dut.halt_f == 1);
+        wait (seen_halt == 1);
         @(posedge clk);
         $display("\nApollo has landed!\n");
         
