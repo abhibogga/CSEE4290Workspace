@@ -10,13 +10,19 @@ switch ($Profile.ToLower()) {
         $AsmFile = "simple_crc.asm"
         $VerilogFile = "scc_tb_simple_crc.v"
     }
-    "group6" {
-        $AsmFile = "assembler/tests/ALU_Test.asm"
-        $VerilogFile = "alu_tb.v"
-    }
     "bubble" {
         $AsmFile = "BubbleSort.asm"
         $VerilogFile = "oct_10_checkpoint.v"
+    }
+
+    "group6" {
+        $AsmFile = "shift_count.asm"
+        $VerilogFile = "shift_count_tb.v"
+    }
+
+    "simpleMul" {
+        $AsmFile = "test_mul.asm"
+        $VerilogFile = "testbench.v"
     }
 
     "" {

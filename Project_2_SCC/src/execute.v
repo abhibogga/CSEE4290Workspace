@@ -160,15 +160,147 @@ module execute(
                         end 
                     end
 
-                    4'b0010: begin  //B.hs
-                       
-                        if (flags[1] == 1'b1) begin 
-                            //$display("Non Zero Flag Branch Taken");
-                            exeOverride = 1; 
-                            exeData = imm;
-                        end else begin 
-                            exeOverride = 0; 
-                        end 
+                    4'b0001: begin //Conditional Flags
+                        case (branchInstruction)
+                            //$display("t=%0t | flags_next = %b (bin) | old flags = %b",$time, flags_next, flags);
+                            4'b0000: begin //BEQ
+                                //$display("beq considered");
+                                if (flags[2] == 1'b1) begin 
+                                    //$display("beq taken");
+                                    exeOverride = 1; 
+                                    exeData = imm;
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end   
+
+                            4'b0001: begin  //BNE
+                            
+                                if (flags[2] == 1'b0) begin 
+                                    $display("Non Zero Flag Branch Taken");
+                                    exeOverride = 1; 
+                                    exeData = imm;
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end
+
+                            4'b0010: begin  //B.hs
+                            
+                                if (flags[1] == 1'b1) begin 
+                                    //$display("Non Zero Flag Branch Taken");
+                                    exeOverride = 1; 
+                                    exeData = imm;
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end
+
+                            4'b0011: begin  //B.lo
+                            
+                                if (flags[1] == 1'b0) begin 
+                                    exeOverride = 1; 
+                                    exeData = imm;
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end
+
+                            4'b0100: begin //BMI
+                                //$display("BMI? flags=%b | N=%b Z=%b C=%b V=%b", flags, flags[3], flags[2], flags[1], flags[0]);
+                            
+                                if (flags[3] == 1'b1) begin 
+                                    //$display("BMI? flags=%b | N=%b Z=%b C=%b V=%b", flags, flags[3], flags[2], flags[1], flags[0]);
+                                    exeOverride = 1; 
+                                    exeData = imm;
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end
+
+                            4'b0101: begin  //B.pl
+                            
+                                if (flags[3] == 1'b0) begin 
+                                    exeOverride = 1; 
+                                    exeData = imm;
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end
+
+                            4'b0110: begin  //B.vs
+                                if (flags[0] == 1'b1) begin 
+                                    exeOverride = 1; 
+                                    exeData = imm;
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end
+
+                            4'b0111: begin  //B.vc
+                                if (flags[0] == 1'b0) begin 
+                                    exeOverride = 1;
+                                    exeData = imm; 
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end
+
+
+                            4'b1000: begin  //B.hi
+                                if (flags[2] == 1'b0 && flags[1] == 1'b1) begin 
+                                    exeOverride = 1; 
+                                    exeData = imm;
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end
+
+                            4'b1001: begin  //B.ls
+                                if (!(flags[2] == 1'b0 && flags[1] == 1'b1)) begin 
+                                    exeOverride = 1; 
+                                    exeData = imm;
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end
+
+                            4'b1010: begin  //B.ge
+                                if (flags[3] == flags[0]) begin 
+                                    exeOverride = 1; 
+                                    exeData = imm;
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end
+
+                            4'b1011: begin  //B.lt
+                                if (!(flags[3] == flags[0])) begin 
+                                    exeOverride = 1; 
+                                    exeData = imm;
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end
+
+                            4'b1100: begin  //B.gt
+                                if (flags[2] == 1'b0 && flags[3] == flags[0]) begin 
+                                    exeOverride = 1; 
+                                    exeData = imm;
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end
+
+                            4'b1101: begin  //B.le
+                                if (!(flags[2] == 1'b0 && flags[3] == flags[0])) begin 
+                                    exeOverride = 1; 
+                                    exeData = imm;
+                                end else begin 
+                                    exeOverride = 0; 
+                                end 
+                            end
+                        endcase
                     end
 
                     4'b0011: begin  //B.lo
@@ -283,37 +415,81 @@ module execute(
                     readRegFirst = sourceFirstReg; // base
                     readRegDest  = destReg;        // data to store
                     
-                    /*readRegFirst = sourceFirstReg; // base
-                    readRegDest   = destReg;   // data to store
-
-                    
-                    memoryAddressOut = readDataFirst + {{16{imm[15]}}, imm};
-                    memoryDataOut = readDataDest;
-                    memoryWrite   = 1'b1;*/
-
-                    writeToReg   = 1'b0; // store doesn’t write back
-                    
-                    
-                end else begin //Load
+                                
+                
+                
                     
 
-                    //First we get the calculate the address
-                    readRegFirst = sourceFirstReg; // base
-                    memoryAddressOut = readDataFirst + {{16{imm[15]}}, imm};
-                    //$display(imm);
-                    //$display("memory address out = %0d (dec) = 0x%0h (hex)", memoryAddressOut, memoryAddressOut);
+                        
 
-                    //Then we use that address to look into memory, so load that address into an output
-                    memoryRead = 1; 
-                    //Read that value
-                    readRegDest = destReg; 
-                    writeData = memoryDataIn;
-                    
-                    
-                    writeToReg  = 1'b1; 
-                    //Load it into the desination register
-                end
-            end
+                                            
+                    end
+
+                    2'b10: begin 
+                        if (aluFunctions[0] == 1) begin //Stor
+
+                            readRegFirst = sourceFirstReg; // base
+                            readRegDest  = destReg;        // data to store
+                            
+                            /*readRegFirst = sourceFirstReg; // base
+                            readRegDest   = destReg;   // data to store
+
+                            
+                            memoryAddressOut = readDataFirst + {{16{imm[15]}}, imm};
+                            memoryDataOut = readDataDest;
+                            memoryWrite   = 1'b1;*/
+
+                            writeToReg   = 1'b0; // store doesn’t write back
+                            
+                            
+                        end else begin //Load
+                            
+
+                            //First we get the calculate the address
+                            readRegFirst = sourceFirstReg; // base
+                            memoryAddressOut = readDataFirst + {{16{imm[15]}}, imm};
+                            //$display(imm);
+                            //$display("memory address out = %0d (dec) = 0x%0h (hex)", memoryAddressOut, memoryAddressOut);
+
+                            //Then we use that address to look into memory, so load that address into an output
+                            memoryRead = 1; 
+                            //Read that value
+                            readRegDest = destReg; 
+                            writeData = memoryDataIn;
+                            
+                            
+                            writeToReg  = 1'b1; 
+                            //Load it into the desination register
+
+                            
+
+
+
+                        end
+                    end
+
+                                            
+                                        
+                                                
+                                
+                                                                                                    
+                                                            
+
+
+												 
+														 
+
+
+												
+													  
+						
+																   
+
+										  
+
+					   
+
+							 
 
             2'b00: begin // Bits 31 and 30 are 00 (Data Immediete instructions) 
                 
