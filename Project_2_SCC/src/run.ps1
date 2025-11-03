@@ -10,6 +10,14 @@ switch ($Profile.ToLower()) {
         $AsmFile = "simple_crc.asm"
         $VerilogFile = "scc_tb_simple_crc.v"
     }
+    "group3" {
+        $AsmFile = "encrypt_decrypt.asm"
+        $VerilogFile = "scc_encrypt_tb.v"
+    }
+    "group1" {
+        $AsmFile = "new_lut.asm"
+        $VerilogFile = "lut_tb.v"
+    }
     "group6" {
         $AsmFile = "shift_count.asm"
         $VerilogFile = "shift_count_tb.v"
