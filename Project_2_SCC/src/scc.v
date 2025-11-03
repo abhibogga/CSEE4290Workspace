@@ -1,8 +1,6 @@
-
 `include "iFetch.v"
 `include "iDecode.v"
 `include "execute.v"
-				
 `include "register.v"
 `include "ucode.v"
 `include "mux.v"
@@ -40,6 +38,7 @@ module scc
 	//Lets intialize IF module
 	wire [31:0] instructionForID;
 	wire [6:0] opcode;
+	wire exeOverrideBR;
 	iFetch IF (
 		.clk(clk), 
 		.rst(rst), 
@@ -47,6 +46,7 @@ module scc
 		.programCounter(programCounter), 
 		.filteredInstruction(filtered_instruction), 
 		.exeOverride(exeOverride),
+		.exeOverrideBR(exeOverrideBR),
 		.exeData(exeData),
 		.mul_trigger(mul_trigger),
 		.mul_release(mul_release),
@@ -124,10 +124,6 @@ module scc
 		.flags_back_out(flags_ucode_to_exe)
 	);
 
-						   
-							  
-								 
-							
 
 	mux mux (
 		.filtered_instruction(filtered_instruction),
@@ -136,9 +132,6 @@ module scc
 		.finalized_instruction(instructionForID)
 	);
 
-			 
-			  
-			  
 
 	//Exe wires
 	wire [3:0] exe_readRegDest;
@@ -148,9 +141,6 @@ module scc
 	wire        exe_writeToReg;
 	wire        exeOverride;
 	wire [15:0] exeData;
-										
-									
-						
 
 	// Memory interface outputs
 	wire [31:0] exe_memoryDataOut;
@@ -209,9 +199,6 @@ module scc
 	    .flags_back_in(flags_ucode_to_exe),
 
 	    .opcode_in(opcode)
-						  
-							
-						 
 	);
 
 
