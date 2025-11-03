@@ -317,8 +317,11 @@ module execute(
                                 readRegDest = destReg; 
                                 writeData = {{16'b0}, imm};
                                 //$display(imm);
-                                
-                                
+
+                                if (mul_type == 2'b11 && imm == 0) begin //MULSR
+                                    flags_next[2] = 1;
+                                    $display("movs lol");
+                                end
                                 writeToReg  = 1'b1;  
                             end
 

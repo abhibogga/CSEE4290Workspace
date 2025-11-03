@@ -1,0 +1,53 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Mon Nov 03 05:31:37 2025
+[*]
+[dumpfile] "C:\CSEE4290Workspace\Project_2_SCC\src\dump.vcd"
+[dumpfile_mtime] "Mon Nov 03 05:26:41 2025"
+[dumpfile_size] 434965
+[savefile] "C:\CSEE4290Workspace\Project_2_SCC\src\float_add_debugging.gtkw"
+[timestart] 0
+[size] 1000 600
+[pos] -1 -1
+*-5.859175 4098 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] scc_tb.
+[treeopen] scc_tb.dut.
+[treeopen] scc_tb.dut.scc.
+[sst_width] 197
+[signals_width] 369
+[sst_expanded] 1
+[sst_vpaned_height] 153
+@22
+scc_tb.dut.scc.EXE.flags[3:0]
+scc_tb.dut.scc.REGFILE.dbg_R15[31:0]
+scc_tb.dut.scc.EXE.flags_back_in[3:0]
+scc_tb.dut.scc.IF.programCounter[31:0]
+scc_tb.dut.scc.ID.instruction[31:0]
+@28
+scc_tb.dut.scc.mux.control
+@22
+scc_tb.dut.scc.mux.filtered_instruction[31:0]
+scc_tb.dut.scc.mux.ucode_instruction[31:0]
+@28
+scc_tb.dut.scc.mux.finalized_instruction[31:0]
+scc_tb.dut.scc.Ucode.state_reg[2:0]
+@420
+scc_tb.dut.scc.Ucode.sClear
+scc_tb.dut.scc.Ucode.sHalt
+@c00420
+scc_tb.dut.scc.Ucode.sMov
+@28
+(0)scc_tb.dut.scc.Ucode.sMov
+(1)scc_tb.dut.scc.Ucode.sMov
+(2)scc_tb.dut.scc.Ucode.sMov
+@1401200
+-group_end
+@200
+-
+@28
+scc_tb.dut.scc.EXE.mul_type[1:0]
+scc_tb.dut.scc.EXE.mul_type[1:0]
+@29
+scc_tb.dut.scc.Ucode.mul_type[1:0]
+[pattern_trace] 1
+[pattern_trace] 0

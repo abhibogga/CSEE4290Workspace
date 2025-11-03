@@ -7,7 +7,7 @@
 	FCB     #0x40400000;op2 num 2
 	FCB     #1;         op2 output
 
-	FCB     #0x00000000;op3 num 1
+	FCB     #0x00000001;op3 num 1
 	FCB     #0xC1200000;op3 num 2
 	FCB     #1;         op3 output
 
