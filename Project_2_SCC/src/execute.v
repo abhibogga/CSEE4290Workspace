@@ -110,7 +110,7 @@ module execute(
         tempDiff = 0; 
 
         flags_next = flags;
-	flags_out = flags; 
+	    flags_out = flags; 
 
 	if (mul_release) begin
 	    flags_next = flags_back_in | flags; 

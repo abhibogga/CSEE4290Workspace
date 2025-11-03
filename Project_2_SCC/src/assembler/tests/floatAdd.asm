@@ -1,27 +1,27 @@
 	ORG     #0x400;
 	FCB     #0xC1200000;op1 num 1
 	FCB     #0xC1200000;op1 num 2
-	FCB     #0;         op1 output
+	FCB     #1;         op1 output
 
 	FCB     #0xC1200000;op2 num 1
 	FCB     #0x40400000;op2 num 2
-	FCB     #0;         op2 output
+	FCB     #1;         op2 output
 
 	FCB     #0x00000000;op3 num 1
 	FCB     #0xC1200000;op3 num 2
-	FCB     #0;         op3 output
+	FCB     #1;         op3 output
 
 	FCB     #0x7F800000;op4 num 1
 	FCB     #0xFF800000;op4 num 2
-	FCB     #0;         op4 output
+	FCB     #1;         op4 output
 
 	FCB     #0x7F810000;op5 num 1
 	FCB     #0xFF800000;op5 num 2
-	FCB     #0;         op5 output
+	FCB     #1;         op5 output
 
 	FCB     #0x40200000;op6 num 1
 	FCB     #0x3ff00000;op6 num 2
-	FCB     #0;         op6 output
+	FCB     #1;         op6 output
 	ORG     #0x0;
 START:
 	MOV R13,#6;  //counter for how many times to loop
@@ -51,7 +51,7 @@ LoadNum:
 	MOV32 R12, #0;	
 	LOAD R0, r11; //op1
 	LOAD R1, r11,#4; //op2
-	ors r5,r5,r5
+	ors r5,r5,r5 
 	b.ne #0xFFFF;
 CHKZERO1:
 	MOV32 R2, #0x7F800000; //Masking exponents for 0
@@ -175,7 +175,7 @@ DONE:
 	STOR R12,r11,#8;
 	add r11,r11,#12;
 	sub r13,r13,#1;
-	MULS r14,r13,r13; //using this instead of subs to check an instruct no one had checked 
+	MULS r15,r13,r13; //using this instead of subs to check an instruct no one had checked 
 	b.ne LoadNum
 	HALT;
 	
