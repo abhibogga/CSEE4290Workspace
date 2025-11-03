@@ -390,9 +390,9 @@ module execute(
                                 flags_next = readDataDest[3:0]; 
 
                                 
-                                //writeData = {{28'b0}, readDataDest[3:0]}; 
+                                writeData = {{28'b0}, readDataDest[3:0]}; 
 
-                                // writeToReg = 1'b1; 
+                                writeToReg = 1'b1; 
                                 
 
                             end
