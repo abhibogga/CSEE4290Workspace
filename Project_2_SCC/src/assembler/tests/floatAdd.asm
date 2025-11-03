@@ -16,7 +16,7 @@
 	FCB     #1;         op4 output
 
 	FCB     #0x7F810000;op5 num 1
-	FCB     #0xFF800000;op5 num 2
+	FCB     #0xFF800001;op5 num 2
 	FCB     #1;         op5 output
 
 	FCB     #0x40200000;op6 num 1

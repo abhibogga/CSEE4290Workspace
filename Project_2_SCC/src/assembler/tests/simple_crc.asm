@@ -10,7 +10,7 @@ Data_Block:
         FCB     #0x90ABCDEF ; d508
         FCB     #0x00000001 ; d50c
         FCB     #0x87654321 ; d510
-        FCB     #0x0F0F0F0F ; d514
+        FCB     #0x0F0F0F0A ; d514
         ORG     #0x00000000 ; d518
 
 ; -------- 1) SETUP --------
