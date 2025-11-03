@@ -29,8 +29,12 @@ case "${Profile,,}" in
         ;;
     bubble)
         AsmFile="BubbleSort.asm"
-        VerilogFile="oct_10_checkpoint.v"
+        VerilogFile="bubble_sort_tb.v"
         ;;
+    group7)
+	AsmFile="Kadane_max_alg_test.asm"
+	VerilogFile="kadane_tb.v"
+	;;
     *)
         echo "❌ Invalid profile '$Profile'. Valid options are: group1, group2, group3, group5, group6, bubble"
         exit 1
