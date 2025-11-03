@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "scc_f25_top.v"
+
 module lut_tb;
 
     // Testbench signals

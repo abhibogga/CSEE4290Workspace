@@ -1,0 +1,53 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Sun Nov  2 19:35:33 2025
+[*]
+[dumpfile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/dump.vcd"
+[dumpfile_mtime] "Sun Nov  2 18:53:10 2025"
+[dumpfile_size] 62719657
+[savefile] "/home/vizhins/Documents/UGA_classes/FALL_2025/Computer_Architecture/CSEE4290Workspace/ucode_trying_again/group2_crc_debugging.gtkw"
+[timestart] 0
+[size] 1854 1001
+[pos] -51 -51
+*-8.000000 424 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] scc_tb_simple_crc.
+[treeopen] scc_tb_simple_crc.top.
+[treeopen] scc_tb_simple_crc.top.scc.
+[sst_width] 278
+[signals_width] 150
+[sst_expanded] 1
+[sst_vpaned_height] 297
+@22
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R3[31:0]
+@28
+scc_tb_simple_crc.top.scc.REGFILE.clk
+@22
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R0[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R1[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R7[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R8[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R2[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R1[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R4[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R5[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R6[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R3[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R0[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R8[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R9[31:0]
+scc_tb_simple_crc.top.scc.EXE.flags_next[3:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R5[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R1[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R10[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R2[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R4[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R5[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R6[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R1[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R0[31:0]
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R10[31:0]
+scc_tb_simple_crc.top.scc.EXE.flags[3:0]
+@23
+scc_tb_simple_crc.top.scc.REGFILE.dbg_R5[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

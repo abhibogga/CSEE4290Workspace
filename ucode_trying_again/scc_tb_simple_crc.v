@@ -55,7 +55,7 @@ module scc_tb_simple_crc();
         data_block[0] = 32'hDEADBEEF;
         data_block[1] = 32'h12345678;
         data_block[2] = 32'h90ABCDEF;
-        data_block[3] = 32'h00000000;
+        data_block[3] = 32'h00000001;
         data_block[4] = 32'h87654321;
         data_block[5] = 32'h0F0F0F0F;
     end
@@ -94,9 +94,10 @@ module scc_tb_simple_crc();
         #10 rst = 1;
         #30; // rst active for 3 clocks
         rst = 0;
-
+	#3000
+	
         // Wait for the processor to halt before checking memory
-        wait (halt_f == 1);
+        wait (halt == 1);
         $display("Apollo has Landed!");
         @(posedge clk);   // allow instruction_and_data to write to scc_out.txt
 

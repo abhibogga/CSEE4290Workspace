@@ -8,19 +8,19 @@ Data_Block:
         FCB     #0xDEADBEEF ; d500
         FCB     #0x12345678 ; d504
         FCB     #0x90ABCDEF ; d508
-        FCB     #0x00000000 ; d50c
+        FCB     #0x00000001 ; d50c
         FCB     #0x87654321 ; d510
         FCB     #0x0F0F0F0F ; d514
         ORG     #0x00000000 ; d518
 
 ; -------- 1) SETUP --------
 Start:  
-        MOV32   R3, #0x00000D500     ; pointer to data
+        MOV32   R3, #0x0000D500     ; pointer to data
         MOV     R0,  #6              ; word count
-        SET R1                        ; Initial check sum value. R1 will also contain the running checksum
+        SET     R1                   ; Initial check sum value. R1 will also contain the running checksum
         MOV     R7,  #0               ; zero constant
         MOV     R8, #0x1c             ; R8 = &Loop
-        BR R8                         ; Abs branch to loop, just to test. 
+        BR      R8                         ; Abs branch to loop, just to test. 
 
 ; -------- 2) MAIN LOOP --------
 Loop:
