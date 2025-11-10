@@ -1,3 +1,8 @@
+//This testbench is used hand in hand with our unique test case program "Kadane_max_alg_test.asm"
+//The purpose of Kadane's Algorithim is to find the biggest subarray within a array of data to find the biggest sum.
+//The testbench will check for a final value given a matching data set such that:
+//"All quiet on the Western Front" indicates that the calculated subarray is equal to that of the expected *SUCCESS
+//"NOOOOOOOOO" indicates that the calculated subarray does not equal that of the expected value *Failiure
 `timescale 1ps/1ps
 `include "scc_f25_top.v"
 module kadane_tb();
@@ -88,9 +93,9 @@ initial begin
 
     // Self-checking
     if (correct_value == test_output) begin
-        $display("TEST PASSED: Kadane ALG SUCCESS");
+        $display("All quiet on the Western Front");
     end else begin
-        $display("TEST FAILED: NOOOOOOOOO");
+        $display("NOOOOOOOOO");
     end
         $display("Expected Value: 0x00000037");
         $display("Actual Value: 0x%h\n", test_output);
