@@ -25,10 +25,9 @@ print_usage () //I have a feeling this isn't being used rn
 
 int main(int argc, char * argv []) {
 
-//argc = argument count. If default, argc = 1 because only program object cache.out is sent through to program
-//argv = argument value. If default, argc[0] = cache.out, this is the only argument
-//one can pass other arguments like custom cache size, miss penalty, association, etc
 
+  bool cache [2^10][61] = {0}; //2^10 rows, 61 columns
+//might need another bit for the dirty bit
   long address;
   int loadstore, icount;
   char marker;
@@ -77,48 +76,24 @@ int main(int argc, char * argv []) {
   printf ("\n");
 
   while (scanf("%c %d %lx %d\n",&marker,&loadstore,&address,&icount) != EOF) {
-    // Code to print out just the first 10 addresses.  You'll want to delete
-    // this part once you get things going.
-//    if(i<10){//there should be less than 6 million instructions right?
-//	printf("\t%c %d %lx %d\n",marker, loadstore, address, icount);
-//don't print every instruction lmao
 	i++;
 	total_inst = total_inst + icount;
+
+	if (loadstore = 0){ //this is a load
+	    //locate the appropriate cache block
+	   //determine if tag matches tag in address AND valid bit is on
+	   //pull data if correct, else, go to memory and wait
+	}
+	else if (loadstore = 1) //this is a store
+
     }
-   // else{
-	printf("all done\n");
-	printf("total instructions: %ld \n", total_inst);
-	printf("memory access: %ld \n", i);
-	//assuming memory access is load/stor both, just count # lines
-	return 0;
 
+  printf("all done\n");
+  printf("total instructions: %ld \n", total_inst);
+  printf("memory access: %ld \n", i); //count the lines
+  return 0;
 
-  // }
-
-    //here is where you will want to process your memory accesses
-
- // }
-  // Here is where you want to print out stats
   printf("Lines found = %ld \n",i);
   printf("Simulation results:\n");
-  //  Use your simulator to output the following statistics.  The 
-  //  print statements are provided, just replace the question marks with
-  //  your calcuations.
-
-  /*
-  printf("\texecution time %ld cycles\n", ?);
-  printf("\tinstructions %ld\n", ?);
-  printf("\tmemory accesses %ld\n", ?);
-  printf("\toverall miss rate %.2f\n", ? );
-  printf("\tread miss rate %.2f\n", ? );
-  printf("\tmemory CPI %.2f\n", ?);
-  printf("\ttotal CPI %.2f\n", ?);
-  printf("\taverage memory access time %.2f cycles\n",  ?);
-  printf("dirty evictions %d\n", ?);
-  printf("load_misses %d\n", ?);
-  printf("store_misses %d\n", ?);
-  printf("load_hits %d\n", ?);
-  printf("store_hits %d\n", ?);
-  */
 
 }
