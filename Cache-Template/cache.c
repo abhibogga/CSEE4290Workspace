@@ -5,9 +5,11 @@
 #include <math.h>
 
 int associativity = 1;    // Associativity of cache  1 for now bc direct map
-int blocksize_bytes = 4;   //make it a word for simple example    // Cache Block size in bytes
-int cachesize_kb = 4;     //around 1000 words     // Cache size in KB
+int blocksize_bytes = 16;   //4 words for a block    // Cache Block size in bytes
+int cachesize_kb = 16;     //around 1000 words     // Cache size in KB
 int miss_penalty = 30; //can be same for now
+//hardcoded for now....
+
 
 void
 print_usage () //I have a feeling this isn't being used rn
@@ -77,28 +79,32 @@ int main(int argc, char * argv []) {
   while (scanf("%c %d %lx %d\n",&marker,&loadstore,&address,&icount) != EOF) {
     // Code to print out just the first 10 addresses.  You'll want to delete
     // this part once you get things going.
-    if(i<10){//there should be less than 6 million instructions right?
+//    if(i<10){//there should be less than 6 million instructions right?
 //	printf("\t%c %d %lx %d\n",marker, loadstore, address, icount);
 //don't print every instruction lmao
 	i++;
 	total_inst = total_inst + icount;
     }
-    else{
+   // else{
 	printf("all done\n");
-	printf("total instructions: %ld", total_inst);
+	printf("total instructions: %ld \n", total_inst);
+	printf("memory access: %ld \n", i);
+	//assuming memory access is load/stor both, just count # lines
 	return 0;
-   }
+
+
+  // }
 
     //here is where you will want to process your memory accesses
 
-  }
+ // }
   // Here is where you want to print out stats
   printf("Lines found = %ld \n",i);
   printf("Simulation results:\n");
   //  Use your simulator to output the following statistics.  The 
   //  print statements are provided, just replace the question marks with
   //  your calcuations.
-  
+
   /*
   printf("\texecution time %ld cycles\n", ?);
   printf("\tinstructions %ld\n", ?);
