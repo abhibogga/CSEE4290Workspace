@@ -85,15 +85,17 @@ int main(int argc, char *argv[])
   // This will work as a 2D array - Blocks exist within WAYS and WAYS exist within sets
 
   int cacheLines = (cachesize_kb * 1024) / blocksize_bytes; // This gives us the amount of cache lines needed for each way
+//                 amount of bytes       / blocksize_bytes = #blocks in cache
+
 
   int sets = cacheLines / associativity;
-
+  // should only be 1 right now
   struct cacheLine
   {
     int dirty;
     int tag;
 
-    int valid; // This means that
+    int valid;
   };
 
   struct cacheLine *cache[sets][associativity];
