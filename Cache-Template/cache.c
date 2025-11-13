@@ -1,15 +1,16 @@
+//include stuff
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <winsock2.h> //For windows compilation
-//#include <ws2tcpip.h> //For windows compilation
 #include <math.h>
 
-int associativity = 1;    // Associativity of cache
-int blocksize_bytes = 16; // Cache Block size in bytes
-int cachesize_kb = 16;    // Cache size in KB
+//set 4 main params
+int associativity = 1;
+int blocksize_bytes = 16;
+int cachesize_kb = 16;
 int miss_penalty = 30;
 
+//print usage block for input params
 void print_usage()
 {
   printf("Usage: gunzip2 -c <tracefile> | ./cache -a <assoc> -l <blksz> -s <size> -mp <mispen>\n");
@@ -21,17 +22,19 @@ void print_usage()
   exit(0);
 }
 
+//main function
 int main(int argc, char *argv[])
 {
-
+  //defining parts of each line of the trace
   long address;
   int loadstore, icount;
   char marker;
 
+  //initializing incrementers
   int i = 0;
   int j = 1;
-  // Process the command line arguments
-  // Process the command line arguments
+
+  //replace the 4 params if they were set by user
   while (j < argc)
   {
     if (strcmp("-a", argv[j]) == 0)
@@ -72,7 +75,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  // print out cache configuration
+  // print out 4 main cache params
   printf("Cache parameters:\n");
   printf("Cache Size (KB)\t\t\t%d\n", cachesize_kb);
   printf("Cache Associativity\t\t%d\n", associativity);
@@ -80,197 +83,87 @@ int main(int argc, char *argv[])
   printf("Miss penalty (cyc)\t\t%d\n", miss_penalty);
   printf("\n");
 
-  // First we need to make our data structure for our cache simulator
+  //calculate number of blocks, aka number of lines in the cache
+  //each line in cache holds 1 block
+  int total_lines = (cachesize_kb * 1024);
 
-  // This will work as a 2D array - Blocks exist within WAYS and WAYS exist within sets
-
-  int amt_blocks = (cachesize_kb * 1024) / blocksize_bytes; // This gives us the amount of cache lines needed for each way
-//                 amount of bytes       / blocksize_bytes = #blocks in cache
-
-
-  int sets = amt_blocks / associativity;
-  // sets should be amt_blocks rn
-
-  struct cacheBlock
-  {
-    int dirty;
-    int tag;
-    int valid; //parameters for the cacheblock struct
+  //make one cache line
+  struct cache_line {
+     int dirty_bit;
+     int valid_bit;
+     int tag;
+     /*we don't need to put data because we don't care about that. only addresses
+     we don't need to put index because index simply acts as a pointer.
+     Index is not stored in the cache */
   };
-//can instantiate this struct later and assign parameters to the object
-  struct cacheBlock *cache[sets][associativity];
-  //just saying cacheBlock = cacheblock
 
+  //make cache array
+  struct cache_line *cache;
+  cache = malloc(total_lines * sizeof(struct cache_line);
+//cache = total number of rows x total number of columns
 
-  // Lets allocate space in memory for this cache:
-  for (int k = 0; k < sets; k++) //k is initialized right here
-  //increment k for the number of blocks
-  {
-    for (int l = 0; l < associativity; l++) //should only do it once bc direct
-    {
+  for (int k = 0; k < total_lines; k++) { //go through each line in trace
+     //initialize cache params
+     cache[k].dirty_bit = 0;
+     cache[k].valid_bit = 0;
+     cache[k].tag = -1;
+     //come back to put in error print statement if needed
 
-      // Allocate space for one integer (or a block)
-	//I assume this is initializing the cache ???
-      cache[k][l] = malloc(sizeof(struct cacheBlock));
-      cache[k][l]->valid = 0;
-      cache[k][l]->dirty = 0;
-      cache[k][l]->tag = -1; //why is the tag -1? 
+     //set index, offset, tag size
+     int index_size = log2(total_lines);
+     int offset_size = log2(blocksize_bytes);
+     int tag_size = 32 - (index_size + offset_size);
 
-	//the l can be ignored...think of it like cache[k], where
-	//is the number block
+     //set desired statistics
+     int ld_hit = 0;
+     int ld_miss = 0;
+     int st_hit = 0;
+     int st_miss = 0;
+     long instructionsParsed = 0;
+     long memAccess = 0;
+     long totalCycle = 0; //COME BACK TO FINISH THIS
+			  //CAN'T WE PUT THIS STUFF BEFORE THE FOR LOOP??
 
+     while (scanf("%c %d %lx %d\n", &marker, &loadstore, &address, &icount) != EOF){
+	int index = (address >> offset_size) & ((1U << index_size) - 1);
+	int checkedTag = address & (~0U << (32 - tagBits));
+	memAccess++;
+	instructionsParsed += icount;
+	if (loadstore == 0){
+	   //load functionality here
+	   if (cache[index].tag == checkedTag) {
+		if (cache[index].dirty_bit == 0 && cache[index].valid_bit == 1){
+		    ld_hit++;
+		}
+		else{
+		    ld_miss++;
+		}
+	   }
+	   else{
+		ld_miss++;
+	   }
+	}else {
+	   //store functionality here
+	    if (cache[index].tag == checkedTag) {
+		if (cache[index].dirty_bit == 0 && cache[index].valid_bit == 1){
+		    st_hit++;
+		}
+		else{
+		    st_miss++;
+		}
+	   }
+	   else{
+		st_miss++;
+	   }
 
-      // Check allocation
-      if (cache[k][l] == NULL)
-      {
-        fprintf(stderr, "malloc failed at set %d, way %d\n", k, l);
-        exit(1);
-      }
-    }
-  }
-
-  // Now we to work on calculating the index and the tag, we don't really need the offset but we'll calc that as well
-  int indexBits = log2(sets); //should be 10
-  int offsetBits = log2(blocksize_bytes); //should be 4
-  int tagBits = 32 - (indexBits + offsetBits); //the rest of the address is the tag
-
-  printf("indexBits: %d  || offsetBits: %d || tagBits: %d\n", indexBits, offsetBits, tagBits);
-
-  // Stat Vars
-  int hitCount_load = 0;
-  int missCount_load = 0;
-  int hitCount_store = 0;
-  int missCount_store = 0;
-  long instructionsParsed = 0;
-  long memAccess = 0;
- // int executionTime = 0; // this isn't used rn
-  long totalCycles = 0;
- // int executionTime = 0;
-					  
-
-  // Now lets build our simple LRU eviction data structure
-  
-  
-
-  while (scanf("%c %d %lx %d\n", &marker, &loadstore, &address, &icount) != EOF)
-  {
-
-    /////////////////////////////////////////////////////////////////////////////////////
-    // So now we know that our marker, loadstore, address, and instruction count are updated here:
-
-    // In terms of logic distribution, for loads are reads - load from memory and stores will be writes - store into memory
-    // When reading all we need to do is read the cache, if it is either a hit or miss, all we do is update the stats
-
-    int index = (address >> offsetBits) & ((1U << indexBits) - 1);
-    //this draws the index from the address
-    //address >> offsetBits is taking away the offset bits
-    // 1U <<indexBits is LSL'ing an unsigned number 1 by indexbits (a number)
-    //subtract one and now you have a mask of 1s exactly indexBits wide
-    //and that and you'll get the lowest indexBits number of bits, aka the index
-
-
-
-
-    // With our checked tag, we need to bit mask the top x bits
-    int checkedTag = address & (~0U << (32 - tagBits));
-    //~0U is a 32 bit number all 1s
-    //LSL that all one number by everything but the tag and now
-    //you have the top tag bits are 1s and the rest are zeros
-
-
-
-    memAccess++; //mem access is the number of load stores aka number of lines in the trace
-
-//	totalCycles+=icount;	abhhi's attempt at total cycles rn
-
-
-    instructionsParsed += icount;
-
-    if (loadstore == 0) { //this means we are reading
-      // This means all we have to do is look into memory and see if its a hit
-      //printf("%d\n", index);
-
-      // First we need to loop through the right set to make sure the tag exists:
-      for (int search = 0; search < associativity; search++) //useless for loop, should only happen once
-      {
-        //totalCycles += miss_penalty;
-        // Now we look for the tags and make sure they good
-        if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
-	//again this search thing is just overcomplicating it
-        {
-          hitCount_load++;
-          //totalCycles++;
-        }
-        else
-        {
-
-          if (cache[index][search]->valid && cache[index][search]->dirty)
-        {    totalCycles += miss_penalty + 2; // dirty eviction
 	}
-	//need to recap on difference between dirty and clean eviction
+     }
 
-          else
-         {   totalCycles += miss_penalty; // clean eviction
+    printf("load_misses %d\n", ld_miss);
+    printf("store_misses %d\n", st_miss);
+    printf("load_hits %d\n", ld_hit);
+    printf("store_hits %d\n", st_hit);
 
-          cache[index][search]->tag = checkedTag;
-          cache[index][search]->valid = 1; //we fetched so go again and say the data is valid and
-					//put the tag as the current address' tag
-          missCount_load++;
-        }
-      }
-    }
-
-
-    }
-    else { //code for if ldstr value in trace line is not 0 (aka this is for stors)
-      for (int search = 0; search < associativity; search++)
-      {
-
-        // Now we look for the tags and make sure they good
-        if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
-        {
-		  //totalCycles++;
-          hitCount_store++;
-          cache[index][search]->dirty = 1; 
-        }
-        else
-        {
-
-	   if (cache[index][search]->valid && cache[index][search]->dirty)
-            totalCycles += miss_penalty+2; // dirty eviction
-        else
-            totalCycles += miss_penalty; // clean eviction
-
-          cache[index][search]->tag = checkedTag;
-          cache[index][search]->valid = 1; 
-          missCount_store++;
-        }
-      }
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////
+    return 0;
   }
-  // Here is where you want to print out stats
-  printf("Lines found = %i \n", i);
-  printf("Simulation results:\n");
-  //  Use your simulator to output the following statistics.  The
-  //  print statements are provided, just replace the question marks with
-  //  your calcuations.
 
-  // printf("\texecution time %ld cycles\n", ?);
-  printf("execution time %ld cycles\n", totalCycles);
-  printf("instructions %ld\n", instructionsParsed);
-  printf("tmemory accesses %ld\n", memAccess);
-  printf("overall miss rate %.2f\n", ((double)(missCount_load + missCount_store) / memAccess));
-  printf("read miss rate %.2f\n", ((double)(missCount_load) / (missCount_load + hitCount_load)));
-  //printf("memory CPI %.2f\n", ?);
-  // printf("\ttotal CPI %.2f\n", ?);
-  // printf("\taverage memory access time %.2f cycles\n",  ?);
-  // printf("dirty evictions %d\n", ?);
-  printf("load_misses %d\n", missCount_load);
-  printf("store_misses %d\n", missCount_store);
-  printf("load_hits %d\n", hitCount_load);
-  printf("store_hits %d\n", hitCount_store);
-
-  return 0;
-}
