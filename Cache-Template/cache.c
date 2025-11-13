@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <winsock2.h> //For windows compilation
-#include <ws2tcpip.h> //For windows compilation
+//#include <winsock2.h> //For windows compilation
+//#include <ws2tcpip.h> //For windows compilation
 #include <math.h>
 
 int associativity = 1;    // Associativity of cache
