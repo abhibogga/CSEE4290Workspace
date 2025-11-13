@@ -135,10 +135,9 @@ int main(int argc, char *argv[])
   int instructionsParsed = 0;
   int memAccess = 0;
   int executionTime = 0;
+  int totalCycles = 0;
 
   // Now lets build our simple LRU eviction data structure
-  
-  
 
   while (scanf("%c %d %lx %d\n", &marker, &loadstore, &address, &icount) != EOF)
   {
@@ -155,38 +154,61 @@ int main(int argc, char *argv[])
     int checkedTag = address & (~0U << (32 - tagBits));
 
     memAccess++;
+    totalCycles+=icount;
     instructionsParsed += icount;
-    if (loadstore == 0) { //this means we are reading
+    if (loadstore == 0)
+    { // this means we are reading
       // This means all we have to do is look into memory and see if its a hit
-      //printf("%d\n", index);
+      // printf("%d\n", index);
 
-      //First we need to loop through the right set to make sure the tag exists:
-      for(int search = 0; search < associativity; search++) {
-
-        //Now we look for the tags and make sure they good
-        if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1) {
+      // First we need to loop through the right set to make sure the tag exists:
+      for (int search = 0; search < associativity; search++)
+      {
+        //totalCycles += miss_penalty;
+        // Now we look for the tags and make sure they good
+        if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
+        {
           hitCount_load++;
-        } else {
+          //totalCycles++;
+        }
+        else
+        {
+
+          if (cache[index][search]->valid && cache[index][search]->dirty)
+            totalCycles += miss_penalty + 2; // dirty eviction
+          else
+            totalCycles += miss_penalty; // clean eviction
+
           cache[index][search]->tag = checkedTag;
           cache[index][search]->valid = 1;
           missCount_load++;
+          
         }
       }
-
-    } else { //code for store or write commands
+    }
+    else
+    { // code for store or write commands
       for (int search = 0; search < associativity; search++)
       {
 
         // Now we look for the tags and make sure they good
         if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
         {
+          //totalCycles++;
           hitCount_store++;
-          cache[index][search]->dirty = 1; 
+          cache[index][search]->dirty = 1;
         }
         else
         {
+
+          if (cache[index][search]->valid && cache[index][search]->dirty)
+            totalCycles += miss_penalty+2; // dirty eviction
+          else
+            totalCycles += miss_penalty; // clean eviction
+
+
           cache[index][search]->tag = checkedTag;
-          cache[index][search]->valid = 1; 
+          cache[index][search]->valid = 1;
           missCount_store++;
         }
       }
@@ -201,15 +223,15 @@ int main(int argc, char *argv[])
   //  print statements are provided, just replace the question marks with
   //  your calcuations.
 
-  // printf("\texecution time %ld cycles\n", ?);
+  printf("execution time %ld cycles\n", totalCycles);
   printf("instructions %ld\n", instructionsParsed);
   printf("tmemory accesses %ld\n", memAccess);
   printf("overall miss rate %.2f\n", ((double)(missCount_load + missCount_store) / memAccess));
   printf("read miss rate %.2f\n", ((double)(missCount_load) / (missCount_load + hitCount_load)));
-  //printf("memory CPI %.2f\n", ?);
-  // printf("\ttotal CPI %.2f\n", ?);
-  // printf("\taverage memory access time %.2f cycles\n",  ?);
-  // printf("dirty evictions %d\n", ?);
+  // printf("memory CPI %.2f\n", ?);
+  //  printf("\ttotal CPI %.2f\n", ?);
+  //  printf("\taverage memory access time %.2f cycles\n",  ?);
+  //  printf("dirty evictions %d\n", ?);
   printf("load_misses %d\n", missCount_load);
   printf("store_misses %d\n", missCount_store);
   printf("load_hits %d\n", hitCount_load);
