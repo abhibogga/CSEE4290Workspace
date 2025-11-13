@@ -192,10 +192,13 @@ int main(int argc, char *argv[])
   printf("memory accesses %d\n", memAccess);
   printf("overall miss rate %.2f\n", ((double)(missCount_load + missCount_store) / (double)memAccess));
   printf("read miss rate %.2f\n", ((double)(missCount_load) / (double)(missCount_load + hitCount_load)));
+  printf("memory cpi %.2f\n",((double)memAccess / (double)instructionsParsed) * ((double)(missCount_load + missCount_store) / memAccess) * miss_penalty);
+  printf("total cpi %.2f\n", (1+((double)memAccess / (double)instructionsParsed) * ((double)(missCount_load + missCount_store) / memAccess) * miss_penalty)); //Here we assume ideal CPI = 1
   printf("load_misses %d\n", missCount_load);
   printf("store_misses %d\n", missCount_store);
   printf("load_hits %d\n", hitCount_load);
   printf("store_hits %d\n", hitCount_store);
+  
 
   return 0;
 }
