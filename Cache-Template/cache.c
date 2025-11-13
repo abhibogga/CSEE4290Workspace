@@ -132,9 +132,9 @@ int main(int argc, char *argv[])
   int missCount_load = 0;
   int hitCount_store = 0;
   int missCount_store = 0;
-  int instructionsParsed = 0;
-  int memAccess = 0;
-  int executionTime = 0;
+  long instructionsParsed = 0;
+  long memAccess = 0;
+ // int executionTime = 0;
 
   // Now lets build our simple LRU eviction data structure
   
