@@ -84,33 +84,41 @@ int main(int argc, char *argv[])
 
   // This will work as a 2D array - Blocks exist within WAYS and WAYS exist within sets
 
-  int cacheLines = (cachesize_kb * 1024) / blocksize_bytes; // This gives us the amount of cache lines needed for each way
+  int amt_blocks = (cachesize_kb * 1024) / blocksize_bytes; // This gives us the amount of cache lines needed for each way
 //                 amount of bytes       / blocksize_bytes = #blocks in cache
 
 
-  int sets = cacheLines / associativity;
-  // should only be 1 right now
-  struct cacheLine
+  int sets = amt_blocks / associativity;
+  // sets should be amt_blocks rn
+
+  struct cacheBlock
   {
     int dirty;
     int tag;
-
-    int valid;
+    int valid; //parameters for the cacheblock struct
   };
+//can instantiate this struct later and assign parameters to the object
+  struct cacheBlock *cache[sets][associativity];
+  //just saying cacheBlock = cacheblock
 
-  struct cacheLine *cache[sets][associativity];
 
   // Lets allocate space in memory for this cache:
-  for (int k = 0; k < sets; k++)
+  for (int k = 0; k < sets; k++) //k is initialized right here
+  //increment k for the number of blocks
   {
-    for (int l = 0; l < associativity; l++)
+    for (int l = 0; l < associativity; l++) //should only do it once bc direct
     {
 
       // Allocate space for one integer (or a block)
-      cache[k][l] = malloc(sizeof(struct cacheLine));
+	//I assume this is initializing the cache ???
+      cache[k][l] = malloc(sizeof(struct cacheBlock));
       cache[k][l]->valid = 0;
       cache[k][l]->dirty = 0;
-      cache[k][l]->tag = -1;
+      cache[k][l]->tag = -1; //why is the tag -1? 
+
+	//the l can be ignored...think of it like cache[k], where
+	//is the number block
+
 
       // Check allocation
       if (cache[k][l] == NULL)
@@ -122,10 +130,9 @@ int main(int argc, char *argv[])
   }
 
   // Now we to work on calculating the index and the tag, we don't really need the offset but we'll calc that as well
-  int indexBits = log2(sets);
-  int offsetBits = log2(blocksize_bytes);
-
-  int tagBits = 32 - (indexBits + offsetBits);
+  int indexBits = log2(sets); //should be 10
+  int offsetBits = log2(blocksize_bytes); //should be 4
+  int tagBits = 32 - (indexBits + offsetBits); //the rest of the address is the tag
 
   printf("indexBits: %d  || offsetBits: %d || tagBits: %d\n", indexBits, offsetBits, tagBits);
 
@@ -155,28 +162,41 @@ int main(int argc, char *argv[])
     // When reading all we need to do is read the cache, if it is either a hit or miss, all we do is update the stats
 
     int index = (address >> offsetBits) & ((1U << indexBits) - 1);
+    //this draws the index from the address
+    //address >> offsetBits is taking away the offset bits
+    // 1U <<indexBits is LSL'ing an unsigned number 1 by indexbits (a number)
+    //subtract one and now you have a mask of 1s exactly indexBits wide
+    //and that and you'll get the lowest indexBits number of bits, aka the index
+
+
+
 
     // With our checked tag, we need to bit mask the top x bits
     int checkedTag = address & (~0U << (32 - tagBits));
+    //~0U is a 32 bit number all 1s
+    //LSL that all one number by everything but the tag and now
+    //you have the top tag bits are 1s and the rest are zeros
 
-    memAccess++;
-//	totalCycles+=icount;	abhhi's attempt at total cycles rn			
+
+
+    memAccess++; //mem access is the number of load stores aka number of lines in the trace
+
+//	totalCycles+=icount;	abhhi's attempt at total cycles rn
+
+
     instructionsParsed += icount;
-					   
+
     if (loadstore == 0) { //this means we are reading
       // This means all we have to do is look into memory and see if its a hit
       //printf("%d\n", index);
 
-      //First we need to loop through the right set to make sure the tag exists:
-      for(int search = 0; search < associativity; search++) {
-									
-	
       // First we need to loop through the right set to make sure the tag exists:
-      for (int search = 0; search < associativity; search++)
+      for (int search = 0; search < associativity; search++) //useless for loop, should only happen once
       {
         //totalCycles += miss_penalty;
         // Now we look for the tags and make sure they good
         if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
+	//again this search thing is just overcomplicating it
         {
           hitCount_load++;
           //totalCycles++;
@@ -185,25 +205,31 @@ int main(int argc, char *argv[])
         {
 
           if (cache[index][search]->valid && cache[index][search]->dirty)
-            totalCycles += miss_penalty + 2; // dirty eviction
+        {    totalCycles += miss_penalty + 2; // dirty eviction
+	}
+	//need to recap on difference between dirty and clean eviction
+
           else
-            totalCycles += miss_penalty; // clean eviction
+         {   totalCycles += miss_penalty; // clean eviction
 
           cache[index][search]->tag = checkedTag;
-          cache[index][search]->valid = 1;
+          cache[index][search]->valid = 1; //we fetched so go again and say the data is valid and
+					//put the tag as the current address' tag
           missCount_load++;
-          
         }
       }
     }
-    }else { //code for store or write commands
+
+
+    }
+    else { //code for if ldstr value in trace line is not 0 (aka this is for stors)
       for (int search = 0; search < associativity; search++)
       {
 
         // Now we look for the tags and make sure they good
         if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
         {
-		  //totalCycles++;				  
+		  //totalCycles++;
           hitCount_store++;
           cache[index][search]->dirty = 1; 
         }
