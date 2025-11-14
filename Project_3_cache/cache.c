@@ -122,6 +122,7 @@ int main(int argc, char *argv[])
   int instructionsParsed = 0;
   int memAccess = 0;
   long totalCycles = 0;
+  int dirtyEvictions = 0;
 
   // Cache simulation loop
   while (scanf(" %c %d %lx %d", &marker, &loadstore, &address, &icount) != EOF)
@@ -145,7 +146,10 @@ int main(int argc, char *argv[])
         else
         {
           if (cache[index][search]->valid && cache[index][search]->dirty)
+          {
             totalCycles += miss_penalty + 2;
+            dirtyEvictions += 1;
+          }
           else
             totalCycles += miss_penalty;
 
@@ -170,7 +174,10 @@ int main(int argc, char *argv[])
         else
         {
           if (cache[index][search]->valid && cache[index][search]->dirty)
+          {
             totalCycles += miss_penalty + 2;
+            dirtyEvictions += 1;
+          }
           else
             totalCycles += miss_penalty;
 
@@ -194,7 +201,8 @@ int main(int argc, char *argv[])
   printf("read miss rate %.2f\n", ((double)(missCount_load) / (double)(missCount_load + hitCount_load)));
   printf("memory cpi %.2f\n", ((double)totalCycles / (double)instructionsParsed) - 1);  //Assume ideal cache hit = 1 cycle
   printf("total cpi %.2f\n", (double)totalCycles / (double)instructionsParsed); //TOTAL CPI
-  printf("avg memory access time %.2f\n", 1.0 + (((double)(missCount_load + missCount_store) / memAccess) * miss_penalty));
+  printf("avg memory access time %.2f\n", 1.0 + (((double)(missCount_load + missCount_store) / memAccess) * miss_penalty)); //Assumed ideal cache hit as well
+  printf("dirty evitions %d\n", dirtyEvictions);
   printf("load_misses %d\n", missCount_load);
   printf("store_misses %d\n", missCount_store);
   printf("load_hits %d\n", hitCount_load);
