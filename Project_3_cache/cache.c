@@ -191,6 +191,7 @@ int main(int argc, char *argv[])
     }
   }
 
+
   printf("Lines found = %i \n", i);
   printf("Simulation results:\n");
 
@@ -201,7 +202,7 @@ int main(int argc, char *argv[])
   printf("read miss rate %.2f\n", ((double)(missCount_load) / (double)(missCount_load + hitCount_load)));
   printf("memory cpi %.2f\n", ((double)totalCycles / (double)instructionsParsed) - 1);  //Assume ideal cache hit = 1 cycle
   printf("total cpi %.2f\n", (double)totalCycles / (double)instructionsParsed); //TOTAL CPI
-  printf("avg memory access time %.2f\n", 1.0 + (((double)(missCount_load + missCount_store) / memAccess) * miss_penalty)); //Assumed ideal cache hit as well
+  printf("avg memory access time %.2f\n", (float)(((missCount_load + missCount_store) * miss_penalty) + (dirtyEvictions * 2)) / memAccess); //Help from Group 3
   printf("dirty evitions %d\n", dirtyEvictions);
   printf("load_misses %d\n", missCount_load);
   printf("store_misses %d\n", missCount_store);
