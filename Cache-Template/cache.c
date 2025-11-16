@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
   char marker;
 
   //initializing incrementers
-//  int i = 0; not used rn for some reason
+  // int i = 0; // <-- Removed, was unused
   int j = 1;
 
   //replace the 4 params if they were set by user
@@ -85,16 +85,16 @@ int main(int argc, char *argv[])
 
   //calculate number of blocks, aka number of lines in the cache
   //each line in cache holds 1 block
-  int total_lines = (cachesize_kb * 1024);
+  int total_lines = (cachesize_kb * 1024); // <-- LOGICAL ERROR HERE
 
   //make one cache line
   struct cache_line {
-     int dirty_bit;
-     int valid_bit;
-     int tag;
-     /*we don't need to put data because we don't care about that. only addresses
-     we don't need to put index because index simply acts as a pointer.
-     Index is not stored in the cache */
+      int dirty_bit;
+      int valid_bit;
+      int tag;
+      /*we don't need to put data because we don't care about that. only addresses
+      we don't need to put index because index simply acts as a pointer.
+      Index is not stored in the cache */
   };
 
   //make cache array
@@ -102,68 +102,69 @@ int main(int argc, char *argv[])
   cache = malloc(total_lines * sizeof(struct cache_line));
 //cache = total number of rows x total number of columns
 
-  for (int k = 0; k < total_lines; k++) { //go through each line in trace
-     //initialize cache params
-     cache[k].dirty_bit = 0;
-     cache[k].valid_bit = 0;
-     cache[k].tag = -1;
-     //come back to put in error print statement if needed
+  for (int k = 0; k < total_lines; k++) { //go through each line in trace // <-- LOGICAL ERROR HERE (structure)
+    //initialize cache params
+    cache[k].dirty_bit = 0;
+    cache[k].valid_bit = 0;
+    cache[k].tag = -1;
+    //come back to put in error print statement if needed
 
-     //set index, offset, tag size
-     int index_size = log2(total_lines);
-     int offset_size = log2(blocksize_bytes);
-     int tag_size = 32 - (index_size + offset_size);
+    //set index, offset, tag size
+    int index_size = log2(total_lines); // <-- LOGICAL ERROR HERE
+    int offset_size = log2(blocksize_bytes);
+    int tag_size = 32 - (index_size + offset_size);
 
-     //set desired statistics
-     int ld_hit = 0;
-     int ld_miss = 0;
-     int st_hit = 0;
-     int st_miss = 0;
-     long instructionsParsed = 0;
-     long memAccess = 0;
-  //   long totalCycle = 0; //COME BACK TO FINISH THIS
-			  //CAN'T WE PUT THIS STUFF BEFORE THE FOR LOOP??
+    //set desired statistics
+    int ld_hit = 0; // <-- LOGICAL ERROR HERE (placement)
+    int ld_miss = 0;
+    int st_hit = 0;
+    int st_miss = 0;
+    long instructionsParsed = 0;
+    long memAccess = 0;
+//    long totalCycle = 0; //COME BACK TO FINISH THIS
 
-     while (scanf("%c %d %lx %d\n", &marker, &loadstore, &address, &icount) != EOF){
-	int index = (address >> offset_size) & ((1U << index_size) - 1);
-	int checkedTag = address & (~0U << (32 - tag_size));
-	memAccess++;
-	instructionsParsed += icount;
-	if (loadstore == 0){
-	   //load functionality here
-	   if (cache[index].tag == checkedTag) {
-		if (cache[index].dirty_bit == 0 && cache[index].valid_bit == 1){
-		    ld_hit++;
-		}
-		else{
-		    ld_miss++;
-		}
-	   }
-	   else{
-		ld_miss++;
-	   }
-	}else {
-	   //store functionality here
-	    if (cache[index].tag == checkedTag) {
-		if (cache[index].dirty_bit == 0 && cache[index].valid_bit == 1){
-		    st_hit++;
-		}
-		else{
-		    st_miss++;
-		}
-	   }
-	   else{
-		st_miss++;
-	   }
-
-	}
-     }
+    while (scanf("%c %d %lx %d\n", &marker, &loadstore, &address, &icount) != EOF){
+      int index = (address >> offset_size) & ((1U << index_size) - 1);
+      // FIXED SYNTAX ERROR ON LINE BELOW (was tagBits)
+      int checkedTag = address & (~0U << (32 - tag_size));
+      memAccess++;
+      instructionsParsed += icount;
+      if (loadstore == 0){
+        //load functionality here
+        if (cache[index].tag == checkedTag) { // <-- LOGICAL ERROR HERE (hit logic)
+          if (cache[index].dirty_bit == 0 && cache[index].valid_bit == 1){
+              ld_hit++;
+          }
+          else{
+              ld_miss++;
+          }
+        }
+        else{
+          ld_miss++;
+        }
+      }else {
+        //store functionality here
+        if (cache[index].tag == checkedTag) { // <-- LOGICAL ERROR HERE (hit logic)
+          if (cache[index].dirty_bit == 0 && cache[index].valid_bit == 1){
+              st_hit++;
+          }
+          else{
+              st_miss++;
+          }
+        }
+        else{
+          st_miss++;
+        }
+      }
+    }
 
     printf("load_misses %d\n", ld_miss);
     printf("store_misses %d\n", st_miss);
     printf("load_hits %d\n", ld_hit);
     printf("store_hits %d\n", st_hit);
 
-    return 0;
+    return 0; // <-- LOGICAL ERROR HERE (placement)
   }
-}
+  
+  return 0; // This return is technically never reached, but main should return int
+} // <-- ADDED MISSING BRACE TO CLOSE main()
