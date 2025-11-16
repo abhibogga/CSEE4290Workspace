@@ -1,17 +1,16 @@
-//include stuff
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+//#include <winsock2.h> //For windows compilation
+//#include <ws2tcpip.h> //For windows compilation
 #include <math.h>
 
-//set 4 main params
-int associativity = 1;
-int blocksize_bytes = 16;
-int cachesize_kb = 16;
+int associativity = 1;    // Associativity of cache
+int blocksize_bytes = 16; // Cache Block size in bytes
+int cachesize_kb = 16;    // Cache size in KB
 int miss_penalty = 30;
 
-//print usage block for input params
-void print_usage()
+void print_usage(void)
 {
   printf("Usage: gunzip2 -c <tracefile> | ./cache -a <assoc> -l <blksz> -s <size> -mp <mispen>\n");
   printf("  <tracefile>: The memory trace file\n");
@@ -22,19 +21,16 @@ void print_usage()
   exit(0);
 }
 
-//main function
 int main(int argc, char *argv[])
 {
-  //defining parts of each line of the trace
-  long address;
-  int loadstore, icount;
-  char marker;
+  unsigned long address = 0; // use unsigned long for shifts and bit masking
+  int loadstore = 0, icount = 0;
+  char marker = 0;
 
-  //initializing incrementers
-  // int i = 0; // <-- Removed, was unused
+  int i = 0;
   int j = 1;
 
-  //replace the 4 params if they were set by user
+  // Process the command line arguments
   while (j < argc)
   {
     if (strcmp("-a", argv[j]) == 0)
@@ -75,7 +71,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  // print out 4 main cache params
+  // print out cache configuration
   printf("Cache parameters:\n");
   printf("Cache Size (KB)\t\t\t%d\n", cachesize_kb);
   printf("Cache Associativity\t\t%d\n", associativity);
@@ -83,88 +79,137 @@ int main(int argc, char *argv[])
   printf("Miss penalty (cyc)\t\t%d\n", miss_penalty);
   printf("\n");
 
-  //calculate number of blocks, aka number of lines in the cache
-  //each line in cache holds 1 block
-  int total_lines = (cachesize_kb * 1024); // <-- LOGICAL ERROR HERE
+  int cacheLines = (cachesize_kb * 1024) / blocksize_bytes; // total cache lines
+  int sets = cacheLines / associativity;
 
-  //make one cache line
-  struct cache_line {
-      int dirty_bit;
-      int valid_bit;
-      int tag;
-      /*we don't need to put data because we don't care about that. only addresses
-      we don't need to put index because index simply acts as a pointer.
-      Index is not stored in the cache */
+  struct cacheLine
+  {
+    int dirty;
+    int tag;
+    int valid;
   };
 
-  //make cache array
-  struct cache_line *cache;
-  cache = malloc(total_lines * sizeof(struct cache_line));
-//cache = total number of rows x total number of columns
+  struct cacheLine *cache[sets][associativity];
 
-  for (int k = 0; k < total_lines; k++) { //go through each line in trace // <-- LOGICAL ERROR HERE (structure)
-    //initialize cache params
-    cache[k].dirty_bit = 0;
-    cache[k].valid_bit = 0;
-    cache[k].tag = -1;
-    //come back to put in error print statement if needed
+  // Allocate cache lines
+  for (int k = 0; k < sets; k++)
+  {
+    for (int l = 0; l < associativity; l++)
+    {
+      cache[k][l] = (struct cacheLine *)malloc(sizeof(struct cacheLine));
+      if (cache[k][l] == NULL)
+      {
+        fprintf(stderr, "malloc failed at set %d, way %d\n", k, l);
+        exit(1);
+      }
+      cache[k][l]->valid = 0;
+      cache[k][l]->dirty = 0;
+      cache[k][l]->tag = -1;
+    }
+  }
 
-    //set index, offset, tag size
-    int index_size = log2(total_lines); // <-- LOGICAL ERROR HERE
-    int offset_size = log2(blocksize_bytes);
-    int tag_size = 32 - (index_size + offset_size);
+  int indexBits = (int)log2((double)sets);
+  int offsetBits = (int)log2((double)blocksize_bytes);
+  int tagBits = 32 - (indexBits + offsetBits);
 
-    //set desired statistics
-    int ld_hit = 0; // <-- LOGICAL ERROR HERE (placement)
-    int ld_miss = 0;
-    int st_hit = 0;
-    int st_miss = 0;
-    long instructionsParsed = 0;
-    long memAccess = 0;
-//    long totalCycle = 0; //COME BACK TO FINISH THIS
+  printf("indexBits: %d  || offsetBits: %d || tagBits: %d\n", indexBits, offsetBits, tagBits);
 
-    while (scanf("%c %d %lx %d\n", &marker, &loadstore, &address, &icount) != EOF){
-      int index = (address >> offset_size) & ((1U << index_size) - 1);
-      // FIXED SYNTAX ERROR ON LINE BELOW (was tagBits)
-      int checkedTag = address & (~0U << (32 - tag_size));
-      memAccess++;
-      instructionsParsed += icount;
-      if (loadstore == 0){
-        //load functionality here
-        if (cache[index].tag == checkedTag) { // <-- LOGICAL ERROR HERE (hit logic)
-          if (cache[index].dirty_bit == 0 && cache[index].valid_bit == 1){
-              ld_hit++;
-          }
-          else{
-              ld_miss++;
-          }
+  // Stat Vars
+  int hitCount_load = 0;
+  int missCount_load = 0;
+  int hitCount_store = 0;
+  int missCount_store = 0;
+  int instructionsParsed = 0;
+  int memAccess = 0;
+  long totalCycles = 0;
+  int dirtyEvictions = 0;
+
+  // Cache simulation loop
+  while (scanf(" %c %d %lx %d", &marker, &loadstore, &address, &icount) != EOF)
+  {
+    int index = (int)((address >> offsetBits) & ((1UL << indexBits) - 1));
+    int checkedTag = (int)(address >> (indexBits + offsetBits));
+
+    memAccess++;
+    totalCycles += icount;
+    instructionsParsed += icount;
+
+    if (loadstore == 0)
+    { // LOAD
+      for (int search = 0; search < associativity; search++)
+      {
+        if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
+        {
+          hitCount_load++;
+          break;
         }
-        else{
-          ld_miss++;
-        }
-      }else {
-        //store functionality here
-        if (cache[index].tag == checkedTag) { // <-- LOGICAL ERROR HERE (hit logic)
-          if (cache[index].dirty_bit == 0 && cache[index].valid_bit == 1){
-              st_hit++;
+        else
+        {
+          if (cache[index][search]->valid && cache[index][search]->dirty)
+          {
+            totalCycles += miss_penalty + 2;
+            dirtyEvictions += 1;
           }
-          else{
-              st_miss++;
-          }
-        }
-        else{
-          st_miss++;
+          else
+            totalCycles += miss_penalty;
+
+          cache[index][search]->tag = checkedTag;
+          cache[index][search]->valid = 1;
+          cache[index][search]->dirty = 0;
+          missCount_load++;
+          break;
         }
       }
     }
+    else
+    { // STORE
+      for (int search = 0; search < associativity; search++)
+      {
+        if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
+        {
+          hitCount_store++;
+          cache[index][search]->dirty = 1;
+          break;
+        }
+        else
+        {
+          if (cache[index][search]->valid && cache[index][search]->dirty)
+          {
+            totalCycles += miss_penalty + 2;
+            dirtyEvictions += 1;
+          }
+          else
+            totalCycles += miss_penalty;
 
-    printf("load_misses %d\n", ld_miss);
-    printf("store_misses %d\n", st_miss);
-    printf("load_hits %d\n", ld_hit);
-    printf("store_hits %d\n", st_hit);
-
-    return 0; // <-- LOGICAL ERROR HERE (placement)
+          cache[index][search]->tag = checkedTag;
+          cache[index][search]->valid = 1;
+          cache[index][search]->dirty = 1;
+          missCount_store++;
+          break;
+        }
+      }
+    }
   }
+
+
+  printf("Lines found = %i \n", i);
+  printf("Simulation results:\n");
+
+  printf("execution time %ld cycles\n", totalCycles);
+  printf("instructions %d\n", instructionsParsed);
+  printf("memory accesses %d\n", memAccess);
+  printf("overall miss rate %.2f\n", ((double)(missCount_load + missCount_store) / (double)memAccess));
+  printf("read miss rate %.2f\n", ((double)(missCount_load) / (double)(missCount_load + hitCount_load)));
+  printf("memory cpi %.2f\n", ((double)totalCycles / (double)instructionsParsed) - 1);  //Assume ideal cache hit = 1 cycle
+  printf("total cpi %.2f\n", (double)totalCycles / (double)instructionsParsed); //TOTAL CPI
+  printf("avg memory access time %.2f\n", (float)(((missCount_load + missCount_store) * miss_penalty) + (dirtyEvictions * 2)) / memAccess); //Help from Group 3
+  printf("dirty evitions %d\n", dirtyEvictions);
+  printf("load_misses %d\n", missCount_load);
+  printf("store_misses %d\n", missCount_store);
+  printf("load_hits %d\n", hitCount_load);
+  printf("store_hits %d\n", hitCount_store);
+
   
-  return 0; // This return is technically never reached, but main should return int
-} // <-- ADDED MISSING BRACE TO CLOSE main()
+
+  return 0;
+}
