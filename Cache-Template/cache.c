@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
   char marker;
 
   //initializing incrementers
-  int i = 0;
+//  int i = 0; not used rn for some reason
   int j = 1;
 
   //replace the 4 params if they were set by user
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
   //make cache array
   struct cache_line *cache;
-  cache = malloc(total_lines * sizeof(struct cache_line);
+  cache = malloc(total_lines * sizeof(struct cache_line));
 //cache = total number of rows x total number of columns
 
   for (int k = 0; k < total_lines; k++) { //go through each line in trace
@@ -121,12 +121,12 @@ int main(int argc, char *argv[])
      int st_miss = 0;
      long instructionsParsed = 0;
      long memAccess = 0;
-     long totalCycle = 0; //COME BACK TO FINISH THIS
+  //   long totalCycle = 0; //COME BACK TO FINISH THIS
 			  //CAN'T WE PUT THIS STUFF BEFORE THE FOR LOOP??
 
      while (scanf("%c %d %lx %d\n", &marker, &loadstore, &address, &icount) != EOF){
 	int index = (address >> offset_size) & ((1U << index_size) - 1);
-	int checkedTag = address & (~0U << (32 - tagBits));
+	int checkedTag = address & (~0U << (32 - tag_size));
 	memAccess++;
 	instructionsParsed += icount;
 	if (loadstore == 0){
@@ -166,4 +166,4 @@ int main(int argc, char *argv[])
 
     return 0;
   }
-
+}
