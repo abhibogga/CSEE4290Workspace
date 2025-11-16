@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
         {
           if (cache[index][search]->valid && cache[index][search]->dirty)
           {
-            totalCycles += miss_penalty + 2;
+            totalCycles += miss_penalty + 2; //where is this +2 coming from?
             dirtyEvictions += 1;
           }
           else
@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
   printf("load_hits %d\n", hitCount_load);
   printf("store_hits %d\n", hitCount_store);
 
-  
+
 
   return 0;
 }
