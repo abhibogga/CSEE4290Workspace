@@ -152,7 +152,8 @@ int main(int argc, char *argv[])
           }
           else
             totalCycles += miss_penalty;
-
+	  //so this happens on all misses, it resets the line
+	  //and ensures it is fresh and valid at this point
           cache[index][search]->tag = checkedTag;
           cache[index][search]->valid = 1;
           cache[index][search]->dirty = 0;
@@ -192,7 +193,8 @@ int main(int argc, char *argv[])
   }
 
 
-  printf("Lines found = %i \n", i);
+//  printf("Lines found = %i \n", i);
+//commenting out above bc lines = mem accesses
   printf("Simulation results:\n");
 
   printf("execution time %ld cycles\n", totalCycles);
