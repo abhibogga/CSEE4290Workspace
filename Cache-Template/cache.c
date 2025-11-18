@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
   int loadstore = 0, icount = 0;
   char marker = 0;
 
-  int i = 0;
+//  int i = 0;
   int j = 1;
 
   // Process the command line arguments
