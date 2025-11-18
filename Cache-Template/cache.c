@@ -5,7 +5,7 @@
 //#include <ws2tcpip.h> //For windows compilation
 #include <math.h>
 
-int associativity = 1;    // Associativity of cache
+int associativity = 2;    // Associativity of cache
 int blocksize_bytes = 16; // Cache Block size in bytes
 int cachesize_kb = 16;    // Cache size in KB
 int miss_penalty = 30;
