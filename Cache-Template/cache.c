@@ -110,6 +110,7 @@ int main(int argc, char *argv[])
 
   int indexBits = (int)log2((double)sets);
   int offsetBits = (int)log2((double)blocksize_bytes);
+  //				     ^ shouldn't this block size in bits?
   int tagBits = 32 - (indexBits + offsetBits);
 
   printf("indexBits: %d  || offsetBits: %d || tagBits: %d\n", indexBits, offsetBits, tagBits);
