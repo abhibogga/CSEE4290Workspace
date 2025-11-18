@@ -142,6 +142,7 @@ int main(int argc, char *argv[])
         if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
         {
           hitCount_load++;
+	  printf("address: %lx is a load hit!\n", address);
           break;
         }
         else
@@ -150,10 +151,13 @@ int main(int argc, char *argv[])
           {
             totalCycles += miss_penalty + 2; //where is this +2 coming from?
             dirtyEvictions += 1;
+	    printf("address: %lx is a dirty load miss!\n", address);
           }
-          else
+          else{
             totalCycles += miss_penalty;
-	  //so this happens on all misses, it resets the line
+	    printf("address: %lx is a clean load miss!\n", address);
+	 } 
+	 //so this happens on all misses, it resets the line
 	  //and ensures it is fresh and valid at this point
           cache[index][search]->tag = checkedTag;
           cache[index][search]->valid = 1;
@@ -170,7 +174,8 @@ int main(int argc, char *argv[])
         if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
         {
           hitCount_store++;
-          cache[index][search]->dirty = 1;
+          cache[index][search]->dirty = 1; //write back
+	  printf("address: %lx is a store hit!\n", address);
           break;
         }
         else
@@ -179,10 +184,12 @@ int main(int argc, char *argv[])
           {
             totalCycles += miss_penalty + 2;
             dirtyEvictions += 1;
+	    printf("address: %lx is a dirty store miss!\n", address);
           }
-          else
+          else{
             totalCycles += miss_penalty;
-
+	    printf("address: %lx is a store miss!\n", address);
+	  }
           cache[index][search]->tag = checkedTag;
           cache[index][search]->valid = 1;
           cache[index][search]->dirty = 1;
