@@ -10,8 +10,6 @@ int blocksize_bytes = 32; // Cache Block size in bytes
 int cachesize_kb = 32;    // Cache size in KB
 int miss_penalty = 30;
 
-
-
 void print_usage(void)
 {
   printf("Usage: gunzip2 -c <tracefile> | ./cache -a <assoc> -l <blksz> -s <size> -mp <mispen>\n");
@@ -53,16 +51,12 @@ int findVictim(int indexOfSet, struct cacheLine **cacheLinePointer)
   for (int i = 0; i < associativity; i++)
   {
 
-    if ((cacheLinePointer[i])->uses > (cacheLinePointer[victim])->uses)
+    if ((cacheLinePointer[i])->uses < (cacheLinePointer[victim])->uses)
     {
       victim = i;
     }
   }
 
-  (cacheLinePointer[victim])->valid = 0;
-  (cacheLinePointer[victim])->tag = -1;
-  (cacheLinePointer[victim])->uses = 0;
-  (cacheLinePointer[victim])->dirty = 0;
 
   return victim; // return the pointer difference to where our victim is to evict location
 }
@@ -178,77 +172,152 @@ int main(int argc, char *argv[])
 
     if (loadstore == 0)
     { // LOAD
-      for (int search = 0; search < associativity; search++)
+
+      int hit = 0;
+      int hitWay = -1;
+
+      // First pass: check ALL ways for a hit
+      for (int w = 0; w < associativity; w++)
       {
-        if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
+
+        if (cache[index][w]->valid == 1 &&
+            cache[index][w]->tag == checkedTag)
         {
-          hitCount_load++;
-          cache[index][search]->uses = 0;
+
+          // HIT
+          hit = 1;
+          hitWay = w;
           break;
+        }
+      }
+
+      if (hit)
+      {
+        // Handle LOAD hit
+        hitCount_load++;
+        cache[index][hitWay]->uses++; // reset LRU counter
+      }
+      else
+      {
+        // MISS
+        missCount_load++;
+
+        // Check for empty slot
+        int emptyWay = -1;
+        for (int w = 0; w < associativity; w++)
+        {
+          if (cache[index][w]->valid == 0)
+          {
+            emptyWay = w;
+            break;
+          }
+        }
+
+
+        int targetWay;
+
+        if (emptyWay != -1)
+        {
+          // There is space; no eviction
+          targetWay = emptyWay;
         }
         else
         {
-          if (cache[index][search]->valid && cache[index][search]->dirty)
+          // No space → eviction
+          targetWay = findVictim(index, cache[index]);
+
+          if (cache[index][targetWay]->dirty == 1)
           {
-            totalCycles += miss_penalty + 2;
+
+            // Dirty eviction: write-back cost
+            dirtyEvictions++;
+            totalCycles += 2;
           }
-          else
-            totalCycles += miss_penalty;
-
-          cache[index][search]->tag = checkedTag;
-          cache[index][search]->valid = 1;
-          cache[index][search]->dirty = 0;
-          cache[index][search]->uses++;
-          missCount_load++;
-
-          // Check to evict
-          if (isFull(index, cache[index]) == 1)
-          {
-            // This means that we have to evict
-            dirtyEvictions += 1;
-            findVictim(index, cache[index]);
-          }
-
-          break;
         }
+
+        // Install new line
+        cache[index][targetWay]->tag = checkedTag;
+        cache[index][targetWay]->valid = 1;
+        cache[index][targetWay]->dirty = 0;
+        cache[index][targetWay]->uses = 0;
+
+        // Miss penalty timing
+        totalCycles += miss_penalty;
       }
     }
     else
     { // STORE
-      for (int search = 0; search < associativity; search++)
+
+      int hit = 0;
+      int hitWay = -1;
+
+      // First pass: check ALL ways for a hit
+      for (int w = 0; w < associativity; w++)
       {
-        if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
+
+        if (cache[index][w]->valid == 1 && cache[index][w]->tag == checkedTag)
         {
-          hitCount_store++;
-          cache[index][search]->dirty = 1;
-          cache[index][search]->uses = 0;
+
+          // HIT
+          hit = 1;
+          hitWay = w;
           break;
+        }
+      }
+
+      if (hit)
+      {
+        // STORE hit
+        hitCount_store++;
+        cache[index][hitWay]->dirty = 1; // stores make line dirty
+        cache[index][hitWay]->uses++;    // reset LRU counter
+      }
+      else
+      {
+        // STORE miss
+        missCount_store++;
+
+        // Check for empty slot
+        int emptyWay = -1;
+        for (int w = 0; w < associativity; w++)
+        {
+          if (cache[index][w]->valid == 0)
+          {
+            emptyWay = w;
+            break;
+          }
+        }
+
+        int targetWay;
+
+        if (emptyWay != -1)
+        {
+          // Use empty slot
+          targetWay = emptyWay;
         }
         else
         {
-          if (cache[index][search]->valid && cache[index][search]->dirty)
-          {
-            totalCycles += miss_penalty + 2;
-            dirtyEvictions += 1;
-          }
-          else
-            totalCycles += miss_penalty;
+          // Need eviction
 
-          cache[index][search]->tag = checkedTag;
-          cache[index][search]->valid = 1;
-          cache[index][search]->dirty = 1;
-          cache[index][search]->uses++;
-          missCount_store++;
+          targetWay = findVictim(index, cache[index]);
 
-          // Check for evictions
-          if (isFull(index, cache[index]) == 1)
+          if (cache[index][targetWay]->dirty == 1)
           {
-            // This means that we have to evict
-            dirtyEvictions += 1;
-            findVictim(index, cache[index]);
+
+            // Dirty eviction: write-back cost
+            dirtyEvictions++;
+            totalCycles += 2;
           }
-          break;
         }
+
+        // Install new line
+        cache[index][targetWay]->tag = checkedTag;
+        cache[index][targetWay]->valid = 1;
+        cache[index][targetWay]->dirty = 1; // stores make new line dirty
+        cache[index][targetWay]->uses = 0;
+
+        // Miss penalty timing
+        totalCycles += miss_penalty;
       }
     }
   }
@@ -269,6 +338,8 @@ int main(int argc, char *argv[])
   printf("store_misses %d\n", missCount_store);
   printf("load_hits %d\n", hitCount_load);
   printf("store_hits %d\n", hitCount_store);
+
+
 
   return 0;
 }
