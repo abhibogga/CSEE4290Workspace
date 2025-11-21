@@ -1,0 +1,8 @@
+Cache parameters:
+Cache Size (KB)			16
+Cache Associativity		8
+Cache Block Size (bytes)	16
+Miss penalty (cyc)		30
+
+indexBits: 7  || offsetBits: 4 || tagBits: 21
+total cpi 4.23

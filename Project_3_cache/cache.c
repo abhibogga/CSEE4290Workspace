@@ -5,12 +5,10 @@
 #include <ws2tcpip.h> //For windows compilation
 #include <math.h>
 
-int associativity = 4;    // Associativity of cache
+int associativity = 2;    // Associativity of cache
 int blocksize_bytes = 32; // Cache Block size in bytes
-int cachesize_kb = 32;    // Cache size in KB
+int cachesize_kb = 30;    // Cache size in KB
 int miss_penalty = 30;
-
-
 
 void print_usage(void)
 {
@@ -53,22 +51,19 @@ int findVictim(int indexOfSet, struct cacheLine **cacheLinePointer)
   for (int i = 0; i < associativity; i++)
   {
 
-    if ((cacheLinePointer[i])->uses > (cacheLinePointer[victim])->uses)
+    if ((cacheLinePointer[i])->uses < (cacheLinePointer[victim])->uses)
     {
       victim = i;
     }
   }
-
-  (cacheLinePointer[victim])->valid = 0;
-  (cacheLinePointer[victim])->tag = -1;
-  (cacheLinePointer[victim])->uses = 0;
-  (cacheLinePointer[victim])->dirty = 0;
 
   return victim; // return the pointer difference to where our victim is to evict location
 }
 
 int main(int argc, char *argv[])
 {
+
+
   unsigned long address = 0; // use unsigned long for shifts and bit masking
   int loadstore = 0, icount = 0;
   char marker = 0;
@@ -164,111 +159,195 @@ int main(int argc, char *argv[])
   long totalCycles = 0;
   int dirtyEvictions = 0;
 
-  // Eviction Policy
+  long global_counter = 0; // COunt whenever a line is accessed in a set
 
-  // Cache simulation loop
-  while (scanf(" %c %d %lx %d", &marker, &loadstore, &address, &icount) != EOF)
-  {
-    int index = (int)((address >> offsetBits) & ((1UL << indexBits) - 1));
-    int checkedTag = (int)(address >> (indexBits + offsetBits));
-
-    memAccess++;
-    totalCycles += icount;
-    instructionsParsed += icount;
-
-    if (loadstore == 0)
-    { // LOAD
-      for (int search = 0; search < associativity; search++)
-      {
-        if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
-        {
-          hitCount_load++;
-          cache[index][search]->uses = 0;
-          break;
-        }
-        else
-        {
-          if (cache[index][search]->valid && cache[index][search]->dirty)
-          {
-            totalCycles += miss_penalty + 2;
-          }
-          else
-            totalCycles += miss_penalty;
-
-          cache[index][search]->tag = checkedTag;
-          cache[index][search]->valid = 1;
-          cache[index][search]->dirty = 0;
-          cache[index][search]->uses++;
-          missCount_load++;
-
-          // Check to evict
-          if (isFull(index, cache[index]) == 1)
-          {
-            // This means that we have to evict
-            dirtyEvictions += 1;
-            findVictim(index, cache[index]);
-          }
-
-          break;
-        }
-      }
-    }
-    else
-    { // STORE
-      for (int search = 0; search < associativity; search++)
-      {
-        if (cache[index][search]->tag == checkedTag && cache[index][search]->valid == 1)
-        {
-          hitCount_store++;
-          cache[index][search]->dirty = 1;
-          cache[index][search]->uses = 0;
-          break;
-        }
-        else
-        {
-          if (cache[index][search]->valid && cache[index][search]->dirty)
-          {
-            totalCycles += miss_penalty + 2;
-            dirtyEvictions += 1;
-          }
-          else
-            totalCycles += miss_penalty;
-
-          cache[index][search]->tag = checkedTag;
-          cache[index][search]->valid = 1;
-          cache[index][search]->dirty = 1;
-          cache[index][search]->uses++;
-          missCount_store++;
-
-          // Check for evictions
-          if (isFull(index, cache[index]) == 1)
-          {
-            // This means that we have to evict
-            dirtyEvictions += 1;
-            findVictim(index, cache[index]);
-          }
-          break;
-        }
-      }
-    }
+  // Change miss penalty based on block size
+  if (blocksize_bytes == 32) {
+    miss_penalty += 2; 
+  } else if (blocksize_bytes == 64) {
+    miss_penalty += 6;
+  } else if (blocksize_bytes == 128) {
+    miss_penalty += 12;
   }
 
-  printf("Lines found = %i \n", i);
-  printf("Simulation results:\n");
+    // Cache simulation loop
+    while (scanf(" %c %d %lx %d", &marker, &loadstore, &address, &icount) != EOF)
+    {
+      int index = (int)((address >> offsetBits) & ((1UL << indexBits) - 1));
+      int checkedTag = (int)(address >> (indexBits + offsetBits));
+
+      memAccess++;
+      totalCycles += icount;
+      instructionsParsed += icount;
+      global_counter++; // Line is accessed in every set
+
+      if (loadstore == 0)
+      { // LOAD
+
+        int hit = 0;
+        int hitWay = -1;
+
+        // First pass: check ALL ways for a hit
+        for (int w = 0; w < associativity; w++)
+        {
+
+          if (cache[index][w]->valid == 1 &&
+              cache[index][w]->tag == checkedTag)
+          {
+
+            // HIT
+            hit = 1;
+            hitWay = w;
+            break;
+          }
+        }
+
+        if (hit)
+        {
+          // Handle LOAD hit
+          hitCount_load++;
+          cache[index][hitWay]->uses = global_counter; // Line accessed is now filled with most recently used!
+        }
+        else
+        {
+          // MISS
+          missCount_load++;
+
+          // Check for empty slot
+          int emptyWay = -1;
+          for (int w = 0; w < associativity; w++)
+          {
+            if (cache[index][w]->valid == 0)
+            {
+              emptyWay = w;
+              break;
+            }
+          }
+
+          int targetWay;
+
+          if (emptyWay != -1)
+          {
+            // There is space; no eviction
+            targetWay = emptyWay;
+          }
+          else
+          {
+            // No space → eviction
+            targetWay = findVictim(index, cache[index]);
+
+            if (cache[index][targetWay]->dirty == 1)
+            {
+
+              // Dirty eviction: write-back cost
+              dirtyEvictions++;
+              totalCycles += 2;
+            }
+          }
+
+          // Install new line
+          cache[index][targetWay]->tag = checkedTag;
+          cache[index][targetWay]->valid = 1;
+          cache[index][targetWay]->dirty = 0;
+          cache[index][targetWay]->uses = global_counter; // New line is now filled with most recently used!
+
+          // Miss penalty timing
+          totalCycles += miss_penalty;
+        }
+      }
+      else
+      { // STORE
+
+        int hit = 0;
+        int hitWay = -1;
+
+        // First pass: check ALL ways for a hit
+        for (int w = 0; w < associativity; w++)
+        {
+
+          if (cache[index][w]->valid == 1 && cache[index][w]->tag == checkedTag)
+          {
+
+            // HIT
+            hit = 1;
+            hitWay = w;
+            break;
+          }
+        }
+
+        if (hit)
+        {
+          // STORE hit
+          hitCount_store++;
+          cache[index][hitWay]->dirty = 1;             // stores make line dirty
+          cache[index][hitWay]->uses = global_counter; // Line used here is now most recently used
+        }
+        else
+        {
+          // STORE miss
+          missCount_store++;
+
+          // Check for empty slot
+          int emptyWay = -1;
+          for (int w = 0; w < associativity; w++)
+          {
+            if (cache[index][w]->valid == 0)
+            {
+              emptyWay = w;
+              break;
+            }
+          }
+
+          int targetWay;
+
+          if (emptyWay != -1)
+          {
+            // Use empty slot
+            targetWay = emptyWay;
+          }
+          else
+          {
+            // Need eviction
+
+            targetWay = findVictim(index, cache[index]);
+
+            if (cache[index][targetWay]->dirty == 1)
+            {
+
+              // Dirty eviction: write-back cost
+              dirtyEvictions++;
+              totalCycles += 2;
+            }
+          }
+
+          // Install new line
+          cache[index][targetWay]->tag = checkedTag;
+          cache[index][targetWay]->valid = 1;
+          cache[index][targetWay]->dirty = 1;             // stores make new line dirty
+          cache[index][targetWay]->uses = global_counter; // New line is now filled with most recently used!
+
+          // Miss penalty timing
+          totalCycles += miss_penalty;
+        }
+      }
+    }
+
+  //printf("Lines found = %i \n", i);
+  //printf("Simulation results:\n");
 
   printf("execution time %ld cycles\n", totalCycles);
-  printf("instructions %d\n", instructionsParsed);
-  printf("memory accesses %d\n", memAccess);
+  //printf("instructions %d\n", instructionsParsed);
+  //printf("memory accesses %d\n", memAccess);
+  printf("total cpi %.2f\n", (double)totalCycles / (double)instructionsParsed);
   printf("overall miss rate %.2f\n", ((double)(missCount_load + missCount_store) / (double)memAccess));
-  printf("read miss rate %.2f\n", ((double)(missCount_load) / (double)(missCount_load + hitCount_load)));
+  /*printf("read miss rate %.2f\n", ((double)(missCount_load) / (double)(missCount_load + hitCount_load)));
   printf("memory cpi %.2f\n", ((double)totalCycles / (double)instructionsParsed) - 1);                                                      // Assume ideal cache hit = 1 cycle
-  printf("total cpi %.2f\n", (double)totalCycles / (double)instructionsParsed);                                                             // TOTAL CPI
-  printf("avg memory access time %.2f\n", (float)(((missCount_load + missCount_store) * miss_penalty) + (dirtyEvictions * 2)) / memAccess); // Help from Group 3
+                                                               // TOTAL CPI
   printf("dirty evitions %d\n", dirtyEvictions);
   printf("load_misses %d\n", missCount_load);
   printf("store_misses %d\n", missCount_store);
   printf("load_hits %d\n", hitCount_load);
-  printf("store_hits %d\n", hitCount_store);
+  printf("store_hits %d\n", hitCount_store);*/
 
   return 0;
 }

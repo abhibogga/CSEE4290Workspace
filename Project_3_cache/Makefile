@@ -11,7 +11,7 @@ EXE=$(FILE).out
 ifeq (run,$(firstword $(MAKECMDGOALS)))
   # use the first as argument for gunzip, making sure to set a default of 'art'
   ifeq (,$(word 2, $(MAKECMDGOALS)))
-  	TRACE := art
+  	TRACE := swim
   else
 	TRACE := $(word 2, $(MAKECMDGOALS))
   endif
