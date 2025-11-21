@@ -5,4 +5,6 @@ Cache Block Size (bytes)	64
 Miss penalty (cyc)		30
 
 indexBits: 8  || offsetBits: 6 || tagBits: 18
-total cpi 3.53
+execution time 8552766 cycles
+overall miss rate 0.06
+total cpi 1.71

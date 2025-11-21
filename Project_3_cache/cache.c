@@ -6,8 +6,8 @@
 #include <math.h>
 
 int associativity = 4;    // Associativity of cache
-int blocksize_bytes = 32; // Cache Block size in bytes
-int cachesize_kb = 30;    // Cache size in KB
+int blocksize_bytes = 16; // Cache Block size in bytes
+int cachesize_kb = 16;    // Cache size in KB
 int miss_penalty = 30;
 
 void print_usage(void)
@@ -110,12 +110,15 @@ int main(int argc, char *argv[])
     }
   }
 
+  int noCache = 0;
+
   // print out cache configuration
   printf("Cache parameters:\n");
   printf("Cache Size (KB)\t\t\t%d\n", cachesize_kb);
   printf("Cache Associativity\t\t%d\n", associativity);
   printf("Cache Block Size (bytes)\t%d\n", blocksize_bytes);
   printf("Miss penalty (cyc)\t\t%d\n", miss_penalty);
+  printf("No Cache? \t\t%d\n", noCache);
   printf("\n");
 
   int cacheLines = (cachesize_kb * 1024) / blocksize_bytes; // total cache lines
@@ -159,6 +162,35 @@ int main(int argc, char *argv[])
 
   long global_counter = 0; // COunt whenever a line is accessed in a set
 
+  double blockSizePen_cache; 
+  double blockSizePen_assoc; 
+
+  //Calc the cache penalty with size increase - this is because with a large cache, it takes more cycles to pick up memory
+  if (cachesize_kb == 32) {
+    blockSizePen_cache = .05;
+  }
+  else if (cachesize_kb == 64) {
+    blockSizePen_cache = .075;
+  }
+  else if (cachesize_kb == 128) {
+    blockSizePen_cache = .15; 
+  }
+
+
+  //Calc the asssoc penalty with the size increase - this is because with more ways, we are looking up more things
+  if (associativity == 2)
+  {
+    blockSizePen_assoc = .05;
+  }
+  else if (associativity == 4)
+  {
+    blockSizePen_assoc = .075;
+  }
+  else if (associativity == 8)
+  {
+    blockSizePen_assoc = .10;
+  }
+
   // change penalty
   if (blocksize_bytes == 32)
   {
@@ -184,7 +216,7 @@ int main(int argc, char *argv[])
     instructionsParsed += icount;
     global_counter++; // Line is accessed in every set
 
-    if (loadstore == 0)
+    if (loadstore == 0 && !noCache)
     { // LOAD
 
       int hit = 0;
@@ -239,6 +271,8 @@ int main(int argc, char *argv[])
           // No space → eviction
           targetWay = findVictim(index, cache[index]);
 
+
+          
           if (cache[index][targetWay]->dirty == 1)
           {
 
@@ -246,6 +280,9 @@ int main(int argc, char *argv[])
             dirtyEvictions++;
             totalCycles += 2;
           }
+          
+
+
         }
 
         // Install new line
@@ -258,7 +295,7 @@ int main(int argc, char *argv[])
         totalCycles += miss_penalty;
       }
     }
-    else
+    else if (loadstore == 1 && !noCache)
     { // STORE
 
       int hit = 0;
@@ -332,15 +369,20 @@ int main(int argc, char *argv[])
         // Miss penalty timing
         totalCycles += miss_penalty;
       }
+    } else if (loadstore == 0 && noCache) {
+      totalCycles += miss_penalty;
+    } else if (loadstore == 1 && noCache) {
+      totalCycles += miss_penalty;
     }
   }
 
   //printf("Lines found = %i \n", i);
   //printf("Simulation results:\n");
 
-  printf("execution time %ld cycles\n", totalCycles);
-  //printf("instructions %d\n", instructionsParsed);
-  //printf("memory accesses %d\n", memAccess);
+  //printf("execution time %ld cycles\n", totalCycles);
+  printf("elapsed time %.3f ms\n", (double)totalCycles * (1.0 + blockSizePen_assoc + blockSizePen_cache) / 2000000.0);
+  // printf("instructions %d\n", instructionsParsed);
+  // printf("memory accesses %d\n", memAccess);
   printf("overall miss rate %.2f\n", ((double)(missCount_load + missCount_store) / (double)memAccess));
   //printf("read miss rate %.2f\n", ((double)(missCount_load) / (double)(missCount_load + hitCount_load)));
   //printf("memory cpi %.2f\n", ((double)totalCycles / (double)instructionsParsed) - 1);                                                      // Assume ideal cache hit = 1 cycle

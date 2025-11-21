@@ -3,7 +3,7 @@
 # -------------------------------
 # CONFIGURATION
 # -------------------------------
-TRACE="art"   # default trace unless argument is given
+TRACE="swim"   # default trace unless argument is given
 
 if [ $# -ge 1 ]; then
     TRACE="$1"
@@ -38,7 +38,7 @@ for BS in "${BLOCK_SIZES[@]}"; do
 
         # Call your Makefile's run target
         gunzip -c traces/$TRACE.trace.gz \
-            | ./cache.out -a 2 -l $BS -s $CS -mp 30 \
+            | ./cache.out -a 8 -l $BS -s $CS -mp 30 \
             | tee "$OUTPUT_FILE"
 
         echo
